@@ -1,7 +1,9 @@
 import './App.css'
 import Layout from "./components/layout/Layout"
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { MENU_ITEMS } from "@/constants/menu"
+import IndexManagement from "./app/index/page"
+import IndexAdd from "./app/index/add/page"
+import IndexView from "./app/index/view/page"
 
 function App() {
 
@@ -10,13 +12,12 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          {MENU_ITEMS.map((item) => (
-            <Route 
-              key={item.id}
-              path={item.path} 
-              element={<div>{item.title} 페이지</div>} 
-            />
-          ))}
+          <Route path="/dashboard" element={<div>dashboard</div>} />
+          <Route path="/index" element={<IndexManagement />} />
+          <Route path="/index/add" element={<IndexAdd />} />
+          <Route path="/index/view/:id" element={<IndexView />} />
+          <Route path="/dictionary" element={<div>dictionary</div>} />
+          <Route path="/search-simulator" element={<div>search-simulator</div>} />
         </Routes>
       </Layout>
     </BrowserRouter>
