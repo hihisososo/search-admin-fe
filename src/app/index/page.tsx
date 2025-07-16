@@ -191,7 +191,6 @@ export default function IndexManagement() {
                             placeholder="색인명으로 검색..." 
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                         />
                         <Button variant="outline" size="icon" onClick={handleSearch} title="검색">
                             <Search className="h-4 w-4" />

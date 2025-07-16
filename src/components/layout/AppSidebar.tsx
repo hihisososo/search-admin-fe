@@ -7,11 +7,29 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar"
-import { ScanSearch } from "lucide-react"
+import { ScanSearch, ChevronRight } from "lucide-react"
 import { MENU_ITEMS } from "@/constants/menu"
+import { useState } from "react"
+import { useLocation } from "react-router-dom"
 
 export function AppSidebar() {
+  const [expandedItems, setExpandedItems] = useState<string[]>(['dictionary'])
+  const location = useLocation()
+
+  const toggleExpanded = (itemId: string) => {
+    setExpandedItems(prev => 
+      prev.includes(itemId) 
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    )
+  }
+
+  const isExpanded = (itemId: string) => expandedItems.includes(itemId)
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -26,12 +44,38 @@ export function AppSidebar() {
             <SidebarMenu>
               {MENU_ITEMS.map((item) => (
                 <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.path}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
+                  {item.subItems ? (
+                    <>
+                      <SidebarMenuButton onClick={() => toggleExpanded(item.id)}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                        <ChevronRight className={`ml-auto transition-transform duration-200 ${isExpanded(item.id) ? 'rotate-90' : ''}`} />
+                      </SidebarMenuButton>
+                      {isExpanded(item.id) && (
+                        <SidebarMenuSub>
+                          {item.subItems.map((subItem) => (
+                            <SidebarMenuSubItem key={subItem.id}>
+                              <SidebarMenuSubButton 
+                                asChild
+                                isActive={location.pathname === subItem.path}
+                              >
+                                <a href={subItem.path}>
+                                  <span>{subItem.title}</span>
+                                </a>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      )}
+                    </>
+                  ) : (
+                    <SidebarMenuButton asChild isActive={location.pathname === item.path}>
+                      <a href={item.path}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

@@ -5,6 +5,13 @@ export interface MenuItem {
   title: string
   path: string
   icon: any
+  subItems?: SubMenuItem[]
+}
+
+export interface SubMenuItem {
+  id: string
+  title: string
+  path: string
 }
 
 export const MENU_ITEMS: MenuItem[] = [
@@ -25,6 +32,18 @@ export const MENU_ITEMS: MenuItem[] = [
     title: '사전관리',
     path: '/dictionary',
     icon: Calendar,
+    subItems: [
+      {
+        id: 'user-dictionary',
+        title: '사용자사전',
+        path: '/dictionary/user'
+      },
+      {
+        id: 'synonym-dictionary',
+        title: '유의어사전',
+        path: '/dictionary/synonym'
+      }
+    ]
   },
   {
     id: 'search-simulator',
@@ -36,7 +55,25 @@ export const MENU_ITEMS: MenuItem[] = [
 
 // 헬퍼 함수들
 export const getMenuByPath = (path: string) => {
-  return MENU_ITEMS.find(item => item.path === path)
+  // 먼저 메인 메뉴에서 찾기
+  const mainMenu = MENU_ITEMS.find(item => item.path === path)
+  if (mainMenu) return mainMenu
+
+  // 서브 메뉴에서 찾기
+  for (const item of MENU_ITEMS) {
+    if (item.subItems) {
+      const subMenu = item.subItems.find(sub => sub.path === path)
+      if (subMenu) {
+        return {
+          ...item,
+          title: subMenu.title,
+          path: subMenu.path
+        }
+      }
+    }
+  }
+  
+  return undefined
 }
 
 export const getMenuById = (id: string) => {
