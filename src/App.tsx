@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import IndexManagement from "./app/index/page"
 import IndexAdd from "./app/index/add/page"
 import IndexView from "./app/index/view/page"
+import UserDictionary from "./app/dictionary/user/page"
+import SynonymDictionary from "./app/dictionary/synonym/page"
 import { useEffect } from 'react'
 import { logger } from './lib/logger'
 import { config } from './lib/config'
@@ -32,7 +34,9 @@ function App() {
           <Route path="/index" element={<IndexManagement />} />
           <Route path="/index/add" element={<IndexAdd />} />
           <Route path="/index/view/:id" element={<IndexView />} />
-          <Route path="/dictionary" element={<div>dictionary</div>} />
+          <Route path="/dictionary" element={<Navigate to="/dictionary/user" replace />} />
+          <Route path="/dictionary/user" element={<UserDictionary />} />
+          <Route path="/dictionary/synonym" element={<SynonymDictionary />} />
           <Route path="/search-simulator" element={<div>search-simulator</div>} />
         </Routes>
       </Layout>
