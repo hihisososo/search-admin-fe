@@ -1,6 +1,14 @@
 import { logger } from './logger'
 import { APIError, errorTracker } from './errorHandler'
 import { config } from './config'
+import type { 
+  DashboardStats, 
+  PopularKeywordsResponse, 
+  TrendingKeywordsResponse, 
+  TrendsResponse, 
+  IndexDistributionResponse,
+  DashboardApiParams 
+} from '@/types/dashboard'
 
 export async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
   logger.debug('API 요청', { url, method: options.method || 'GET' })
@@ -82,4 +90,51 @@ export async function apiFetchMultipart<T>(url: string, formData: FormData, meth
     method,
     body: formData,
   })
+}
+
+// 쿼리 파라미터를 URL에 추가하는 헬퍼 함수
+function buildQueryString(params: Record<string, any>): string {
+  const searchParams = new URLSearchParams()
+  
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      searchParams.append(key, String(value))
+    }
+  })
+  
+  const queryString = searchParams.toString()
+  return queryString ? `?${queryString}` : ''
+}
+
+// 대시보드 API 함수들
+export const dashboardApi = {
+  // 기본 통계 조회
+  async getStats(params: DashboardApiParams = {}): Promise<DashboardStats> {
+    const queryString = buildQueryString(params)
+    return apiFetch<DashboardStats>(`/api/v1/dashboard/stats${queryString}`)
+  },
+
+  // 인기검색어 조회
+  async getPopularKeywords(params: DashboardApiParams = {}): Promise<PopularKeywordsResponse> {
+    const queryString = buildQueryString(params)
+    return apiFetch<PopularKeywordsResponse>(`/api/v1/dashboard/popular-keywords${queryString}`)
+  },
+
+  // 급등검색어 조회
+  async getTrendingKeywords(params: DashboardApiParams = {}): Promise<TrendingKeywordsResponse> {
+    const queryString = buildQueryString(params)
+    return apiFetch<TrendingKeywordsResponse>(`/api/v1/dashboard/trending-keywords${queryString}`)
+  },
+
+  // 시계열 추이 조회
+  async getTrends(params: DashboardApiParams = {}): Promise<TrendsResponse> {
+    const queryString = buildQueryString(params)
+    return apiFetch<TrendsResponse>(`/api/v1/dashboard/trends${queryString}`)
+  },
+
+  // 인덱스별 분포 조회
+  async getIndexDistribution(params: Omit<DashboardApiParams, 'indexName' | 'limit' | 'interval'> = {}): Promise<IndexDistributionResponse> {
+    const queryString = buildQueryString(params)
+    return apiFetch<IndexDistributionResponse>(`/api/v1/dashboard/index-distribution${queryString}`)
+  }
 } 
