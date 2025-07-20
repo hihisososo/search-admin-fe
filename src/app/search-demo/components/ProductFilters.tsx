@@ -1,7 +1,9 @@
 import * as React from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { AggregationBucket } from "@/lib/api";
 
@@ -55,102 +57,115 @@ export function ProductFilters({
   };
 
   return (
-    <Card className="p-4 shadow-lg border border-blue-100 rounded-2xl bg-white flex flex-col gap-0">
-      {/* 카테고리 */}
-      <div className="flex items-start gap-2 mb-2">
-        <div className="flex items-center gap-2 mt-1">
-          <span className="font-bold text-gray-700 text-xs whitespace-nowrap">카테고리</span>
-          <span className="text-gray-200">|</span>
-        </div>
-        <div className="flex-1">
-          <div 
-            className="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto pr-2" 
-            style={{ scrollbarWidth: 'thin' }}
-          >
+    <Card className="shadow-sm border border-border">
+      <CardContent className="p-4">
+        {/* 카테고리 섹션 */}
+        <div className="flex items-start gap-4 mb-4">
+          <Label className="text-sm font-semibold text-foreground w-24 mt-1">
+            카테고리
+          </Label>
+          <div className="grid grid-cols-5 gap-x-4 gap-y-2 flex-1">
             {categoryAgg.map(cat => (
-              <Checkbox
-                key={cat.key}
-                checked={category.includes(cat.key)}
-                onCheckedChange={(checked) => handleCategory(cat.key, checked)}
-                className="text-[11px]"
-              >
-                {cat.key} <span className="text-gray-400 text-[11px]">({cat.docCount})</span>
-              </Checkbox>
+              <div key={cat.key} className="flex items-center space-x-2">
+                <Checkbox
+                  checked={category.includes(cat.key)}
+                  onCheckedChange={(checked) => handleCategory(cat.key, checked)}
+                  className="h-4 w-4"
+                />
+                <Label 
+                  className="text-xs font-normal cursor-pointer leading-tight"
+                  onClick={() => handleCategory(cat.key, !category.includes(cat.key))}
+                >
+                  {cat.key} 
+                  <span className="text-muted-foreground ml-1">
+                    ({cat.docCount})
+                  </span>
+                </Label>
+              </div>
             ))}
           </div>
+          <div className="text-xs text-muted-foreground">
+            {category.length > 0 ? `${category.length}개` : ''} 
+            {categoryAgg.length > 10 && <span className="ml-1">+</span>}
+          </div>
         </div>
-      </div>
-      
-      {/* 구분선 */}
-      <div className="w-full h-px bg-gray-200 my-2" />
-      
-      {/* 브랜드 */}
-      <div className="flex items-start gap-2 mb-2">
-        <div className="flex items-center gap-2 mt-1">
-          <span className="font-bold text-gray-700 text-xs whitespace-nowrap">브랜드</span>&nbsp;
-          <span className="text-gray-200">|</span>
-        </div>
-        <div className="flex-1">
-          <div 
-            className="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto pr-2" 
-            style={{ scrollbarWidth: 'thin' }}
-          >
+
+        <Separator className="my-3" />
+
+        {/* 제조사/브랜드 섹션 */}
+        <div className="flex items-start gap-4 mb-4">
+          <Label className="font-semibold text-foreground w-24 mt-1">
+            제조사/브랜드
+          </Label>
+          <div className="grid grid-cols-5 gap-x-4 gap-y-2 flex-1">
             {brandAgg.map(b => (
-              <Checkbox
-                key={b.key}
-                checked={brand.includes(b.key)}
-                onCheckedChange={(checked) => handleBrandFilter(b.key, checked)}
-                className="text-xs"
-              >
-                {b.key} <span className="text-gray-400">({b.docCount})</span>
-              </Checkbox>
+              <div key={b.key} className="flex items-center space-x-2">
+                <Checkbox
+                  checked={brand.includes(b.key)}
+                  onCheckedChange={(checked) => handleBrandFilter(b.key, checked)}
+                  className="h-4 w-4"
+                />
+                <Label 
+                  className="text-xs font-normal cursor-pointer leading-tight"
+                  onClick={() => handleBrandFilter(b.key, !brand.includes(b.key))}
+                >
+                  {b.key} 
+                  <span className="text-muted-foreground ml-1">
+                    ({b.docCount})
+                  </span>
+                </Label>
+              </div>
             ))}
           </div>
+          <div className="text-xs text-muted-foreground">
+            {brand.length > 0 ? `${brand.length}개` : ''} 
+            {brandAgg.length > 10 && <span className="ml-1">+</span>}
+          </div>
         </div>
-      </div>
-      
-      {/* 구분선 */}
-      <div className="w-full h-px bg-gray-200 my-2" />
-      
-      {/* 가격대 */}
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-2">
-          <span className="font-bold text-gray-700 text-xs whitespace-nowrap">가격대</span>&nbsp;
-          <span className="text-gray-200">|</span>
+
+        <Separator className="my-3" />
+
+        {/* 가격 섹션 */}
+        <div className="flex items-center gap-4">
+          <Label className="text-sm font-semibold text-foreground w-24">
+            가격
+          </Label>
+          <div className="flex items-center gap-2">
+            <Input 
+              value={price.from} 
+              onChange={e => handlePrice("from", e.target.value)} 
+              placeholder="원" 
+              className="w-20 h-7 text-xs" 
+            />
+            <span className="text-xs text-muted-foreground">~</span>
+            <Input 
+              value={price.to} 
+              onChange={e => handlePrice("to", e.target.value)} 
+              placeholder="원" 
+              className="w-20 h-7 text-xs" 
+            />
+            <Button
+              size="sm"
+              onClick={onPriceSearch}
+              className="h-7 px-3 text-xs bg-gray-600 hover:bg-gray-700"
+            >
+              검색
+            </Button>
+          </div>
+          
+          {/* 필터 초기화 */}
+          <div className="ml-auto">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={onResetFilters}
+              className="text-xs h-7 px-3"
+            >
+              필터 초기화
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2 items-center">
-          <Input 
-            value={price.from} 
-            onChange={e => handlePrice("from", e.target.value)} 
-            placeholder="최소" 
-            className="w-20 text-xs" 
-          />
-          <span className="text-xs">~</span>
-          <Input 
-            value={price.to} 
-            onChange={e => handlePrice("to", e.target.value)} 
-            placeholder="최대" 
-            className="w-20 text-xs" 
-          />
-          <Button
-            size="sm"
-            onClick={onPriceSearch}
-            className="ml-2 text-xs px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-full"
-          >
-            검색
-          </Button>
-        </div>
-      </div>
-      
-      {/* 필터 초기화 버튼 */}
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        onClick={onResetFilters}
-        className="mt-4 text-gray-500 border border-gray-200 rounded-full shadow-sm transition-colors duration-150 hover:scale-105 text-xs self-end"
-      >
-        필터 초기화
-      </Button>
+      </CardContent>
     </Card>
   );
 } 
