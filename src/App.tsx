@@ -8,6 +8,7 @@ import IndexView from "./app/index/view/page"
 import UserDictionary from "./app/dictionary/user/page"
 import SynonymDictionary from "./app/dictionary/synonym/page"
 import SearchSimulator from "./app/search-simulator/page"
+import SearchDemo from "./app/search-demo/page"
 import { useEffect } from 'react'
 import { logger } from './lib/logger'
 import { config } from './lib/config'
@@ -29,19 +30,27 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/index" element={<IndexManagement />} />
-          <Route path="/index/add" element={<IndexAdd />} />
-          <Route path="/index/view/:id" element={<IndexView />} />
-          <Route path="/dictionary" element={<Navigate to="/dictionary/user" replace />} />
-          <Route path="/dictionary/user" element={<UserDictionary />} />
-          <Route path="/dictionary/synonym" element={<SynonymDictionary />} />
-          <Route path="/search-simulator" element={<SearchSimulator />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        {/* 검색 데모는 별도 레이아웃 (전체 영역 사용) */}
+        <Route path="/search-demo" element={<SearchDemo />} />
+        
+        {/* 관리도구 레이아웃 */}
+        <Route path="*" element={
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/index" element={<IndexManagement />} />
+              <Route path="/index/add" element={<IndexAdd />} />
+              <Route path="/index/view/:id" element={<IndexView />} />
+              <Route path="/dictionary" element={<Navigate to="/dictionary/user" replace />} />
+              <Route path="/dictionary/user" element={<UserDictionary />} />
+              <Route path="/dictionary/synonym" element={<SynonymDictionary />} />
+              <Route path="/search-simulator" element={<SearchSimulator />} />
+            </Routes>
+          </Layout>
+        } />
+      </Routes>
     </BrowserRouter>
   )
 }
