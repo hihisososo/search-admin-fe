@@ -36,6 +36,25 @@ export default function SearchDemo() {
   const [relatedKeywords, setRelatedKeywords] = React.useState<string[]>([]);
   const [hasSearched, setHasSearched] = React.useState(false); // 검색 실행 여부 추적
 
+  // 최소 로딩 시간을 보장하는 헬퍼 함수
+  const ensureMinimumLoadingTime = React.useCallback(async (apiCall: Promise<any>, minTime: number = 500) => {
+    const startTime = Date.now();
+    
+    try {
+      const result = await apiCall;
+      const elapsedTime = Date.now() - startTime;
+      
+      if (elapsedTime < minTime) {
+        // 최소 시간이 되지 않았으면 추가 대기
+        await new Promise(resolve => setTimeout(resolve, minTime - elapsedTime));
+      }
+      
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }, []);
+
   // 초기 검색 실행 (새 검색어로 검색 시 - aggregation 업데이트)
   const performInitialSearch = React.useCallback(async () => {
     if (!searchQuery) {
@@ -67,7 +86,10 @@ export default function SearchDemo() {
         sortOrder: 'desc'
       };
 
-      const response = await searchApi.searchProducts(searchRequest);
+      const response = await ensureMinimumLoadingTime(
+        searchApi.searchProducts(searchRequest), 
+        500 // 0.5초 최소 로딩
+      );
 
       setProducts(response.hits.data);
       setTotalResults(response.hits.total);
@@ -92,7 +114,7 @@ export default function SearchDemo() {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, pageSize]);
+  }, [searchQuery, pageSize, ensureMinimumLoadingTime]);
 
   // 필터 검색 실행 (필터 변경 시 - 상품 리스트만 업데이트)
   const performFilterSearch = React.useCallback(async () => {
@@ -132,7 +154,10 @@ export default function SearchDemo() {
         ...(price.to && { priceTo: Number(price.to) })
       };
 
-      const response = await searchApi.searchProducts(searchRequest);
+      const response = await ensureMinimumLoadingTime(
+        searchApi.searchProducts(searchRequest), 
+        600 // 필터링은 조금 더 빠르게
+      );
 
       setProducts(response.hits.data);
       setTotalResults(response.hits.total);
@@ -149,10 +174,10 @@ export default function SearchDemo() {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, page, pageSize, sort, brand, category, categorySub, price]);
+  }, [searchQuery, page, pageSize, sort, brand, category, categorySub, price, ensureMinimumLoadingTime]);
 
-  // 어제부터 오늘까지 날짜 범위를 계산하는 함수
-  const getYesterdayToTodayDateRange = () => {
+  // 어제 날짜 범위를 계산하는 함수
+  const getYesterdayDateRange = () => {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
@@ -161,8 +186,9 @@ export default function SearchDemo() {
     const from = new Date(yesterday);
     from.setHours(0, 0, 0, 0);
 
-    // to: 오늘 현재 시간
-    const to = new Date(today);
+    // to: 어제 23:59:59
+    const to = new Date(yesterday);
+    to.setHours(23, 59, 59, 999);
 
     return {
       from: from.toISOString(),
@@ -174,7 +200,7 @@ export default function SearchDemo() {
   React.useEffect(() => {
     const loadKeywords = async () => {
       try {
-        const { from, to } = getYesterdayToTodayDateRange();
+        const { from, to } = getYesterdayDateRange();
 
         const popularResponse = await dashboardApi.getPopularKeywords({ from, to, limit: 10 });
 
@@ -208,7 +234,7 @@ export default function SearchDemo() {
     if (searchQuery) { // 검색어가 있을 때만 필터 적용
       performFilterSearch();
     }
-  }, [brand, category, categorySub, price, page, sort, performFilterSearch]);
+  }, [brand, category, categorySub, page, sort, performFilterSearch]);
 
   // 핸들러
   const handleSearch = (val: string) => {
