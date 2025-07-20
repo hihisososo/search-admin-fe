@@ -27,9 +27,11 @@ export interface DashboardStats {
 
 export interface KeywordItem {
   keyword: string;
-  count: number;
-  percentage: number;
+  searchCount: number;
   rank: number;
+  previousRank: number | null;
+  rankChange: number | null;
+  changeStatus: "UP" | "DOWN" | "NEW" | "SAME";
 }
 
 export interface PopularKeywordsResponse {

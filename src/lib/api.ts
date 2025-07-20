@@ -10,6 +10,102 @@ import type {
   DashboardApiParams 
 } from '@/types/dashboard'
 
+// 검색 관련 타입 정의
+export interface Product {
+  id: number
+  name: string
+  nameRaw: string
+  brand: string
+  category: string
+  subCategory?: string
+  price: number
+  lowestPrice: number
+  reviewCount: number
+  rating: number
+  thumbnailUrl: string
+  description?: string
+  descriptionRaw?: string
+}
+
+export interface AggregationBucket {
+  key: string
+  docCount: number
+}
+
+export interface SearchRequest {
+  query?: string
+  page: number
+  size: number
+  sortField?: 'score' | 'price' | 'rating' | 'reviewCount' | 'name'
+  sortOrder?: 'asc' | 'desc'
+  brand?: string[]
+  category?: string[]
+  priceFrom?: number
+  priceTo?: number
+}
+
+export interface SearchResponse {
+  hits: {
+    total: number
+    data: Product[]
+  }
+  aggregations?: {
+    brand?: AggregationBucket[]
+    category?: AggregationBucket[]
+  }
+  meta: {
+    page: number
+    size: number
+    totalPages: number
+    processingTime: number
+  }
+}
+
+export interface AutocompleteResponse {
+  suggestions: string[]
+  count: number
+}
+
+export interface PopularKeyword {
+  keyword: string
+  searchCount: number
+  rank: number
+}
+
+export interface TrendingKeyword {
+  keyword: string
+  currentCount: number
+  previousCount: number
+  growthRate: number
+  rank: number
+}
+
+export interface PopularKeywordsApiResponse {
+  keywords: PopularKeyword[]
+  fromDate: string
+  toDate: string
+  totalCount: number
+  lastUpdated: string
+}
+
+export interface TrendingKeywordsApiResponse {
+  keywords: TrendingKeyword[]
+  currentFromDate: string
+  currentToDate: string
+  previousFromDate: string
+  previousToDate: string
+  totalCount: number
+  lastUpdated: string
+}
+
+export interface RealtimeKeywordsResponse {
+  keywords: PopularKeyword[]
+  fromDate: string
+  toDate: string
+  totalCount: number
+  lastUpdated: string
+}
+
 export async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
   logger.debug('API 요청', { url, method: options.method || 'GET' })
 
@@ -111,30 +207,96 @@ export const dashboardApi = {
   // 기본 통계 조회
   async getStats(params: DashboardApiParams = {}): Promise<DashboardStats> {
     const queryString = buildQueryString(params)
-    return apiFetch<DashboardStats>(`/api/v1/dashboard/stats${queryString}`)
+    return apiFetch<DashboardStats>(`/api/v1/stats${queryString}`)
   },
 
   // 인기검색어 조회
   async getPopularKeywords(params: DashboardApiParams = {}): Promise<PopularKeywordsResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<PopularKeywordsResponse>(`/api/v1/dashboard/popular-keywords${queryString}`)
+    return apiFetch<PopularKeywordsResponse>(`/api/v1/stats/popular-keywords${queryString}`)
   },
 
   // 급등검색어 조회
   async getTrendingKeywords(params: DashboardApiParams = {}): Promise<TrendingKeywordsResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<TrendingKeywordsResponse>(`/api/v1/dashboard/trending-keywords${queryString}`)
+    return apiFetch<TrendingKeywordsResponse>(`/api/v1/stats/trending-keywords${queryString}`)
   },
 
   // 시계열 추이 조회
   async getTrends(params: DashboardApiParams = {}): Promise<TrendsResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<TrendsResponse>(`/api/v1/dashboard/trends${queryString}`)
+    return apiFetch<TrendsResponse>(`/api/v1/stats/trends${queryString}`)
   },
 
   // 인덱스별 분포 조회
   async getIndexDistribution(params: Omit<DashboardApiParams, 'indexName' | 'limit' | 'interval'> = {}): Promise<IndexDistributionResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<IndexDistributionResponse>(`/api/v1/dashboard/index-distribution${queryString}`)
+    return apiFetch<IndexDistributionResponse>(`/api/v1/stats/index-distribution${queryString}`)
+  }
+}
+
+// 검색 API 함수들
+export const searchApi = {
+  // 자동완성
+  async getAutocomplete(keyword: string): Promise<AutocompleteResponse> {
+    const queryString = buildQueryString({ keyword })
+    return apiFetch<AutocompleteResponse>(`/api/v1/search/autocomplete${queryString}`)
+  },
+
+  // 상품 검색 - GET 방식으로 변경
+  async searchProducts(searchRequest: SearchRequest): Promise<SearchResponse> {
+    const params = new URLSearchParams()
+    
+    // 필수 파라미터
+    if (searchRequest.query) {
+      params.set('query', searchRequest.query)
+    }
+    params.set('page', searchRequest.page.toString())
+    params.set('size', searchRequest.size.toString())
+    
+    // 선택적 파라미터
+    if (searchRequest.sortField) {
+      params.set('sortField', searchRequest.sortField)
+    }
+    if (searchRequest.sortOrder) {
+      params.set('sortOrder', searchRequest.sortOrder)
+    }
+    
+    // 가격 범위
+    if (searchRequest.priceFrom !== undefined) {
+      params.set('priceFrom', searchRequest.priceFrom.toString())
+    }
+    if (searchRequest.priceTo !== undefined) {
+      params.set('priceTo', searchRequest.priceTo.toString())
+    }
+    
+    // 다중 값 파라미터들
+    searchRequest.brand?.forEach(brand => {
+      params.append('brand', brand)
+    })
+    searchRequest.category?.forEach(category => {
+      params.append('category', category)
+    })
+    
+    const queryString = params.toString()
+    return apiFetch<SearchResponse>(`/api/v1/search?${queryString}`)
+  },
+
+  // 인기 검색어 조회
+  async getPopularKeywords(params: { fromDate?: string; toDate?: string; limit?: number } = {}): Promise<PopularKeywordsApiResponse> {
+    const queryString = buildQueryString(params)
+    return apiFetch<PopularKeywordsApiResponse>(`/api/v1/keywords/popular${queryString}`)
+  },
+
+  // 급등 검색어 조회
+  async getTrendingKeywords(params: { currentFromDate?: string; currentToDate?: string; limit?: number } = {}): Promise<TrendingKeywordsApiResponse> {
+    const queryString = buildQueryString(params)
+    return apiFetch<TrendingKeywordsApiResponse>(`/api/v1/keywords/trending${queryString}`)
+  },
+
+  // 실시간 인기 검색어 조회
+  async getRealtimeKeywords(params: { limit?: number } = {}): Promise<RealtimeKeywordsResponse> {
+    const queryString = buildQueryString(params)
+    return apiFetch<RealtimeKeywordsResponse>(`/api/v1/keywords/realtime${queryString}`)
   }
 } 
