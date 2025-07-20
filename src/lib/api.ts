@@ -25,6 +25,7 @@ export interface Product {
   thumbnailUrl: string
   description?: string
   descriptionRaw?: string
+  registeredMonth?: string
 }
 
 export interface AggregationBucket {

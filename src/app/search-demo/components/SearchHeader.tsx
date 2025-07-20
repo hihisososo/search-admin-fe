@@ -35,9 +35,12 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords }: Sea
   const [showSuggest, setShowSuggest] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(-1);
   const [originalQuery, setOriginalQuery] = React.useState(""); // 사용자가 입력한 원본 쿼리 저장
+  const [isNavigating, setIsNavigating] = React.useState(false); // 키보드 네비게이션 중인지 추적
 
-  // 자동완성 처리
+  // 자동완성 처리 (키보드 네비게이션 중이 아닐 때만)
   React.useEffect(() => {
+    if (isNavigating) return; // 키보드 네비게이션 중이면 자동완성 갱신 안함
+
     const timeoutId = setTimeout(async () => {
       try {
         const response = await searchApi.getAutocomplete(query);
@@ -51,7 +54,7 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords }: Sea
     }, 200); // 200ms 디바운싱
 
     return () => clearTimeout(timeoutId);
-  }, [query]);
+  }, [query, isNavigating]);
 
   // 키보드 이벤트 핸들러
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -65,18 +68,21 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords }: Sea
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
+        setIsNavigating(true);
         setSelectedIndex(prev => 
           prev < suggestions.length - 1 ? prev + 1 : 0
         );
         break;
       case 'ArrowUp':
         e.preventDefault();
+        setIsNavigating(true);
         setSelectedIndex(prev => 
           prev > 0 ? prev - 1 : suggestions.length - 1
         );
         break;
       case 'Enter':
         e.preventDefault();
+        setIsNavigating(false);
         if (selectedIndex >= 0) {
           const selectedSuggestion = suggestions[selectedIndex];
           setQuery(selectedSuggestion);
@@ -84,11 +90,13 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords }: Sea
           setShowSuggest(false);
         } else {
           onSearch(query);
+          setShowSuggest(false);
         }
         break;
       case 'Escape':
         setShowSuggest(false);
         setSelectedIndex(-1);
+        setIsNavigating(false);
         setQuery(originalQuery); // 원본 쿼리로 복원
         break;
     }
@@ -108,6 +116,7 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords }: Sea
     setOriginalQuery(value); // 사용자 입력 시 원본 쿼리 업데이트
     setShowSuggest(true);
     setSelectedIndex(-1); // 입력 시 선택 초기화
+    setIsNavigating(false); // 직접 입력시 네비게이션 모드 해제
   };
 
   return (
@@ -152,7 +161,10 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords }: Sea
                 <Button 
                   className="ml-2 px-3 py-2 rounded-full text-lg font-bold bg-blue-500 hover:bg-blue-600 text-white shadow-md flex items-center justify-center" 
                   style={{minWidth:'40px', minHeight:'40px'}} 
-                  onClick={() => onSearch(query)}
+                  onClick={() => { 
+                    onSearch(query); 
+                    setShowSuggest(false);
+                  }}
                 >
                   <Search />
                 </Button>
@@ -168,8 +180,7 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords }: Sea
                             ? 'bg-blue-100 text-blue-700' 
                             : 'hover:bg-blue-50'
                         }`}
-                        onMouseDown={() => { onSearch(s); setQuery(s); }}
-                        onMouseEnter={() => setSelectedIndex(i)}
+                        onMouseDown={() => { onSearch(s); setQuery(s); setShowSuggest(false); }}
                       >
                         {highlight(s, originalQuery)}
                       </li>
