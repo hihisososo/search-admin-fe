@@ -124,32 +124,54 @@ export default function SearchSimulator() {
     })
 
     // API 응답을 Product 타입으로 변환
-    const transformToProduct = (item: any): Product & { score?: number; explain?: ExplainDetail } => ({
-        id: parseInt(item.id) || Math.floor(Math.random() * 1000000),
-        name: item.name || '',
-        nameRaw: item.nameRaw || item.name || '',
-        brand: item.brand || '',
-        category: item.category || '',
-        price: item.price || 0,
-        lowestPrice: item.price || 0,
-        reviewCount: item.reviewCount || Math.floor(Math.random() * 1000),
-        rating: item.rating || 4.5,
-        thumbnailUrl: item.thumbnailUrl || `https://picsum.photos/200?random=${item.id}`,
-        description: item.description || '',
-        descriptionRaw: item.description || '',
-        registeredMonth: item.registeredMonth || '2024-01',
-        score: item.score,
-        explain: item.explain
-    })
+    const transformToProduct = (item: any): Product & { score?: number; explain?: ExplainDetail } => {
+        const product = {
+            id: parseInt(item.id) || Math.floor(Math.random() * 1000000),
+            name: item.name || '',
+            nameRaw: item.nameRaw || item.name || '',
+            brand: item.brand || '',
+            category: item.category || '',
+            price: item.price || 0,
+            lowestPrice: item.price || 0,
+            reviewCount: item.reviewCount || Math.floor(Math.random() * 1000),
+            rating: item.rating || 4.5,
+            thumbnailUrl: item.thumbnailUrl || `https://picsum.photos/200?random=${item.id}`,
+            description: item.description || '',
+            descriptionRaw: item.description || '',
+            registeredMonth: item.registeredMonth || '2024-01',
+            score: item.score,
+            explain: item.explain
+        }
+        
+        // explain 데이터 디버깅
+        if (item.explain) {
+            console.log('🔍 변환된 상품의 explain:', item.id, item.explain)
+        }
+        
+        return product
+    }
 
     // 검색 실행
-    const performSearch = async (envId: string, isInitialSearch = false) => {
-        const env = environments[envId]
+    const performSearch = async (envId: string, isInitialSearch = false, overrideParams?: Partial<EnvironmentState>) => {
+        // 현재 환경 상태 가져오기
+        const currentEnv = environments[envId]
         
-        if (!env.query.trim() && isInitialSearch) {
+        if (!currentEnv.query.trim() && isInitialSearch) {
             return
         }
 
+        // 검색에 사용할 파라미터 (override 값이 있으면 적용)
+        const searchParams = {
+            query: overrideParams?.query ?? currentEnv.query,
+            brand: overrideParams?.brand ?? currentEnv.brand,
+            category: overrideParams?.category ?? currentEnv.category,
+            price: overrideParams?.price ?? currentEnv.price,
+            page: overrideParams?.page ?? currentEnv.page,
+            sort: overrideParams?.sort ?? currentEnv.sort,
+            showExplain: overrideParams?.showExplain ?? currentEnv.showExplain
+        }
+
+        // 로딩 상태 설정
         setEnvironments(prev => ({
             ...prev,
             [envId]: { 
@@ -168,12 +190,12 @@ export default function SearchSimulator() {
             
             // 필수 파라미터
             params.append('environmentType', envId)
-            params.append('query', env.query.trim())
-            params.append('page', env.page.toString())
+            params.append('query', searchParams.query.trim())
+            params.append('page', searchParams.page.toString())
             params.append('size', '10')
             
             // 선택적 파라미터
-            if (env.showExplain) {
+            if (searchParams.showExplain) {
                 params.append('explain', 'true')
             }
 
@@ -181,16 +203,16 @@ export default function SearchSimulator() {
             let sortField = 'score'
             let sortOrder: 'asc' | 'desc' = 'desc'
 
-            if (env.sort === 'price_asc') {
+            if (searchParams.sort === 'price_asc') {
                 sortField = 'price'
                 sortOrder = 'asc'
-            } else if (env.sort === 'price_desc') {
+            } else if (searchParams.sort === 'price_desc') {
                 sortField = 'price'
                 sortOrder = 'desc'
-            } else if (env.sort === 'reviewCount') {
+            } else if (searchParams.sort === 'reviewCount') {
                 sortField = 'reviewCount'
                 sortOrder = 'desc'
-            } else if (env.sort === 'registeredMonth') {
+            } else if (searchParams.sort === 'registeredMonth') {
                 sortField = 'registeredMonth'
                 sortOrder = 'desc'
             }
@@ -201,20 +223,20 @@ export default function SearchSimulator() {
             }
 
             // 필터 조건 추가
-            if (env.brand.length > 0) {
-                env.brand.forEach(b => params.append('brand', b))
+            if (searchParams.brand.length > 0) {
+                searchParams.brand.forEach((b: string) => params.append('brand', b))
             }
             
-            if (env.category.length > 0) {
-                env.category.forEach(c => params.append('category', c))
+            if (searchParams.category.length > 0) {
+                searchParams.category.forEach((c: string) => params.append('category', c))
             }
             
-            if (env.price.from) {
-                params.append('priceFrom', env.price.from)
+            if (searchParams.price.from) {
+                params.append('priceFrom', searchParams.price.from)
             }
             
-            if (env.price.to) {
-                params.append('priceTo', env.price.to)
+            if (searchParams.price.to) {
+                params.append('priceTo', searchParams.price.to)
             }
 
             const response = await apiFetch<SimulationSearchResponse>(`/api/v1/search/simulation?${params.toString()}`, {
@@ -222,6 +244,15 @@ export default function SearchSimulator() {
             })
 
             const endTime = Date.now()
+
+            // API 응답 디버깅
+            console.log('🔍 검색 API 응답:', response)
+            if (response.hits?.data?.length > 0) {
+                console.log('🔍 첫 번째 상품 데이터:', response.hits.data[0])
+                if (response.hits.data[0].explain) {
+                    console.log('🔍 Explain 데이터:', response.hits.data[0].explain)
+                }
+            }
 
             // 상품 데이터 변환
             const products = response.hits?.data?.map(transformToProduct) || []
@@ -263,11 +294,6 @@ export default function SearchSimulator() {
             ...prev,
             [envId]: { ...prev[envId], ...updates }
         }))
-
-        // 필터 변경 시 자동 검색 (검색어가 있는 경우에만)
-        if (environments[envId].query && (updates.brand || updates.category || updates.page || updates.sort)) {
-            setTimeout(() => performSearch(envId, false), 100)
-        }
     }
 
     // 검색 실행
@@ -286,22 +312,26 @@ export default function SearchSimulator() {
 
     // 필터 초기화
     const resetFilters = (envId: string) => {
-        updateEnvironmentState(envId, {
+        const resetParams = {
             brand: [],
             category: [],
             price: { from: '', to: '' },
             page: 1
-        })
+        }
+        updateEnvironmentState(envId, resetParams)
+        performSearch(envId, false, resetParams)
     }
 
     // 가격 검색
     const handlePriceSearch = (envId: string) => {
         updateEnvironmentState(envId, { page: 1 })
-        setTimeout(() => performSearch(envId, false), 100)
+        performSearch(envId, false, { page: 1 })
     }
 
     const currentEnv = ENVIRONMENTS.find(env => env.id === selectedEnv)!
     const envState = environments[selectedEnv]
+
+
 
     return (
         <div className="bg-gray-50 min-h-screen p-3">
@@ -389,8 +419,10 @@ export default function SearchSimulator() {
                                 if (typeof category === 'function') {
                                     const newCategory = category(envState.category)
                                     updateEnvironmentState(selectedEnv, { category: newCategory, page: 1 })
+                                    performSearch(selectedEnv, false, { category: newCategory, page: 1 })
                                 } else {
                                     updateEnvironmentState(selectedEnv, { category, page: 1 })
+                                    performSearch(selectedEnv, false, { category, page: 1 })
                                 }
                             }}
                             categorySub={[]}
@@ -400,8 +432,10 @@ export default function SearchSimulator() {
                                 if (typeof brand === 'function') {
                                     const newBrand = brand(envState.brand)
                                     updateEnvironmentState(selectedEnv, { brand: newBrand, page: 1 })
+                                    performSearch(selectedEnv, false, { brand: newBrand, page: 1 })
                                 } else {
                                     updateEnvironmentState(selectedEnv, { brand, page: 1 })
+                                    performSearch(selectedEnv, false, { brand, page: 1 })
                                 }
                             }}
                             price={envState.price}
@@ -429,9 +463,15 @@ export default function SearchSimulator() {
                         totalResults={envState.totalResults}
                         totalPages={envState.totalPages}
                         page={envState.page}
-                        setPage={(page: number) => updateEnvironmentState(selectedEnv, { page })}
+                        setPage={(page: number) => {
+                            updateEnvironmentState(selectedEnv, { page })
+                            performSearch(selectedEnv, false, { page })
+                        }}
                         sort={envState.sort}
-                        onSortChange={(sort: string) => updateEnvironmentState(selectedEnv, { sort, page: 1 })}
+                        onSortChange={(sort: string) => {
+                            updateEnvironmentState(selectedEnv, { sort, page: 1 })
+                            performSearch(selectedEnv, false, { sort, page: 1 })
+                        }}
                         searchQuery={envState.query}
                         showExplain={envState.showExplain}
                     />

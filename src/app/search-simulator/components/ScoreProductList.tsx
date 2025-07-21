@@ -6,7 +6,7 @@ import { Pagination } from "@/components/ui/pagination"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { ChevronDown, ChevronRight, Eye } from "lucide-react"
+import { Eye } from "lucide-react"
 import type { Product } from "@/lib/api"
 
 interface ExplainDetail {
@@ -53,55 +53,6 @@ function highlight(text: string, keyword: string) {
     )
 }
 
-// Explain 정보를 예쁘게 표시하는 컴포넌트
-function ExplainTree({ explain, depth = 0 }: { explain: ExplainDetail | null | undefined; depth?: number }) {
-    const [isExpanded, setIsExpanded] = useState(depth < 2)
-    
-    // explain이 없는 경우 방어 처리
-    if (!explain) {
-        return (
-            <div className="text-xs text-gray-400 p-2">
-                Explain 정보가 없습니다.
-            </div>
-        )
-    }
-    
-    return (
-        <div className={`${depth > 0 ? 'ml-4 border-l border-gray-200 pl-3' : ''}`}>
-            <div className="flex items-start gap-2 py-1">
-                {explain.details && explain.details.length > 0 && (
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0"
-                        onClick={() => setIsExpanded(!isExpanded)}
-                    >
-                        {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-                    </Button>
-                )}
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                        <Badge variant="outline" className="text-xs font-mono">
-                            {typeof explain.value === 'number' ? explain.value.toFixed(3) : 'N/A'}
-                        </Badge>
-                        <span className="text-xs text-gray-700 break-words">
-                            {explain.description || 'No description'}
-                        </span>
-                    </div>
-                </div>
-            </div>
-            
-            {isExpanded && explain.details && Array.isArray(explain.details) && (
-                <div className="mt-1">
-                    {explain.details.map((detail, index) => (
-                        <ExplainTree key={index} explain={detail} depth={depth + 1} />
-                    ))}
-                </div>
-            )}
-        </div>
-    )
-}
-
 function LoadingRow() {
     return (
         <TableRow className="animate-pulse">
@@ -124,6 +75,8 @@ function LoadingRow() {
         </TableRow>
     )
 }
+
+
 
 export function ScoreProductList({
     products,
@@ -266,19 +219,38 @@ export function ScoreProductList({
                                                         <Eye className="h-3 w-3" />
                                                     </Button>
                                                 </DialogTrigger>
-                                                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                                                <DialogContent className="max-w-7xl w-[90vw] max-h-[85vh] overflow-y-auto">
                                                     <DialogHeader>
-                                                        <DialogTitle className="flex items-center gap-2">
-                                                            <Badge variant="outline" className="font-mono text-xs">
+                                                        <DialogTitle className="flex items-center gap-2 text-base">
+                                                            <Badge variant="outline" className="font-mono text-sm px-2 py-1">
                                                                 점수: {typeof p.score === 'number' ? p.score.toFixed(3) : 'N/A'}
                                                             </Badge>
-                                                            <span className="text-sm text-gray-600">
+                                                            <span className="text-gray-700 font-medium">
                                                                 {p.name} - 스코어 상세 분석
                                                             </span>
                                                         </DialogTitle>
                                                     </DialogHeader>
                                                     <div className="mt-4">
-                                                        <ExplainTree explain={p.explain} />
+                                                        <div className="bg-gray-50 border rounded-lg p-4">
+                                                            <div className="text-sm text-gray-600 mb-3">
+                                                                📊 Elasticsearch Explain 결과
+                                                            </div>
+                                                            <pre className="text-xs overflow-auto whitespace-pre-wrap font-mono text-gray-700 max-h-[60vh] border bg-white p-3 rounded">
+                                                                {(() => {
+                                                                    try {
+                                                                        // JSON 문자열인 경우 파싱해서 이쁘게 포맷팅
+                                                                        let parsedData = p.explain
+                                                                        if (typeof p.explain === 'string') {
+                                                                            parsedData = JSON.parse(p.explain)
+                                                                        }
+                                                                        return JSON.stringify(parsedData, null, 2)
+                                                                    } catch (error) {
+                                                                        // 파싱 실패 시 원본 그대로
+                                                                        return typeof p.explain === 'string' ? p.explain : JSON.stringify(p.explain, null, 2)
+                                                                    }
+                                                                })()}
+                                                            </pre>
+                                                        </div>
                                                     </div>
                                                 </DialogContent>
                                             </Dialog>
