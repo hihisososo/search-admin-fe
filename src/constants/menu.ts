@@ -1,4 +1,4 @@
-import { Home, Inbox, Calendar, Search } from "lucide-react"
+import { Home, Inbox, Calendar, Search, Rocket } from "lucide-react"
 
 export interface MenuItem {
   id: string
@@ -44,6 +44,12 @@ export const MENU_ITEMS: MenuItem[] = [
         path: '/dictionary/synonym'
       }
     ]
+  },
+  {
+    id: 'deploy',
+    title: '배포관리',
+    path: '/deploy',
+    icon: Rocket,
   },
   {
     id: 'search-simulator',
