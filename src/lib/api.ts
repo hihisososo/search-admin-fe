@@ -301,3 +301,35 @@ export const searchApi = {
     return apiFetch<RealtimeKeywordsResponse>(`/api/v1/keywords/realtime${queryString}`)
   }
 } 
+
+// 배포 관리 API 함수들
+export const deploymentApi = {
+  // 환경 정보 조회
+  async getEnvironments(): Promise<import('@/types/deploy').EnvironmentsResponse> {
+    return apiFetch<import('@/types/deploy').EnvironmentsResponse>('/api/v1/deployment/environments')
+  },
+
+  // 색인 실행 (개발환경만)
+  async executeIndexing(request: import('@/types/deploy').IndexingRequest = {}): Promise<import('@/types/deploy').OperationResponse> {
+    return apiFetch<import('@/types/deploy').OperationResponse>('/api/v1/deployment/indexing', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request)
+    })
+  },
+
+  // 배포 실행
+  async executeDeploy(request: import('@/types/deploy').DeploymentRequest = {}): Promise<import('@/types/deploy').OperationResponse> {
+    return apiFetch<import('@/types/deploy').OperationResponse>('/api/v1/deployment/deploy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request)
+    })
+  },
+
+  // 배포 이력 조회
+  async getDeploymentHistory(params: import('@/types/deploy').DeploymentHistoryParams = {}): Promise<import('@/types/deploy').DeploymentHistoryResponse> {
+    const queryString = buildQueryString(params)
+    return apiFetch<import('@/types/deploy').DeploymentHistoryResponse>(`/api/v1/deployment/history${queryString}`)
+  }
+} 

@@ -9,6 +9,7 @@ import UserDictionary from "./app/dictionary/user/page"
 import SynonymDictionary from "./app/dictionary/synonym/page"
 import SearchSimulator from "./app/search-simulator/page"
 import SearchDemo from "./app/search-demo/page"
+import DeployManagement from "./app/deploy/page"
 import { useEffect } from 'react'
 import { logger } from './lib/logger'
 import { config } from './lib/config'
@@ -46,6 +47,7 @@ function App() {
               <Route path="/dictionary" element={<Navigate to="/dictionary/user" replace />} />
               <Route path="/dictionary/user" element={<UserDictionary />} />
               <Route path="/dictionary/synonym" element={<SynonymDictionary />} />
+              <Route path="/deploy" element={<DeployManagement />} />
               <Route path="/search-simulator" element={<SearchSimulator />} />
             </Routes>
           </Layout>
