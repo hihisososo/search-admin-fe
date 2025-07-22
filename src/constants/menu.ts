@@ -1,4 +1,4 @@
-import { Home, Inbox, Calendar, Search, Rocket } from "lucide-react"
+import { Home, Calendar, Search, Rocket } from "lucide-react"
 
 export interface MenuItem {
   id: string
@@ -22,12 +22,6 @@ export const MENU_ITEMS: MenuItem[] = [
     icon: Home,
   },
   {
-    id: 'index',
-    title: '색인관리',
-    path: '/index',
-    icon: Inbox,
-  },
-  {
     id: 'dictionary',
     title: '사전관리',
     path: '/dictionary',
@@ -42,6 +36,16 @@ export const MENU_ITEMS: MenuItem[] = [
         id: 'synonym-dictionary',
         title: '유의어사전',
         path: '/dictionary/synonym'
+      },
+      {
+        id: 'stopword-dictionary',
+        title: '불용어사전',
+        path: '/dictionary/stopword'
+      },
+      {
+        id: 'typo-dictionary',
+        title: '오타교정사전',
+        path: '/dictionary/typo'
       }
     ]
   },

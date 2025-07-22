@@ -3,12 +3,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { searchApi } from "@/lib/api";
+import { Link } from "react-router-dom";
 
 interface SearchHeaderProps {
   query: string;
   setQuery: (query: string) => void;
   onSearch: (query: string) => void;
   relatedKeywords: string[];
+  applyTypoCorrection?: boolean; // 🆕 오타교정 옵션
+  setApplyTypoCorrection?: (apply: boolean) => void; // 🆕 오타교정 설정 함수
 }
 
 function highlight(text: string, keyword: string) {
@@ -30,7 +33,7 @@ function highlight(text: string, keyword: string) {
   );
 }
 
-export function SearchHeader({ query, setQuery, onSearch, relatedKeywords }: SearchHeaderProps) {
+export function SearchHeader({ query, setQuery, onSearch, relatedKeywords, applyTypoCorrection = true, setApplyTypoCorrection }: SearchHeaderProps) {
   const [suggestions, setSuggestions] = React.useState<string[]>([]);
   const [showSuggest, setShowSuggest] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(-1);
@@ -124,7 +127,7 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords }: Sea
       {/* 상단: 관리도구 링크 */}
       <div className="w-full max-w-7xl mx-auto">
         <div className="flex items-center px-2 py-2 justify-end">
-          <a href="/dashboard" className="text-xs text-gray-400 hover:underline font-medium">관리도구</a>
+          <Link to="/dashboard" className="text-xs text-gray-400 hover:underline font-medium">관리도구</Link>
         </div>
         <div className="w-full h-px bg-gray-200 mb-2" />
       </div>
@@ -191,6 +194,26 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords }: Sea
             </div>
           </div>
         </div>
+
+        {/* 🆕 검색 옵션 */}
+        {setApplyTypoCorrection && (
+          <div className="w-full flex justify-center mt-2 mb-1">
+            <div className="flex items-center gap-1 text-xs">
+              <label className="flex items-center gap-1 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={applyTypoCorrection}
+                  onChange={(e) => setApplyTypoCorrection(e.target.checked)}
+                  className="rounded w-3 h-3"
+                />
+                <span className="text-gray-600">오타 자동교정</span>
+              </label>
+              <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded text-xs font-medium">
+                실시간 적용
+              </span>
+            </div>
+          </div>
+        )}
         
         {/* 연관검색어 */}
         {/* <div className="w-full px-6 py-2 flex items-center gap-2 text-xs bg-transparent justify-center">

@@ -79,6 +79,7 @@ interface EnvironmentState {
     page: number
     sort: string
     showExplain: boolean
+    applyTypoCorrection: boolean  // 🆕 오타교정 옵션 추가
     
     // 결과 데이터
     products: (Product & { score?: number; explain?: ExplainDetail })[]
@@ -104,6 +105,7 @@ const initialEnvironmentState: EnvironmentState = {
     page: 1,
     sort: 'score',
     showExplain: false,
+    applyTypoCorrection: true,  // 🆕 기본값 true
     products: [],
     totalResults: 0,
     totalPages: 0,
@@ -168,7 +170,8 @@ export default function SearchSimulator() {
             price: overrideParams?.price ?? currentEnv.price,
             page: overrideParams?.page ?? currentEnv.page,
             sort: overrideParams?.sort ?? currentEnv.sort,
-            showExplain: overrideParams?.showExplain ?? currentEnv.showExplain
+            showExplain: overrideParams?.showExplain ?? currentEnv.showExplain,
+            applyTypoCorrection: overrideParams?.applyTypoCorrection ?? currentEnv.applyTypoCorrection  // 🆕 오타교정 옵션
         }
 
         // 로딩 상태 설정
@@ -198,6 +201,9 @@ export default function SearchSimulator() {
             if (searchParams.showExplain) {
                 params.append('explain', 'true')
             }
+
+            // 🆕 오타교정 옵션 추가
+            params.append('applyTypoCorrection', searchParams.applyTypoCorrection.toString())
 
             // 정렬 설정
             let sortField = 'score'
@@ -331,8 +337,6 @@ export default function SearchSimulator() {
     const currentEnv = ENVIRONMENTS.find(env => env.id === selectedEnv)!
     const envState = environments[selectedEnv]
 
-
-
     return (
         <div className="bg-gray-50 min-h-screen p-3">
             <div className="max-w-6xl mx-auto">
@@ -384,8 +388,8 @@ export default function SearchSimulator() {
                                 </Button>
                             </div>
                             
-                            {/* Explain 옵션 */}
-                            <div className="flex items-center gap-2">
+                            {/* 검색 옵션들 */}
+                            <div className="flex items-center gap-4">
                                 <label className="flex items-center gap-1 text-xs">
                                     <input
                                         type="checkbox"
@@ -397,6 +401,20 @@ export default function SearchSimulator() {
                                 </label>
                                 <Badge variant="outline" className="text-xs text-gray-500 px-1 py-0">
                                     느려질 수 있음
+                                </Badge>
+                                
+                                {/* 🆕 오타교정 옵션 */}
+                                <label className="flex items-center gap-1 text-xs">
+                                    <input
+                                        type="checkbox"
+                                        checked={envState.applyTypoCorrection}
+                                        onChange={(e) => updateEnvironmentState(selectedEnv, { applyTypoCorrection: e.target.checked })}
+                                        className="rounded w-3 h-3"
+                                    />
+                                    <span>오타 자동교정</span>
+                                </label>
+                                <Badge variant="outline" className="text-xs text-green-600 px-1 py-0">
+                                    실시간 적용
                                 </Badge>
                             </div>
 

@@ -82,10 +82,12 @@ export default function DeployManagement() {
         startIndexingMonitoring()
       } else {
         console.error('색인 실패:', response.message)
+        alert(`색인 시작에 실패했습니다: ${response.message}`)
         setIsIndexing(false)
       }
     } catch (error) {
       console.error('색인 요청 실패:', error)
+      alert('색인 요청 중 네트워크 오류가 발생했습니다. 다시 시도해주세요.')
       setIsIndexing(false)
     }
   }
@@ -136,6 +138,7 @@ export default function DeployManagement() {
         if (devEnv && !backendIndexing && devEnv.indexStatus === 'FAILED') {
           // 색인 실패
           console.error('색인 실패!')
+          alert('색인이 실패했습니다. 다시 시도해주세요.')
           return true
         }
         

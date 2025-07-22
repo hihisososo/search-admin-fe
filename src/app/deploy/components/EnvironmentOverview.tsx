@@ -68,8 +68,8 @@ export default function EnvironmentOverview({
   const canReindex = (env: Environment) => {
     return env.environmentType === 'DEV' && 
            !isEnvironmentIndexing(env) && 
-           !isDeploying &&
-           env.indexStatus !== 'FAILED'  // 실패 상태가 아닐 때만
+           !isDeploying
+    // 실패 상태에서도 재실행 가능하도록 FAILED 체크 제거
   }
 
   return (

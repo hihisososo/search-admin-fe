@@ -127,13 +127,27 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
     
     if (!response.ok) {
       let errorMessage = 'API 오류'
+      let errorDetails = null
       
       try {
         const errorData = await response.json()
         errorMessage = errorData.message || errorMessage
+        errorDetails = errorData
       } catch {
         // JSON 파싱 실패 시 기본 메시지 사용
         errorMessage = `HTTP ${response.status}: ${response.statusText}`
+      }
+      
+      // 개발 환경에서 더 자세한 에러 정보 출력
+      if (config.isDevelopment()) {
+        console.error('API 에러 상세:', {
+          url: fullUrl,
+          status: response.status,
+          statusText: response.statusText,
+          errorMessage,
+          errorDetails,
+          requestOptions
+        })
       }
       
       const apiError = new APIError(errorMessage, response.status)
@@ -187,6 +201,30 @@ export async function apiFetchMultipart<T>(url: string, formData: FormData, meth
     method,
     body: formData,
   })
+}
+
+// API 서버 헬스체크
+export async function healthCheck(): Promise<{ status: 'ok' | 'error', message: string }> {
+  try {
+    const response = await apiFetch<any>('/api/v1/health')
+    return { status: 'ok', message: '서버 정상' }
+  } catch (error) {
+    console.error('헬스체크 실패:', error)
+    return { 
+      status: 'error', 
+      message: error instanceof Error ? error.message : '서버 연결 실패' 
+    }
+  }
+}
+
+// 개발 환경용 API 상태 확인
+export async function checkApiStatus() {
+  if (config.isDevelopment()) {
+    console.log('API 상태 확인 중...')
+    const health = await healthCheck()
+    console.log('API 상태:', health)
+    return health
+  }
 }
 
 // 쿼리 파라미터를 URL에 추가하는 헬퍼 함수
@@ -331,5 +369,330 @@ export const deploymentApi = {
   async getDeploymentHistory(params: import('@/types/deploy').DeploymentHistoryParams = {}): Promise<import('@/types/deploy').DeploymentHistoryResponse> {
     const queryString = buildQueryString(params)
     return apiFetch<import('@/types/deploy').DeploymentHistoryResponse>(`/api/v1/deployment/history${queryString}`)
+  }
+} 
+
+// 🆕 사전 관련 타입 정의
+export interface DictionaryEnvironmentType {
+  CURRENT: "CURRENT"
+  DEV: "DEV" 
+  PROD: "PROD"
+}
+
+export interface SynonymDictionaryItem {
+  id: number
+  keyword: string
+  description?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface TypoCorrectionDictionaryItem {
+  id: number
+  keyword: string
+  correctedWord: string
+  description?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface StopwordDictionaryItem {
+  id: number
+  keyword: string
+  description?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface UserDictionaryItem {
+  id: number
+  keyword: string
+  description?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface DictionaryPageResponse<T> {
+  content: T[]
+  page: number
+  size: number
+  totalElements: number
+  totalPages: number
+  first: boolean
+  last: boolean
+}
+
+export interface RealtimeSyncResponse {
+  success: boolean
+  message: string
+  environment: string
+  timestamp: number
+}
+
+export interface SyncStatusResponse {
+  success: boolean
+  typoCorrectionStatus: string
+  lastSyncTime: number
+  timestamp: number
+}
+
+// 🆕 동의어 사전 API 함수들
+export const synonymDictionaryApi = {
+  // 목록 조회
+  async getList(params: {
+    page?: number
+    size?: number
+    search?: string
+    sortBy?: string
+    sortDir?: string
+    environment?: string
+  } = {}): Promise<DictionaryPageResponse<SynonymDictionaryItem>> {
+    const queryString = buildQueryString(params)
+    return apiFetch<DictionaryPageResponse<SynonymDictionaryItem>>(`/api/v1/dictionaries/synonym${queryString}`)
+  },
+
+  // 생성
+  async create(data: { keyword: string; description?: string }): Promise<SynonymDictionaryItem> {
+    return apiFetch<SynonymDictionaryItem>('/api/v1/dictionaries/synonym', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    })
+  },
+
+  // 상세 조회
+  async getById(id: number): Promise<SynonymDictionaryItem> {
+    return apiFetch<SynonymDictionaryItem>(`/api/v1/dictionaries/synonym/${id}`)
+  },
+
+  // 수정
+  async update(id: number, data: { keyword: string; description?: string }): Promise<SynonymDictionaryItem> {
+    return apiFetch<SynonymDictionaryItem>(`/api/v1/dictionaries/synonym/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    })
+  },
+
+  // 삭제
+  async delete(id: number): Promise<void> {
+    return apiFetch<void>(`/api/v1/dictionaries/synonym/${id}`, {
+      method: 'DELETE'
+    })
+  }
+}
+
+// 🆕 오타교정 사전 API 함수들
+export const typoCorrectionDictionaryApi = {
+  // 목록 조회
+  async getList(params: {
+    page?: number
+    size?: number
+    search?: string
+    sortBy?: string
+    sortDir?: string
+    environment?: string
+  } = {}): Promise<DictionaryPageResponse<TypoCorrectionDictionaryItem>> {
+    const queryString = buildQueryString(params)
+    return apiFetch<DictionaryPageResponse<TypoCorrectionDictionaryItem>>(`/api/v1/dictionaries/typo${queryString}`)
+  },
+
+  // 생성
+  async create(data: { keyword: string; correctedWord: string; description?: string }): Promise<TypoCorrectionDictionaryItem> {
+    return apiFetch<TypoCorrectionDictionaryItem>('/api/v1/dictionaries/typo', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    })
+  },
+
+  // 상세 조회
+  async getById(id: number): Promise<TypoCorrectionDictionaryItem> {
+    return apiFetch<TypoCorrectionDictionaryItem>(`/api/v1/dictionaries/typo/${id}`)
+  },
+
+  // 수정
+  async update(id: number, data: { keyword: string; correctedWord: string; description?: string }): Promise<TypoCorrectionDictionaryItem> {
+    return apiFetch<TypoCorrectionDictionaryItem>(`/api/v1/dictionaries/typo/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    })
+  },
+
+  // 삭제
+  async delete(id: number): Promise<void> {
+    return apiFetch<void>(`/api/v1/dictionaries/typo/${id}`, {
+      method: 'DELETE'
+    })
+  },
+
+  // 🆕 실시간 동기화
+  async realtimeSync(environment: string): Promise<RealtimeSyncResponse> {
+    const params = new URLSearchParams({ environment })
+    return apiFetch<RealtimeSyncResponse>(`/api/v1/dictionaries/typo/realtime-sync?${params}`, {
+      method: 'POST'
+    })
+  },
+
+  // 🆕 동기화 상태 조회
+  async getSyncStatus(): Promise<SyncStatusResponse> {
+    return apiFetch<SyncStatusResponse>('/api/v1/dictionaries/typo/sync-status')
+  }
+}
+
+// 🆕 불용어 사전 API 함수들
+export const stopwordDictionaryApi = {
+  // 목록 조회
+  async getList(params: {
+    page?: number
+    size?: number
+    search?: string
+    sortBy?: string
+    sortDir?: string
+    environment?: string
+  } = {}): Promise<DictionaryPageResponse<StopwordDictionaryItem>> {
+    const queryString = buildQueryString(params)
+    return apiFetch<DictionaryPageResponse<StopwordDictionaryItem>>(`/api/v1/dictionaries/stopword${queryString}`)
+  },
+
+  // 생성
+  async create(data: { keyword: string; description?: string }): Promise<StopwordDictionaryItem> {
+    return apiFetch<StopwordDictionaryItem>('/api/v1/dictionaries/stopword', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    })
+  },
+
+  // 상세 조회
+  async getById(id: number): Promise<StopwordDictionaryItem> {
+    return apiFetch<StopwordDictionaryItem>(`/api/v1/dictionaries/stopword/${id}`)
+  },
+
+  // 수정
+  async update(id: number, data: { keyword: string; description?: string }): Promise<StopwordDictionaryItem> {
+    return apiFetch<StopwordDictionaryItem>(`/api/v1/dictionaries/stopword/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    })
+  },
+
+  // 삭제
+  async delete(id: number): Promise<void> {
+    return apiFetch<void>(`/api/v1/dictionaries/stopword/${id}`, {
+      method: 'DELETE'
+    })
+  }
+}
+
+// 🆕 사용자 사전 API 함수들
+export const userDictionaryApi = {
+  // 목록 조회
+  async getList(params: {
+    page?: number
+    size?: number
+    search?: string
+    sortBy?: string
+    sortDir?: string
+    environment?: string
+  } = {}): Promise<DictionaryPageResponse<UserDictionaryItem>> {
+    const queryString = buildQueryString(params)
+    return apiFetch<DictionaryPageResponse<UserDictionaryItem>>(`/api/v1/dictionaries/user${queryString}`)
+  },
+
+  // 생성
+  async create(data: { keyword: string; description?: string }): Promise<UserDictionaryItem> {
+    return apiFetch<UserDictionaryItem>('/api/v1/dictionaries/user', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    })
+  },
+
+  // 상세 조회
+  async getById(id: number): Promise<UserDictionaryItem> {
+    return apiFetch<UserDictionaryItem>(`/api/v1/dictionaries/user/${id}`)
+  },
+
+  // 수정
+  async update(id: number, data: { keyword: string; description?: string }): Promise<UserDictionaryItem> {
+    return apiFetch<UserDictionaryItem>(`/api/v1/dictionaries/user/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    })
+  },
+
+  // 삭제
+  async delete(id: number): Promise<void> {
+    return apiFetch<void>(`/api/v1/dictionaries/user/${id}`, {
+      method: 'DELETE'
+    })
+  }
+}
+
+// 🆕 실시간 반영 API 함수들
+export const realtimeSyncApi = {
+  // 동의어 사전 실시간 반영
+  async syncSynonym(environment: string): Promise<RealtimeSyncResponse> {
+    const params = new URLSearchParams({ environment })
+    return apiFetch<RealtimeSyncResponse>(`/api/v1/dictionaries/realtime-sync/synonym?${params}`, {
+      method: 'POST'
+    })
+  },
+
+  // 오타교정 사전 실시간 반영
+  async syncTypoCorrection(environment: string): Promise<RealtimeSyncResponse> {
+    return typoCorrectionDictionaryApi.realtimeSync(environment)
+  },
+
+  // 모든 사전 실시간 반영
+  async syncAll(environment: string): Promise<RealtimeSyncResponse> {
+    const params = new URLSearchParams({ environment })
+    return apiFetch<RealtimeSyncResponse>(`/api/v1/dictionaries/realtime-sync/all?${params}`, {
+      method: 'POST'
+    })
+  },
+
+  // 동기화 상태 조회
+  async getStatus(): Promise<SyncStatusResponse> {
+    return apiFetch<SyncStatusResponse>('/api/v1/dictionaries/realtime-sync/status')
+  }
+}
+
+// 🆕 검색 API 업데이트 (오타교정 옵션 추가)
+export const enhancedSearchApi = {
+  // 상품 검색 실행 (오타교정 옵션 포함)
+  async executeSearch(request: {
+    query: string
+    page: number
+    size: number
+    applyTypoCorrection?: boolean
+    sortField?: string
+    sortOrder?: string
+    brand?: string[]
+    category?: string[]
+    priceFrom?: number
+    priceTo?: number
+  }): Promise<SearchResponse> {
+    return apiFetch<SearchResponse>('/api/v1/search/execute', {
+      method: 'POST',
+      body: JSON.stringify(request)
+    })
+  },
+
+  // 검색 시뮬레이션 (오타교정 옵션 포함)
+  async simulateSearch(request: {
+    query: string
+    page: number
+    size: number
+    environmentType: string
+    explain?: boolean
+    applyTypoCorrection?: boolean
+    sortField?: string
+    sortOrder?: string
+    brand?: string[]
+    category?: string[]
+    priceFrom?: number
+    priceTo?: number
+  }): Promise<SearchResponse> {
+    return apiFetch<SearchResponse>('/api/v1/search-simulation/execute', {
+      method: 'POST',
+      body: JSON.stringify(request)
+    })
   }
 } 

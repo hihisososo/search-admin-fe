@@ -12,7 +12,7 @@ import { ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, Check, X } from "lucide-
 import { DictionaryEnvironmentType } from "@/types/dashboard"
 import type { DictionaryItem, DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
 
-interface SynonymDictionaryTableProps {
+interface StopwordDictionaryTableProps {
     items: DictionaryItem[]
     addingItem: boolean
     newKeyword: string
@@ -36,7 +36,6 @@ interface SynonymDictionaryTableProps {
 
 const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('ko-KR', {
-        year: 'numeric',
         month: '2-digit',
         day: '2-digit',
         hour: '2-digit',
@@ -44,27 +43,12 @@ const formatDate = (dateStr: string) => {
     })
 }
 
-const formatKeywordDisplay = (keyword: string) => {
-    if (keyword.includes('=>')) {
-        const [base, synonyms] = keyword.split('=>').map(s => s.trim())
-        const synonymList = synonyms.split(',').map(s => s.trim())
-        return (
-            <span className="flex items-start gap-2 flex-wrap">
-                <span className="font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-xs">
-                    {base}
-                </span>
-                <span className="text-gray-400 text-xs mt-0.5">→</span>
-                <div className="flex flex-wrap gap-1">
-                    {synonymList.map((synonym, index) => (
-                        <span key={index} className="font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded text-xs">
-                            {synonym}
-                        </span>
-                    ))}
-                </div>
-            </span>
-        )
-    }
-    return <span className="font-medium text-gray-900">{keyword}</span>
+const formatStopwordDisplay = (keyword: string) => {
+    return (
+        <span className="font-medium text-orange-600 bg-orange-50 px-2 py-0.5 rounded text-xs">
+            {keyword}
+        </span>
+    )
 }
 
 const getSortIcon = (field: DictionarySortField, sortField: DictionarySortField, sortDirection: DictionarySortDirection) => {
@@ -72,7 +56,7 @@ const getSortIcon = (field: DictionarySortField, sortField: DictionarySortField,
     return sortDirection === 'asc' ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />
 }
 
-export function SynonymDictionaryTable({
+export function StopwordDictionaryTable({
     items,
     addingItem,
     newKeyword,
@@ -92,7 +76,7 @@ export function SynonymDictionaryTable({
     validateKeyword,
     environment,
     canEdit
-}: SynonymDictionaryTableProps) {
+}: StopwordDictionaryTableProps) {
     return (
         <div className="border border-gray-200 rounded-md overflow-hidden">
             <Table>
@@ -103,7 +87,7 @@ export function SynonymDictionaryTable({
                             onClick={() => onSort('keyword')}
                         >
                             <div className="flex items-center gap-1">
-                                유의어 규칙
+                                불용어
                                 {getSortIcon('keyword', sortField, sortDirection)}
                             </div>
                         </TableHead>
@@ -125,13 +109,13 @@ export function SynonymDictionaryTable({
                             <TableCell className="py-2">
                                 <div className="space-y-2">
                                     <Input
-                                        placeholder="유의어 규칙을 입력하세요 (예: 휴대폰 => 핸드폰,모바일,스마트폰)"
+                                        placeholder="불용어를 입력하세요 (예: 그)"
                                         value={newKeyword}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => onNewKeywordChange(e.target.value)}
                                         className="h-7 text-xs"
                                     />
                                     {!validateKeyword(newKeyword) && (
-                                        <div className="text-red-600 text-xs">올바른 형식으로 입력해주세요. (기본어 {'=>'} 유의어1,유의어2)</div>
+                                        <div className="text-red-600 text-xs">불용어는 단일 단어로 입력해주세요. (콤마나 특수문자 불가)</div>
                                     )}
                                 </div>
                             </TableCell>
@@ -170,13 +154,13 @@ export function SynonymDictionaryTable({
                                     <TableCell className="py-2">
                                         <div className="space-y-2">
                                             <Input
-                                                placeholder="유의어 규칙을 입력하세요"
+                                                placeholder="불용어를 입력하세요"
                                                 value={editingKeyword}
                                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => onEditingKeywordChange(e.target.value)}
                                                 className="h-7 text-xs"
                                             />
                                             {!validateKeyword(editingKeyword) && (
-                                                <div className="text-red-600 text-xs">올바른 형식으로 입력해주세요. (기본어 {'=>'} 유의어1,유의어2)</div>
+                                                <div className="text-red-600 text-xs">불용어는 단일 단어로 입력해주세요. (콤마나 특수문자 불가)</div>
                                             )}
                                         </div>
                                     </TableCell>
@@ -208,7 +192,7 @@ export function SynonymDictionaryTable({
                                 <>
                                     <TableCell className="py-2">
                                         <div className="break-words">
-                                            {formatKeywordDisplay(item.keyword)}
+                                            {formatStopwordDisplay(item.keyword)}
                                         </div>
                                     </TableCell>
                                     <TableCell className="py-2 text-xs text-gray-500">
