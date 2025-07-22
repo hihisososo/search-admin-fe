@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button"
 import { apiFetch } from "@/lib/api"
 import { DictionaryEnvironmentType } from "@/types/dashboard"
 import type { DictionaryItem, DictionaryPageResponse, DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
-import { EnvironmentSelector } from "./components/EnvironmentSelector"
-import { UserDictionaryHeader } from "./components/UserDictionaryHeader"
-import { UserDictionaryTable } from "./components/UserDictionaryTable"
+import { EnvironmentSelector } from "../user/components/EnvironmentSelector"
+import { StopwordDictionaryHeader } from "./components/StopwordDictionaryHeader"
+import { StopwordDictionaryTable } from "./components/StopwordDictionaryTable"
 
-export default function UserDictionary() {
+export default function StopwordDictionary() {
     const [items, setItems] = useState<DictionaryItem[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
@@ -37,11 +37,11 @@ export default function UserDictionary() {
                 environment: environment,
                 ...(search && { search: search })
             })
-            const response = await apiFetch<DictionaryPageResponse<DictionaryItem>>(`/api/v1/dictionaries/user?${params}`)
+            const response = await apiFetch<DictionaryPageResponse<DictionaryItem>>(`/api/v1/dictionaries/stopword?${params}`)
             setItems(response.content || [])
             setTotal(response.totalElements || 0)
         } catch (err) {
-            console.error('사용자 사전 API 에러:', err)
+            console.error('불용어 사전 API 에러:', err)
             if (err instanceof Error) {
                 if (err.message.includes('500') || err.message.includes('서버 내부 오류')) {
                     setError("서버에서 일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.")
@@ -60,7 +60,8 @@ export default function UserDictionary() {
     }
 
     const validateKeyword = (keyword: string): boolean => {
-        return keyword.trim() !== ""
+        const trimmed = keyword.trim()
+        return trimmed !== "" && !trimmed.includes(',') && !trimmed.includes('=')
     }
 
     const handleSort = (field: DictionarySortField) => {
@@ -79,14 +80,16 @@ export default function UserDictionary() {
         setNewKeyword("")
     }
 
+
+
     const handleSaveNew = async () => {
         if (!validateKeyword(newKeyword)) {
-            setError("키워드를 입력해주세요.")
+            setError("불용어는 단일 단어로 입력해주세요. (콤마나 특수문자 불가)")
             return
         }
         
         try {
-            const response = await apiFetch<DictionaryItem>("/api/v1/dictionaries/user", {
+            const response = await apiFetch<DictionaryItem>("/api/v1/dictionaries/stopword", {
                 method: "POST",
                 body: JSON.stringify({ 
                     keyword: newKeyword.trim()
@@ -122,12 +125,12 @@ export default function UserDictionary() {
 
     const handleSaveEdit = async (item: DictionaryItem) => {
         if (!validateKeyword(editingKeyword)) {
-            setError("키워드를 입력해주세요.")
+            setError("불용어는 단일 단어로 입력해주세요. (콤마나 특수문자 불가)")
             return
         }
         
         try {
-            const response = await apiFetch<DictionaryItem>(`/api/v1/dictionaries/user/${item.id}`, {
+            const response = await apiFetch<DictionaryItem>(`/api/v1/dictionaries/stopword/${item.id}`, {
                 method: "PUT",
                 body: JSON.stringify({ 
                     keyword: editingKeyword.trim()
@@ -161,7 +164,7 @@ export default function UserDictionary() {
         if (!confirm("정말로 삭제하시겠습니까?")) return
         
         try {
-            await apiFetch(`/api/v1/dictionaries/user/${id}`, { method: 'DELETE' })
+            await apiFetch(`/api/v1/dictionaries/stopword/${id}`, { method: 'DELETE' })
             alert("사전 항목이 성공적으로 삭제되었습니다.")
             await fetchItems()
         } catch (err) {
@@ -182,7 +185,7 @@ export default function UserDictionary() {
     const startPage = Math.max(1, page - 2)
     const endPage = Math.min(totalPages, page + 2)
 
-    // 편집 가능한 환경 (사용자 사전은 현재 환경만 편집 가능)
+    // 편집 가능한 환경 (불용어는 현재 환경만 편집 가능)
     const canEdit = environment === DictionaryEnvironmentType.CURRENT
 
     return (
@@ -197,7 +200,7 @@ export default function UserDictionary() {
                             />
                         </div>
                     </div>
-                    <UserDictionaryHeader
+                    <StopwordDictionaryHeader
                         search={search}
                         onSearchChange={setSearch}
                         onSearch={handleSearch}
@@ -223,7 +226,7 @@ export default function UserDictionary() {
                         </div>
                     ) : (
                         <>
-                            <UserDictionaryTable
+                            <StopwordDictionaryTable
                                 items={items}
                                 addingItem={addingItem}
                                 newKeyword={newKeyword}
@@ -248,7 +251,7 @@ export default function UserDictionary() {
                             {items.length === 0 && !addingItem && (
                                 <div className="text-center py-6 text-gray-500">
                                     <div className="mb-2 text-sm">등록된 항목이 없습니다</div>
-                                    <div className="text-xs text-gray-400">새로운 사용자 단어를 추가해보세요</div>
+                                    <div className="text-xs text-gray-400">새로운 불용어를 추가해보세요</div>
                                 </div>
                             )}
 

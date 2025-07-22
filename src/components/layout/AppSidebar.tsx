@@ -14,11 +14,13 @@ import {
 import { ScanSearch, ChevronRight } from "lucide-react"
 import { MENU_ITEMS } from "@/constants/menu"
 import { useState } from "react"
-import { useLocation } from "react-router-dom"
+import { useLocation, Link } from "react-router-dom"
 
 export function AppSidebar() {
-  const [expandedItems, setExpandedItems] = useState<string[]>(['dictionary'])
   const location = useLocation()
+  
+  // 사전관리는 항상 펼쳐둔 상태로 유지
+  const [expandedItems, setExpandedItems] = useState<string[]>(['dictionary'])
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems(prev => 
@@ -35,10 +37,10 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarHeader>
-            <a href="#" className="flex items-center gap-2 mb-2">
+            <Link to="/dashboard" className="flex items-center gap-2 mb-2">
               <ScanSearch className="!size-5" />
               <span className="text-base font-semibold">Search Admin</span>
-            </a>
+            </Link>
           </SidebarHeader>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -59,9 +61,9 @@ export function AppSidebar() {
                                 asChild
                                 isActive={location.pathname === subItem.path}
                               >
-                                <a href={subItem.path}>
+                                <Link to={subItem.path}>
                                   <span>{subItem.title}</span>
-                                </a>
+                                </Link>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                           ))}
@@ -70,10 +72,10 @@ export function AppSidebar() {
                     </>
                   ) : (
                     <SidebarMenuButton asChild isActive={location.pathname === item.path}>
-                      <a href={item.path}>
+                      <Link to={item.path}>
                         <item.icon />
                         <span>{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   )}
                 </SidebarMenuItem>

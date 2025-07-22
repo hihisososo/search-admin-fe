@@ -12,11 +12,13 @@ import { ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, Check, X } from "lucide-
 import { DictionaryEnvironmentType } from "@/types/dashboard"
 import type { DictionaryItem, DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
 
-interface SynonymDictionaryTableProps {
+interface TypoCorrectionDictionaryTableProps {
     items: DictionaryItem[]
     addingItem: boolean
     newKeyword: string
+    newCorrectedWord: string
     editingKeyword: string
+    editingCorrectedWord: string
     highlightedId: number | null
     sortField: DictionarySortField
     sortDirection: DictionarySortDirection
@@ -26,17 +28,18 @@ interface SynonymDictionaryTableProps {
     onCancelEdit: (item: DictionaryItem) => void
     onDelete: (id: number) => void
     onNewKeywordChange: (value: string) => void
+    onNewCorrectedWordChange: (value: string) => void
     onEditingKeywordChange: (value: string) => void
+    onEditingCorrectedWordChange: (value: string) => void
     onSaveNew: () => void
     onCancelNew: () => void
-    validateKeyword: (keyword: string) => boolean
+    validateTypoCorrection: (keyword: string, correctedWord: string) => boolean
     environment: DictionaryEnvironmentType
     canEdit: boolean
 }
 
 const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('ko-KR', {
-        year: 'numeric',
         month: '2-digit',
         day: '2-digit',
         hour: '2-digit',
@@ -44,39 +47,18 @@ const formatDate = (dateStr: string) => {
     })
 }
 
-const formatKeywordDisplay = (keyword: string) => {
-    if (keyword.includes('=>')) {
-        const [base, synonyms] = keyword.split('=>').map(s => s.trim())
-        const synonymList = synonyms.split(',').map(s => s.trim())
-        return (
-            <span className="flex items-start gap-2 flex-wrap">
-                <span className="font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-xs">
-                    {base}
-                </span>
-                <span className="text-gray-400 text-xs mt-0.5">→</span>
-                <div className="flex flex-wrap gap-1">
-                    {synonymList.map((synonym, index) => (
-                        <span key={index} className="font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded text-xs">
-                            {synonym}
-                        </span>
-                    ))}
-                </div>
-            </span>
-        )
-    }
-    return <span className="font-medium text-gray-900">{keyword}</span>
-}
-
 const getSortIcon = (field: DictionarySortField, sortField: DictionarySortField, sortDirection: DictionarySortDirection) => {
     if (sortField !== field) return <ArrowUpDown className="h-3.5 w-3.5" />
     return sortDirection === 'asc' ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />
 }
 
-export function SynonymDictionaryTable({
+export function TypoCorrectionDictionaryTable({
     items,
     addingItem,
     newKeyword,
+    newCorrectedWord,
     editingKeyword,
+    editingCorrectedWord,
     highlightedId,
     sortField,
     sortDirection,
@@ -86,27 +68,30 @@ export function SynonymDictionaryTable({
     onCancelEdit,
     onDelete,
     onNewKeywordChange,
+    onNewCorrectedWordChange,
     onEditingKeywordChange,
+    onEditingCorrectedWordChange,
     onSaveNew,
     onCancelNew,
-    validateKeyword,
+    validateTypoCorrection,
     environment,
     canEdit
-}: SynonymDictionaryTableProps) {
+}: TypoCorrectionDictionaryTableProps) {
     return (
         <div className="border border-gray-200 rounded-md overflow-hidden">
             <Table>
                 <TableHeader>
                     <TableRow className="bg-gray-50 hover:bg-gray-50">
                         <TableHead
-                            className="cursor-pointer hover:bg-gray-100 py-2 text-xs font-semibold text-gray-700"
+                            className="cursor-pointer hover:bg-gray-100 py-2 text-xs font-semibold text-gray-700 w-1/3"
                             onClick={() => onSort('keyword')}
                         >
                             <div className="flex items-center gap-1">
-                                유의어 규칙
+                                오타 단어
                                 {getSortIcon('keyword', sortField, sortDirection)}
                             </div>
                         </TableHead>
+                        <TableHead className="py-2 text-xs font-semibold text-gray-700 w-1/3">교정어</TableHead>
                         <TableHead
                             className="cursor-pointer hover:bg-gray-100 py-2 text-xs font-semibold text-gray-700 w-24"
                             onClick={() => onSort('updatedAt')}
@@ -123,39 +108,47 @@ export function SynonymDictionaryTable({
                     {addingItem && canEdit && (
                         <TableRow className="bg-blue-50 hover:bg-blue-50">
                             <TableCell className="py-2">
-                                <div className="space-y-2">
-                                    <Input
-                                        placeholder="유의어 규칙을 입력하세요 (예: 휴대폰 => 핸드폰,모바일,스마트폰)"
-                                        value={newKeyword}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onNewKeywordChange(e.target.value)}
-                                        className="h-7 text-xs"
-                                    />
-                                    {!validateKeyword(newKeyword) && (
-                                        <div className="text-red-600 text-xs">올바른 형식으로 입력해주세요. (기본어 {'=>'} 유의어1,유의어2)</div>
-                                    )}
-                                </div>
+                                <Input
+                                    placeholder="오타 단어를 입력하세요 (예: 삼송)"
+                                    value={newKeyword}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onNewKeywordChange(e.target.value)}
+                                    className="h-7 text-xs"
+                                />
+                            </TableCell>
+                            <TableCell className="py-2">
+                                <Input
+                                    placeholder="교정어를 입력하세요 (예: 삼성)"
+                                    value={newCorrectedWord}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onNewCorrectedWordChange(e.target.value)}
+                                    className="h-7 text-xs"
+                                />
                             </TableCell>
                             <TableCell className="py-2 text-xs text-gray-500">
                                 -
                             </TableCell>
                             <TableCell className="py-2">
-                                <div className="flex gap-1">
-                                    <Button
-                                        size="sm"
-                                        onClick={onSaveNew}
-                                        disabled={!validateKeyword(newKeyword)}
-                                        className="h-6 w-6 p-0 bg-green-600 hover:bg-green-700"
-                                    >
-                                        <Check className="h-3 w-3" />
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={onCancelNew}
-                                        className="h-6 w-6 p-0 border-gray-300"
-                                    >
-                                        <X className="h-3 w-3" />
-                                    </Button>
+                                <div className="space-y-1">
+                                    <div className="flex gap-1">
+                                        <Button
+                                            size="sm"
+                                            onClick={onSaveNew}
+                                            disabled={!validateTypoCorrection(newKeyword, newCorrectedWord)}
+                                            className="h-6 w-6 p-0 bg-green-600 hover:bg-green-700"
+                                        >
+                                            <Check className="h-3 w-3" />
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={onCancelNew}
+                                            className="h-6 w-6 p-0 border-gray-300"
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </Button>
+                                    </div>
+                                    {!validateTypoCorrection(newKeyword, newCorrectedWord) && (
+                                        <div className="text-red-600 text-xs">오타 단어와 교정어를 모두 입력해주세요.</div>
+                                    )}
                                 </div>
                             </TableCell>
                         </TableRow>
@@ -168,39 +161,47 @@ export function SynonymDictionaryTable({
                             {item.isEditing && canEdit ? (
                                 <>
                                     <TableCell className="py-2">
-                                        <div className="space-y-2">
-                                            <Input
-                                                placeholder="유의어 규칙을 입력하세요"
-                                                value={editingKeyword}
-                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onEditingKeywordChange(e.target.value)}
-                                                className="h-7 text-xs"
-                                            />
-                                            {!validateKeyword(editingKeyword) && (
-                                                <div className="text-red-600 text-xs">올바른 형식으로 입력해주세요. (기본어 {'=>'} 유의어1,유의어2)</div>
-                                            )}
-                                        </div>
+                                        <Input
+                                            placeholder="오타 단어를 입력하세요"
+                                            value={editingKeyword}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onEditingKeywordChange(e.target.value)}
+                                            className="h-7 text-xs"
+                                        />
+                                    </TableCell>
+                                    <TableCell className="py-2">
+                                        <Input
+                                            placeholder="교정어를 입력하세요"
+                                            value={editingCorrectedWord}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onEditingCorrectedWordChange(e.target.value)}
+                                            className="h-7 text-xs"
+                                        />
                                     </TableCell>
                                     <TableCell className="py-2 text-xs text-gray-500">
                                         {formatDate(item.updatedAt)}
                                     </TableCell>
                                     <TableCell className="py-2">
-                                        <div className="flex gap-1">
-                                            <Button
-                                                size="sm"
-                                                onClick={() => onSaveEdit(item)}
-                                                disabled={!validateKeyword(editingKeyword)}
-                                                className="h-6 w-6 p-0 bg-green-600 hover:bg-green-700"
-                                            >
-                                                <Check className="h-3 w-3" />
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={() => onCancelEdit(item)}
-                                                className="h-6 w-6 p-0 border-gray-300"
-                                            >
-                                                <X className="h-3 w-3" />
-                                            </Button>
+                                        <div className="space-y-1">
+                                            <div className="flex gap-1">
+                                                <Button
+                                                    size="sm"
+                                                    onClick={() => onSaveEdit(item)}
+                                                    disabled={!validateTypoCorrection(editingKeyword, editingCorrectedWord)}
+                                                    className="h-6 w-6 p-0 bg-green-600 hover:bg-green-700"
+                                                >
+                                                    <Check className="h-3 w-3" />
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() => onCancelEdit(item)}
+                                                    className="h-6 w-6 p-0 border-gray-300"
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </Button>
+                                            </div>
+                                            {!validateTypoCorrection(editingKeyword, editingCorrectedWord) && (
+                                                <div className="text-red-600 text-xs">오타 단어와 교정어를 모두 입력해주세요.</div>
+                                            )}
                                         </div>
                                     </TableCell>
                                 </>
@@ -208,7 +209,16 @@ export function SynonymDictionaryTable({
                                 <>
                                     <TableCell className="py-2">
                                         <div className="break-words">
-                                            {formatKeywordDisplay(item.keyword)}
+                                            <span className="font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded text-xs">
+                                                {item.keyword}
+                                            </span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="py-2">
+                                        <div className="break-words">
+                                            <span className="font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded text-xs">
+                                                {item.correctedWord || '-'}
+                                            </span>
                                         </div>
                                     </TableCell>
                                     <TableCell className="py-2 text-xs text-gray-500">

@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react"
 import { Card, CardHeader, CardDescription, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { apiFetch } from "@/lib/api"
+import { apiFetch, realtimeSyncApi, typoCorrectionDictionaryApi } from "@/lib/api"
 import { DictionaryEnvironmentType } from "@/types/dashboard"
 import type { DictionaryItem, DictionaryPageResponse, DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
-import { EnvironmentSelector } from "./components/EnvironmentSelector"
-import { UserDictionaryHeader } from "./components/UserDictionaryHeader"
-import { UserDictionaryTable } from "./components/UserDictionaryTable"
+import { EnvironmentSelector } from "../user/components/EnvironmentSelector"
+import { TypoCorrectionDictionaryHeader } from "./components/TypoCorrectionDictionaryHeader"
+import { TypoCorrectionDictionaryTable } from "./components/TypoCorrectionDictionaryTable"
 
-export default function UserDictionary() {
+export default function TypoCorrectionDictionary() {
     const [items, setItems] = useState<DictionaryItem[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
@@ -22,26 +22,28 @@ export default function UserDictionary() {
     // 추가/편집 관련 상태
     const [addingItem, setAddingItem] = useState(false)
     const [newKeyword, setNewKeyword] = useState("")
+    const [newCorrectedWord, setNewCorrectedWord] = useState("")
     const [editingKeyword, setEditingKeyword] = useState("")
+    const [editingCorrectedWord, setEditingCorrectedWord] = useState("")
     const [highlightedId, setHighlightedId] = useState<number | null>(null)
 
     const fetchItems = async () => {
         setLoading(true)
         setError("")
         try {
-            const params = new URLSearchParams({
-                page: (page - 1).toString(),
-                size: "20",
+            const params = {
+                page: page - 1,
+                size: 20,
                 sortBy: sortField,
                 sortDir: sortDirection,
                 environment: environment,
                 ...(search && { search: search })
-            })
-            const response = await apiFetch<DictionaryPageResponse<DictionaryItem>>(`/api/v1/dictionaries/user?${params}`)
+            }
+            const response = await typoCorrectionDictionaryApi.getList(params)
             setItems(response.content || [])
             setTotal(response.totalElements || 0)
         } catch (err) {
-            console.error('사용자 사전 API 에러:', err)
+            console.error('오타교정 사전 API 에러:', err)
             if (err instanceof Error) {
                 if (err.message.includes('500') || err.message.includes('서버 내부 오류')) {
                     setError("서버에서 일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.")
@@ -59,8 +61,8 @@ export default function UserDictionary() {
         }
     }
 
-    const validateKeyword = (keyword: string): boolean => {
-        return keyword.trim() !== ""
+    const validateTypoCorrection = (keyword: string, correctedWord: string): boolean => {
+        return keyword.trim() !== "" && correctedWord.trim() !== ""
     }
 
     const handleSort = (field: DictionarySortField) => {
@@ -77,24 +79,34 @@ export default function UserDictionary() {
     const handleAdd = () => {
         setAddingItem(true)
         setNewKeyword("")
+        setNewCorrectedWord("")
+    }
+
+    // 실시간 반영 함수
+    const handleApplyChanges = async () => {
+        try {
+            const response = await realtimeSyncApi.syncTypoCorrection(environment)
+            alert(response.message || "오타교정 사전이 실시간으로 반영되었습니다.")
+        } catch (err) {
+            alert(err instanceof Error ? err.message : "실시간 반영 실패")
+        }
     }
 
     const handleSaveNew = async () => {
-        if (!validateKeyword(newKeyword)) {
-            setError("키워드를 입력해주세요.")
+        if (!validateTypoCorrection(newKeyword, newCorrectedWord)) {
+            setError("오타 단어와 교정어를 모두 입력해주세요.")
             return
         }
         
         try {
-            const response = await apiFetch<DictionaryItem>("/api/v1/dictionaries/user", {
-                method: "POST",
-                body: JSON.stringify({ 
-                    keyword: newKeyword.trim()
-                })
+            const response = await typoCorrectionDictionaryApi.create({ 
+                keyword: newKeyword.trim(),
+                correctedWord: newCorrectedWord.trim()
             })
             
             setAddingItem(false)
             setNewKeyword("")
+            setNewCorrectedWord("")
             setError("")
             setPage(1)
             setHighlightedId(response.id)
@@ -108,6 +120,7 @@ export default function UserDictionary() {
     const handleCancelNew = () => {
         setAddingItem(false)
         setNewKeyword("")
+        setNewCorrectedWord("")
         setError("")
     }
 
@@ -118,20 +131,19 @@ export default function UserDictionary() {
                 : { ...i, isEditing: false }
         ))
         setEditingKeyword(item.keyword)
+        setEditingCorrectedWord(item.correctedWord || "")
     }
 
     const handleSaveEdit = async (item: DictionaryItem) => {
-        if (!validateKeyword(editingKeyword)) {
-            setError("키워드를 입력해주세요.")
+        if (!validateTypoCorrection(editingKeyword, editingCorrectedWord)) {
+            setError("오타 단어와 교정어를 모두 입력해주세요.")
             return
         }
         
         try {
-            const response = await apiFetch<DictionaryItem>(`/api/v1/dictionaries/user/${item.id}`, {
-                method: "PUT",
-                body: JSON.stringify({ 
-                    keyword: editingKeyword.trim()
-                })
+            const response = await typoCorrectionDictionaryApi.update(item.id, { 
+                keyword: editingKeyword.trim(),
+                correctedWord: editingCorrectedWord.trim()
             })
             
             setItems(prev => prev.map(i => 
@@ -161,7 +173,7 @@ export default function UserDictionary() {
         if (!confirm("정말로 삭제하시겠습니까?")) return
         
         try {
-            await apiFetch(`/api/v1/dictionaries/user/${id}`, { method: 'DELETE' })
+            await typoCorrectionDictionaryApi.delete(id)
             alert("사전 항목이 성공적으로 삭제되었습니다.")
             await fetchItems()
         } catch (err) {
@@ -182,11 +194,12 @@ export default function UserDictionary() {
     const startPage = Math.max(1, page - 2)
     const endPage = Math.min(totalPages, page + 2)
 
-    // 편집 가능한 환경 (사용자 사전은 현재 환경만 편집 가능)
-    const canEdit = environment === DictionaryEnvironmentType.CURRENT
+    // 편집 가능한 환경 (유의어, 오타교정은 개발용, 운영용도 수정 가능)
+    const canEdit = [DictionaryEnvironmentType.CURRENT, DictionaryEnvironmentType.DEV, DictionaryEnvironmentType.PROD].includes(environment)
 
     return (
         <div className="p-4 space-y-4 bg-gray-50 min-h-screen">
+            {/* 메인 콘텐츠 */}
             <Card className="shadow-sm border-gray-200">
                 <CardHeader className="pb-3">
                     <div className="flex items-center justify-between mb-4">
@@ -196,8 +209,17 @@ export default function UserDictionary() {
                                 onChange={handleEnvironmentChange}
                             />
                         </div>
+                        {canEdit && (
+                            <Button
+                                onClick={handleApplyChanges}
+                                size="sm"
+                                className="h-8 px-3 text-xs bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                                실시간 반영
+                            </Button>
+                        )}
                     </div>
-                    <UserDictionaryHeader
+                    <TypoCorrectionDictionaryHeader
                         search={search}
                         onSearchChange={setSearch}
                         onSearch={handleSearch}
@@ -209,8 +231,18 @@ export default function UserDictionary() {
                 </CardHeader>
                 <CardContent className="pt-0">
                     {error && (
-                        <div className="text-red-700 text-sm mb-3 p-2 bg-red-50 rounded border border-red-200">
-                            {error}
+                        <div className="text-red-700 text-sm mb-3 p-3 bg-red-50 rounded border border-red-200">
+                            <div className="flex items-center justify-between">
+                                <span>{error}</span>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={fetchItems}
+                                    className="h-7 px-3 text-xs border-red-300 text-red-600 hover:bg-red-100"
+                                >
+                                    재시도
+                                </Button>
+                            </div>
                         </div>
                     )}
 
@@ -223,11 +255,13 @@ export default function UserDictionary() {
                         </div>
                     ) : (
                         <>
-                            <UserDictionaryTable
+                            <TypoCorrectionDictionaryTable
                                 items={items}
                                 addingItem={addingItem}
                                 newKeyword={newKeyword}
+                                newCorrectedWord={newCorrectedWord}
                                 editingKeyword={editingKeyword}
+                                editingCorrectedWord={editingCorrectedWord}
                                 highlightedId={highlightedId}
                                 sortField={sortField}
                                 sortDirection={sortDirection}
@@ -237,18 +271,33 @@ export default function UserDictionary() {
                                 onCancelEdit={handleCancelEdit}
                                 onDelete={handleDelete}
                                 onNewKeywordChange={setNewKeyword}
+                                onNewCorrectedWordChange={setNewCorrectedWord}
                                 onEditingKeywordChange={setEditingKeyword}
+                                onEditingCorrectedWordChange={setEditingCorrectedWord}
                                 onSaveNew={handleSaveNew}
                                 onCancelNew={handleCancelNew}
-                                validateKeyword={validateKeyword}
+                                validateTypoCorrection={validateTypoCorrection}
                                 environment={environment}
                                 canEdit={canEdit}
                             />
 
                             {items.length === 0 && !addingItem && (
                                 <div className="text-center py-6 text-gray-500">
-                                    <div className="mb-2 text-sm">등록된 항목이 없습니다</div>
-                                    <div className="text-xs text-gray-400">새로운 사용자 단어를 추가해보세요</div>
+                                    {error ? (
+                                        <div>
+                                            <div className="mb-2 text-sm">서버 연결에 문제가 있습니다</div>
+                                            <div className="text-xs text-gray-400">
+                                                API 서버가 실행 중인지 확인해주세요.
+                                                <br />
+                                                오타교정 API v2.0 구조가 서버에 반영되었는지 확인이 필요합니다.
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <div className="mb-2 text-sm">등록된 항목이 없습니다</div>
+                                            <div className="text-xs text-gray-400">새로운 오타교정 규칙을 추가해보세요</div>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { searchApi, dashboardApi, type Product, type SearchRequest, type AggregationBucket } from "@/lib/api";
+import { searchApi, dashboardApi, enhancedSearchApi, type Product, type SearchRequest, type AggregationBucket } from "@/lib/api";
 import { type KeywordItem } from "@/types/dashboard";
 import { SearchHeader } from "./components/SearchHeader";
 import { PopularKeywords } from "./components/PopularKeywords";
@@ -17,6 +17,7 @@ export default function SearchDemo() {
   const pageSize = 10;
   const [sort, setSort] = React.useState("score");
   const [categorySub, setCategorySub] = React.useState<string[]>([]);
+  const [applyTypoCorrection, setApplyTypoCorrection] = React.useState(true); // 🆕 오타교정 옵션
   const [products, setProducts] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [brandAgg, setBrandAgg] = React.useState<AggregationBucket[]>([]);
@@ -78,16 +79,15 @@ export default function SearchDemo() {
     setPrice({ from: "", to: "" });
     
     try {
-      const searchRequest: SearchRequest = {
+      const searchRequest = {
         query: searchQuery,
         page: 1,
         size: pageSize,
-        sortField: 'score' as any,
-        sortOrder: 'desc'
+        applyTypoCorrection: applyTypoCorrection // 🆕 오타교정 옵션 추가
       };
 
       const response = await ensureMinimumLoadingTime(
-        searchApi.searchProducts(searchRequest), 
+        enhancedSearchApi.executeSearch(searchRequest), 
         500 // 0.5초 최소 로딩
       );
 
@@ -142,12 +142,13 @@ export default function SearchDemo() {
         sortOrder = 'desc';
       }
 
-      const searchRequest: SearchRequest = {
-        query: searchQuery || undefined,
+      const searchRequest = {
+        query: searchQuery || "",
         page: page,
         size: pageSize,
-        sortField: sortField as any,
+        sortField: sortField,
         sortOrder: sortOrder,
+        applyTypoCorrection: applyTypoCorrection, // 🆕 오타교정 옵션 추가
         ...(brand.length > 0 && { brand }),
         ...(category.length > 0 && { category }),
         ...(price.from && { priceFrom: Number(price.from) }),
@@ -155,7 +156,7 @@ export default function SearchDemo() {
       };
 
       const response = await ensureMinimumLoadingTime(
-        searchApi.searchProducts(searchRequest), 
+        enhancedSearchApi.executeSearch(searchRequest), 
         600 // 필터링은 조금 더 빠르게
       );
 
@@ -227,14 +228,14 @@ export default function SearchDemo() {
     if (searchQuery) {
       performInitialSearch();
     }
-  }, [searchQuery, performInitialSearch]);
+  }, [searchQuery, applyTypoCorrection, performInitialSearch]);
 
   // 필터 변경 시 (필터 검색)
   React.useEffect(() => {
     if (searchQuery) { // 검색어가 있을 때만 필터 적용
       performFilterSearch();
     }
-  }, [brand, category, categorySub, page, sort, performFilterSearch]);
+  }, [brand, category, categorySub, page, sort, applyTypoCorrection, performFilterSearch]);
 
   // 핸들러
   const handleSearch = (val: string) => {
@@ -272,6 +273,8 @@ export default function SearchDemo() {
         setQuery={setQuery}
         onSearch={handleSearch}
         relatedKeywords={[]}
+        applyTypoCorrection={applyTypoCorrection}
+        setApplyTypoCorrection={setApplyTypoCorrection}
       />
 
       {/* 중앙: 필터/인기검색어/상품리스트 */}

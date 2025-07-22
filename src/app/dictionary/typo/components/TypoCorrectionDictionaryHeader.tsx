@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { DictionaryEnvironmentType, ENVIRONMENT_LABELS } from "@/types/dashboard"
 
-interface UserDictionaryHeaderProps {
+interface TypoCorrectionDictionaryHeaderProps {
     search: string
     onSearchChange: (value: string) => void
     onSearch: () => void
@@ -14,7 +14,7 @@ interface UserDictionaryHeaderProps {
     canEdit: boolean
 }
 
-export function UserDictionaryHeader({
+export function TypoCorrectionDictionaryHeader({
     search,
     onSearchChange,
     onSearch,
@@ -22,7 +22,7 @@ export function UserDictionaryHeader({
     addingItem,
     environment,
     canEdit
-}: UserDictionaryHeaderProps) {
+}: TypoCorrectionDictionaryHeaderProps) {
     const environmentInfo = ENVIRONMENT_LABELS[environment]
     
     return (
@@ -32,7 +32,7 @@ export function UserDictionaryHeader({
                     <div className="relative flex-1">
                         <Search className="absolute left-2 top-2 h-3.5 w-3.5 text-gray-400" />
                         <Input
-                            placeholder="사용자 단어 검색..."
+                            placeholder="오타교정 검색..."
                             value={search}
                             onChange={(e) => onSearchChange(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && onSearch()}

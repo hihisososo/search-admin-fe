@@ -7,49 +7,35 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, Check, X } from "lucide-react"
-import { UserDictionaryForm } from "./UserDictionaryForm"
-
-interface UserDictionaryItem {
-    id: number
-    keyword: string
-    description?: string
-    createdAt: string
-    updatedAt: string
-    isNew?: boolean
-    isEditing?: boolean
-}
-
-type SortField = 'keyword' | 'createdAt' | 'updatedAt'
-type SortDirection = 'asc' | 'desc'
+import { DictionaryEnvironmentType } from "@/types/dashboard"
+import type { DictionaryItem, DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
 
 interface UserDictionaryTableProps {
-    items: UserDictionaryItem[]
+    items: DictionaryItem[]
     addingItem: boolean
     newKeyword: string
-    newDescription: string
     editingKeyword: string
-    editingDescription: string
     highlightedId: number | null
-    sortField: SortField
-    sortDirection: SortDirection
-    onSort: (field: SortField) => void
-    onEdit: (item: UserDictionaryItem) => void
-    onSaveEdit: (item: UserDictionaryItem) => void
-    onCancelEdit: (item: UserDictionaryItem) => void
+    sortField: DictionarySortField
+    sortDirection: DictionarySortDirection
+    onSort: (field: DictionarySortField) => void
+    onEdit: (item: DictionaryItem) => void
+    onSaveEdit: (item: DictionaryItem) => void
+    onCancelEdit: (item: DictionaryItem) => void
     onDelete: (id: number) => void
     onNewKeywordChange: (value: string) => void
-    onNewDescriptionChange: (value: string) => void
     onEditingKeywordChange: (value: string) => void
-    onEditingDescriptionChange: (value: string) => void
     onSaveNew: () => void
     onCancelNew: () => void
     validateKeyword: (keyword: string) => boolean
+    environment: DictionaryEnvironmentType
+    canEdit: boolean
 }
 
 const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('ko-KR', {
-        year: 'numeric',
         month: '2-digit',
         day: '2-digit',
         hour: '2-digit',
@@ -58,32 +44,23 @@ const formatDate = (dateStr: string) => {
 }
 
 const formatKeywordDisplay = (keyword: string) => {
-    const parts = keyword.split(',').map(s => s.trim()).filter(s => s)
-    if (parts.length >= 2) {
-        const [firstKeyword, ...restKeywords] = parts
-        return (
-            <span>
-                <span className="font-semibold text-blue-700">{firstKeyword}</span>
-                <span className="text-muted-foreground">, </span>
-                <span>{restKeywords.join(', ')}</span>
-            </span>
-        )
-    }
-    return keyword
+    return (
+        <span className="font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded text-xs">
+            {keyword}
+        </span>
+    )
 }
 
-const getSortIcon = (field: SortField, sortField: SortField, sortDirection: SortDirection) => {
-    if (sortField !== field) return <ArrowUpDown className="h-4 w-4" />
-    return sortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+const getSortIcon = (field: DictionarySortField, sortField: DictionarySortField, sortDirection: DictionarySortDirection) => {
+    if (sortField !== field) return <ArrowUpDown className="h-3.5 w-3.5" />
+    return sortDirection === 'asc' ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />
 }
 
 export function UserDictionaryTable({
     items,
     addingItem,
     newKeyword,
-    newDescription,
     editingKeyword,
-    editingDescription,
     highlightedId,
     sortField,
     sortDirection,
@@ -93,132 +70,162 @@ export function UserDictionaryTable({
     onCancelEdit,
     onDelete,
     onNewKeywordChange,
-    onNewDescriptionChange,
     onEditingKeywordChange,
-    onEditingDescriptionChange,
     onSaveNew,
     onCancelNew,
-    validateKeyword
+    validateKeyword,
+    environment,
+    canEdit
 }: UserDictionaryTableProps) {
     return (
-        <Table>
-            <TableHeader>
-                <TableRow>
-                    <TableHead 
-                        className="cursor-pointer hover:bg-muted/50"
-                        onClick={() => onSort('keyword')}
-                    >
-                        <div className="flex items-center gap-2">
-                            키워드
-                            {getSortIcon('keyword', sortField, sortDirection)}
-                        </div>
-                    </TableHead>
-                    <TableHead 
-                        className="cursor-pointer hover:bg-muted/50"
-                        onClick={() => onSort('updatedAt')}
-                    >
-                        <div className="flex items-center gap-2">
-                            수정일
-                            {getSortIcon('updatedAt', sortField, sortDirection)}
-                        </div>
-                    </TableHead>
-                    <TableHead>액션</TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {addingItem && (
-                    <TableRow className="bg-blue-50">
-                        <TableCell colSpan={2}>
-                            <div className="max-w-md">
-                                <UserDictionaryForm
-                                    mode="add"
-                                    keyword={newKeyword}
-                                    description={newDescription}
-                                    onKeywordChange={onNewKeywordChange}
-                                    onDescriptionChange={onNewDescriptionChange}
-                                    isValid={validateKeyword(newKeyword)}
-                                />
+        <div className="border border-gray-200 rounded-md overflow-hidden">
+            <Table>
+                <TableHeader>
+                    <TableRow className="bg-gray-50 hover:bg-gray-50">
+                        <TableHead
+                            className="cursor-pointer hover:bg-gray-100 py-2 text-xs font-semibold text-gray-700"
+                            onClick={() => onSort('keyword')}
+                        >
+                            <div className="flex items-center gap-1">
+                                사용자 단어
+                                {getSortIcon('keyword', sortField, sortDirection)}
                             </div>
-                        </TableCell>
-                        <TableCell>
-                            <div className="flex gap-2 justify-start">
-                                <Button 
-                                    size="sm" 
-                                    onClick={onSaveNew}
-                                    disabled={!validateKeyword(newKeyword)}
-                                >
-                                    <Check className="h-3 w-3" />
-                                </Button>
-                                <Button size="sm" variant="outline" onClick={onCancelNew}>
-                                    <X className="h-3 w-3" />
-                                </Button>
+                        </TableHead>
+                        <TableHead
+                            className="cursor-pointer hover:bg-gray-100 py-2 text-xs font-semibold text-gray-700 w-24"
+                            onClick={() => onSort('updatedAt')}
+                        >
+                            <div className="flex items-center gap-1">
+                                수정일
+                                {getSortIcon('updatedAt', sortField, sortDirection)}
                             </div>
-                        </TableCell>
+                        </TableHead>
+                        {canEdit && <TableHead className="py-2 text-xs font-semibold text-gray-700 w-20">액션</TableHead>}
                     </TableRow>
-                )}
-                {items.map((item) => (
-                    <TableRow 
-                        key={item.id}
-                        className={highlightedId === item.id ? "bg-yellow-100" : ""}
-                    >
-                        {item.isEditing ? (
-                            <>
-                                <TableCell colSpan={2}>
-                                    <div className="max-w-md">
-                                        <UserDictionaryForm
-                                            mode="edit"
-                                            keyword={editingKeyword}
-                                            description={editingDescription}
-                                            onKeywordChange={onEditingKeywordChange}
-                                            onDescriptionChange={onEditingDescriptionChange}
-                                            isValid={validateKeyword(editingKeyword)}
-                                        />
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <div className="flex gap-2 justify-start">
-                                        <Button 
-                                            size="sm" 
-                                            onClick={() => onSaveEdit(item)}
-                                            disabled={!validateKeyword(editingKeyword)}
-                                        >
-                                            <Check className="h-3 w-3" />
-                                        </Button>
-                                        <Button size="sm" variant="outline" onClick={() => onCancelEdit(item)}>
-                                            <X className="h-3 w-3" />
-                                        </Button>
-                                    </div>
-                                </TableCell>
-                            </>
-                        ) : (
-                            <>
-                                <TableCell>
-                                    {formatKeywordDisplay(item.keyword)}
-                                </TableCell>
-                                <TableCell>{formatDate(item.updatedAt)}</TableCell>
-                                <TableCell>
-                                    <div className="flex gap-2">
-                                        <Button 
-                                            size="sm" 
-                                            variant="outline" 
-                                            onClick={() => onEdit(item)}
-                                        >
-                                            <Edit className="h-3 w-3" />
-                                        </Button>
-                                        <Button 
-                                            size="sm" 
-                                            variant="destructive" 
-                                            onClick={() => onDelete(item.id)}
-                                        >
-                                            <Trash2 className="h-3 w-3" />
-                                        </Button>
-                                    </div>
-                                </TableCell>
-                            </>
-                        )}
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
+                </TableHeader>
+                <TableBody>
+                    {addingItem && canEdit && (
+                        <TableRow className="bg-blue-50 hover:bg-blue-50">
+                            <TableCell className="py-2">
+                                <div className="space-y-2">
+                                    <Input
+                                        placeholder="사용자 단어를 입력하세요 (예: 브랜드명, 제품명)"
+                                        value={newKeyword}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onNewKeywordChange(e.target.value)}
+                                        className="h-7 text-xs"
+                                    />
+                                    {!validateKeyword(newKeyword) && (
+                                        <div className="text-red-600 text-xs">키워드를 입력해주세요.</div>
+                                    )}
+                                </div>
+                            </TableCell>
+                            <TableCell className="py-2 text-xs text-gray-500">
+                                -
+                            </TableCell>
+                            <TableCell className="py-2">
+                                <div className="flex gap-1">
+                                    <Button
+                                        size="sm"
+                                        onClick={onSaveNew}
+                                        disabled={!validateKeyword(newKeyword)}
+                                        className="h-6 w-6 p-0 bg-green-600 hover:bg-green-700"
+                                    >
+                                        <Check className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={onCancelNew}
+                                        className="h-6 w-6 p-0 border-gray-300"
+                                    >
+                                        <X className="h-3 w-3" />
+                                    </Button>
+                                </div>
+                            </TableCell>
+                        </TableRow>
+                    )}
+                    {items.map((item) => (
+                        <TableRow
+                            key={item.id}
+                            className={`hover:bg-gray-50 ${highlightedId === item.id ? "bg-amber-50" : ""}`}
+                        >
+                            {item.isEditing && canEdit ? (
+                                <>
+                                    <TableCell className="py-2">
+                                        <div className="space-y-2">
+                                            <Input
+                                                placeholder="사용자 단어를 입력하세요"
+                                                value={editingKeyword}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onEditingKeywordChange(e.target.value)}
+                                                className="h-7 text-xs"
+                                            />
+                                            {!validateKeyword(editingKeyword) && (
+                                                <div className="text-red-600 text-xs">키워드를 입력해주세요.</div>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="py-2 text-xs text-gray-500">
+                                        {formatDate(item.updatedAt)}
+                                    </TableCell>
+                                    <TableCell className="py-2">
+                                        <div className="flex gap-1">
+                                            <Button
+                                                size="sm"
+                                                onClick={() => onSaveEdit(item)}
+                                                disabled={!validateKeyword(editingKeyword)}
+                                                className="h-6 w-6 p-0 bg-green-600 hover:bg-green-700"
+                                            >
+                                                <Check className="h-3 w-3" />
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => onCancelEdit(item)}
+                                                className="h-6 w-6 p-0 border-gray-300"
+                                            >
+                                                <X className="h-3 w-3" />
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </>
+                            ) : (
+                                <>
+                                    <TableCell className="py-2">
+                                        <div className="break-words">
+                                            {formatKeywordDisplay(item.keyword)}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="py-2 text-xs text-gray-500">
+                                        {formatDate(item.updatedAt)}
+                                    </TableCell>
+                                    {canEdit && (
+                                        <TableCell className="py-2">
+                                            <div className="flex gap-1">
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() => onEdit(item)}
+                                                    className="h-6 w-6 p-0 border-gray-300 hover:bg-gray-100"
+                                                >
+                                                    <Edit className="h-3 w-3" />
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() => onDelete(item.id)}
+                                                    className="h-6 w-6 p-0 border-red-300 text-red-600 hover:bg-red-50"
+                                                >
+                                                    <Trash2 className="h-3 w-3" />
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    )}
+                                </>
+                            )}
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </div>
     )
 } 

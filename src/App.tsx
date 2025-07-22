@@ -2,11 +2,10 @@ import './App.css'
 import Layout from "./components/layout/Layout"
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Dashboard from "./app/dashboard/page"
-import IndexManagement from "./app/index/page"
-import IndexAdd from "./app/index/add/page"
-import IndexView from "./app/index/view/page"
 import UserDictionary from "./app/dictionary/user/page"
 import SynonymDictionary from "./app/dictionary/synonym/page"
+import StopwordDictionary from "./app/dictionary/stopword/page"
+import TypoCorrectionDictionary from "./app/dictionary/typo/page"
 import SearchSimulator from "./app/search-simulator/page"
 import SearchDemo from "./app/search-demo/page"
 import DeployManagement from "./app/deploy/page"
@@ -41,12 +40,11 @@ function App() {
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/index" element={<IndexManagement />} />
-              <Route path="/index/add" element={<IndexAdd />} />
-              <Route path="/index/view/:id" element={<IndexView />} />
               <Route path="/dictionary" element={<Navigate to="/dictionary/user" replace />} />
               <Route path="/dictionary/user" element={<UserDictionary />} />
               <Route path="/dictionary/synonym" element={<SynonymDictionary />} />
+              <Route path="/dictionary/stopword" element={<StopwordDictionary />} />
+              <Route path="/dictionary/typo" element={<TypoCorrectionDictionary />} />
               <Route path="/deploy" element={<DeployManagement />} />
               <Route path="/search-simulator" element={<SearchSimulator />} />
             </Routes>
