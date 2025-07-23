@@ -191,8 +191,8 @@ export default function StopwordDictionary() {
     return (
         <div className="p-4 space-y-4 bg-gray-50 min-h-screen">
             <Card className="shadow-sm border-gray-200">
-                <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between mb-4">
+                <CardHeader className="pb-1">
+                    <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-3">
                             <EnvironmentSelector
                                 value={environment}

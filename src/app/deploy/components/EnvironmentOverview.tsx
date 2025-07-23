@@ -36,11 +36,11 @@ export default function EnvironmentOverview({
   const getStatusColor = (status: Environment['indexStatus']) => {
     switch (status) {
       case 'ACTIVE':
-        return 'bg-gray-100 text-gray-700 border-gray-300'
+        return 'bg-green-50 text-green-700 border-green-200'
       case 'INACTIVE':
         return 'bg-gray-50 text-gray-500 border-gray-200'
       case 'INDEXING':
-        return 'bg-gray-100 text-gray-600 border-gray-300'
+        return 'bg-blue-50 text-blue-600 border-blue-200'
       case 'FAILED':
         return 'bg-red-50 text-red-600 border-red-200'
       default:
@@ -140,7 +140,7 @@ export default function EnvironmentOverview({
                   variant="outline"
                   size="sm"
                   disabled={!canReindex(env)}
-                  className="flex-1 text-xs h-8 border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                  className="flex-1 text-xs h-8 border-blue-300 text-blue-700 hover:bg-blue-50 disabled:opacity-50"
                 >
                   {isEnvironmentIndexing(env) ? (
                     <>
@@ -158,7 +158,7 @@ export default function EnvironmentOverview({
                   onClick={() => onDeploy()}
                   disabled={isDeploying || !canDeploy()}
                   size="sm"
-                  className="flex-1 text-xs h-8 bg-gray-800 text-white hover:bg-gray-900 border-0 disabled:bg-gray-400"
+                  className="flex-1 text-xs h-8 bg-green-600 text-white hover:bg-green-700 border-0 disabled:bg-gray-400"
                 >
                   {isDeploying ? (
                     <>

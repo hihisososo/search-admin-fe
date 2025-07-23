@@ -120,20 +120,17 @@ export type DictionarySortField = 'keyword' | 'createdAt' | 'updatedAt'
 export type DictionarySortDirection = 'asc' | 'desc'
 
 // 환경별 표시 정보
-export const ENVIRONMENT_LABELS: Record<DictionaryEnvironmentType, { label: string; description: string; color: string }> = {
+export const ENVIRONMENT_LABELS: Record<DictionaryEnvironmentType, { label: string; color: string }> = {
   [DictionaryEnvironmentType.CURRENT]: {
     label: '현재 (편집용)',
-    description: '실시간 편집/수정하는 사전',
     color: 'bg-blue-500'
   },
   [DictionaryEnvironmentType.DEV]: {
     label: '개발환경',
-    description: '색인 실행 시 스냅샷',
     color: 'bg-green-500'
   },
   [DictionaryEnvironmentType.PROD]: {
     label: '운영환경',
-    description: '배포 실행 시 스냅샷',
     color: 'bg-gray-800'
   }
 } 

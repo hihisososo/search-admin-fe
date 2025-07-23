@@ -199,18 +199,6 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords, apply
         {setApplyTypoCorrection && (
           <div className="w-full flex justify-center mt-2 mb-1">
             <div className="flex items-center gap-1 text-xs">
-              <label className="flex items-center gap-1 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={applyTypoCorrection}
-                  onChange={(e) => setApplyTypoCorrection(e.target.checked)}
-                  className="rounded w-3 h-3"
-                />
-                <span className="text-gray-600">오타 자동교정</span>
-              </label>
-              <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded text-xs font-medium">
-                실시간 적용
-              </span>
             </div>
           </div>
         )}
