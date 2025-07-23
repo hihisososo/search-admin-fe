@@ -4,7 +4,7 @@ import { getMenuByPath } from "@/constants/menu"
 
 export function SiteHeader() {
   const location = useLocation()
-  
+
   const getPageTitle = () => {
     const menuItem = getMenuByPath(location.pathname)
     return menuItem ? menuItem.title : 'Search Admin'
@@ -16,8 +16,8 @@ export function SiteHeader() {
         <h1 className="text-base font-medium">{getPageTitle()}</h1>
         <div className="ml-auto flex items-center gap-2">
           <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
-            <a href="#" rel="noopener noreferrer" target="_blank" className="dark:text-foreground">
-              GitHub
+            <a href="/search-demo" rel="noopener noreferrer" target="_blank" className="dark:text-foreground">
+              데모페이지
             </a>
           </Button>
         </div>

@@ -69,15 +69,6 @@ export function SynonymDictionaryHeader({
                     읽기 전용 환경입니다.
                 </div>
             )}
-            
-            {/* 형식 가이드 */}
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-2 text-xs text-blue-800">
-                <div className="font-medium mb-1">유의어 규칙 형식</div>
-                <div className="space-y-1">
-                    <div><span className="font-medium">단방향:</span> 휴대폰 =&gt; 핸드폰,모바일,스마트폰</div>
-                    <div><span className="font-medium">양방향:</span> 휴대폰,핸드폰,모바일,스마트폰</div>
-                </div>
-            </div>
         </div>
     )
 } 

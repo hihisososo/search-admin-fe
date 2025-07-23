@@ -12,20 +12,20 @@ import type {
 
 // 검색 관련 타입 정의
 export interface Product {
-  id: number
+  id: string
+  score?: number
   name: string
   nameRaw: string
+  model?: string[]
   brand: string
-  category: string
-  subCategory?: string
+  categoryName: string
   price: number
-  lowestPrice: number
-  reviewCount: number
-  rating: number
-  thumbnailUrl: string
-  description?: string
-  descriptionRaw?: string
   registeredMonth?: string
+  rating: number
+  reviewCount: number
+  thumbnailUrl: string
+  specs?: string
+  specsRaw?: string
 }
 
 export interface AggregationBucket {
@@ -51,8 +51,8 @@ export interface SearchResponse {
     data: Product[]
   }
   aggregations?: {
-    brand?: AggregationBucket[]
-    category?: AggregationBucket[]
+    brand_name?: AggregationBucket[]
+    category_name?: AggregationBucket[]
   }
   meta: {
     page: number
@@ -657,7 +657,7 @@ export const realtimeSyncApi = {
 // 🆕 검색 API 업데이트 (오타교정 옵션 추가)
 export const enhancedSearchApi = {
   // 상품 검색 실행 (오타교정 옵션 포함)
-  async executeSearch(request: {
+  async executeSearch(params: {
     query: string
     page: number
     size: number
@@ -669,14 +669,12 @@ export const enhancedSearchApi = {
     priceFrom?: number
     priceTo?: number
   }): Promise<SearchResponse> {
-    return apiFetch<SearchResponse>('/api/v1/search/execute', {
-      method: 'POST',
-      body: JSON.stringify(request)
-    })
+    const queryString = buildQueryString(params)
+    return apiFetch<SearchResponse>(`/api/v1/search${queryString}`)
   },
 
   // 검색 시뮬레이션 (오타교정 옵션 포함)
-  async simulateSearch(request: {
+  async simulateSearch(params: {
     query: string
     page: number
     size: number
@@ -690,9 +688,16 @@ export const enhancedSearchApi = {
     priceFrom?: number
     priceTo?: number
   }): Promise<SearchResponse> {
-    return apiFetch<SearchResponse>('/api/v1/search-simulation/execute', {
-      method: 'POST',
-      body: JSON.stringify(request)
-    })
+    const queryString = buildQueryString(params)
+    return apiFetch<SearchResponse>(`/api/v1/search/simulation${queryString}`)
+  },
+
+  // 🆕 자동완성 시뮬레이션
+  async simulateAutocomplete(params: {
+    keyword: string
+    environmentType: string
+  }): Promise<AutocompleteResponse> {
+    const queryString = buildQueryString(params)
+    return apiFetch<AutocompleteResponse>(`/api/v1/search/autocomplete/simulation${queryString}`)
   }
 } 

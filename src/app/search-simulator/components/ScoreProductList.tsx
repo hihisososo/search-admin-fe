@@ -177,9 +177,9 @@ export function ScoreProductList({
                                             {searchQuery ? highlight(p.nameRaw || p.name, searchQuery) : (p.nameRaw || p.name)}
                                         </div>
                                         
-                                        {p.descriptionRaw && (
-                                            <div className="text-xs text-gray-500 leading-snug overflow-hidden max-h-8">
-                                                {searchQuery ? highlight(p.descriptionRaw, searchQuery) : p.descriptionRaw}
+                                        {p.specsRaw && (
+                                            <div className="text-xs text-gray-500 leading-snug whitespace-pre-line break-words">
+                                                {searchQuery ? highlight(p.specsRaw, searchQuery) : p.specsRaw}
                                             </div>
                                         )}
                                         
@@ -192,7 +192,7 @@ export function ScoreProductList({
                                         
                                         <div>
                                             <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-medium">
-                                                {p.category}
+                                                {p.categoryName}
                                             </span>
                                         </div>
                                     </div>

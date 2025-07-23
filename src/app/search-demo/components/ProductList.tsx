@@ -154,12 +154,12 @@ export function ProductList({
                     {searchQuery ? highlight(p.nameRaw || p.name, searchQuery) : (p.nameRaw || p.name)}
                   </div>
                   
-                  {/* description */}
-                  {p.descriptionRaw && (
+                  {/* 상품 상세설명 */}
+                  {p.specsRaw && (
                     <div 
                       className="text-xs text-gray-500 leading-snug whitespace-pre-line opacity-80"
                     >
-                      {searchQuery ? highlight(p.descriptionRaw, searchQuery) : p.descriptionRaw}
+                      {searchQuery ? highlight(p.specsRaw, searchQuery) : p.specsRaw}
                     </div>
                   )}
                   
@@ -184,7 +184,7 @@ export function ProductList({
                   {/* 카테고리 */}
                   <div>
                     <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
-                      카테고리: {p.category}
+                      카테고리: {p.categoryName}
                     </span>
                   </div>
                 </div>

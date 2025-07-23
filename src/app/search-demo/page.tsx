@@ -91,19 +91,28 @@ export default function SearchDemo() {
         500 // 0.5초 최소 로딩
       );
 
-      setProducts(response.hits.data);
+      // API 응답을 Product 타입에 맞게 변환
+      const transformedProducts = response.hits.data.map((item: any) => ({
+        ...item,
+        id: item.id || String(Math.floor(Math.random() * 1000000)),
+        categoryName: item.categoryName || item.category || '',
+        specsRaw: item.specsRaw || item.descriptionRaw || item.description || '',
+        specs: item.specs || item.description || ''
+      }));
+
+      setProducts(transformedProducts);
       setTotalResults(response.hits.total);
       setTotalPages(response.meta.totalPages);
       setPage(1);
 
       // 최초 검색 시 aggregation 저장 (그룹 필터용)
-      if (response.aggregations?.brand) {
-        setBrandAgg(response.aggregations.brand);
-        setBaseBrandAgg(response.aggregations.brand);
+      if (response.aggregations?.brand_name) {
+        setBrandAgg(response.aggregations.brand_name);
+        setBaseBrandAgg(response.aggregations.brand_name);
       }
-      if (response.aggregations?.category) {
-        setCategoryAgg(response.aggregations.category);
-        setBaseCategoryAgg(response.aggregations.category);
+      if (response.aggregations?.category_name) {
+        setCategoryAgg(response.aggregations.category_name);
+        setBaseCategoryAgg(response.aggregations.category_name);
       }
 
     } catch (error) {
@@ -160,7 +169,16 @@ export default function SearchDemo() {
         600 // 필터링은 조금 더 빠르게
       );
 
-      setProducts(response.hits.data);
+      // API 응답을 Product 타입에 맞게 변환
+      const transformedProducts = response.hits.data.map((item: any) => ({
+        ...item,
+        id: item.id || String(Math.floor(Math.random() * 1000000)),
+        categoryName: item.categoryName || item.category || '',
+        specsRaw: item.specsRaw || item.descriptionRaw || item.description || '',
+        specs: item.specs || item.description || ''
+      }));
+
+      setProducts(transformedProducts);
       setTotalResults(response.hits.total);
       setTotalPages(response.meta.totalPages);
 
