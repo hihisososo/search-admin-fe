@@ -6,6 +6,7 @@ import UserDictionary from "./app/dictionary/user/page"
 import SynonymDictionary from "./app/dictionary/synonym/page"
 import StopwordDictionary from "./app/dictionary/stopword/page"
 import TypoCorrectionDictionary from "./app/dictionary/typo/page"
+import SearchLogs from "./app/search-logs/page"
 import SearchSimulator from "./app/search-simulator/page"
 import SearchDemo from "./app/search-demo/page"
 import DeployManagement from "./app/deploy/page"
@@ -45,6 +46,7 @@ function App() {
               <Route path="/dictionary/synonym" element={<SynonymDictionary />} />
               <Route path="/dictionary/stopword" element={<StopwordDictionary />} />
               <Route path="/dictionary/typo" element={<TypoCorrectionDictionary />} />
+              <Route path="/search-logs" element={<SearchLogs />} />
               <Route path="/deploy" element={<DeployManagement />} />
               <Route path="/search-simulator" element={<SearchSimulator />} />
             </Routes>
