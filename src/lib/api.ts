@@ -701,3 +701,17 @@ export const enhancedSearchApi = {
     return apiFetch<AutocompleteResponse>(`/api/v1/search/autocomplete/simulation${queryString}`)
   }
 } 
+
+// 🆕 검색 로그 API 함수들
+export const searchLogApi = {
+  // 검색 로그 목록 조회
+  async getList(params: import('@/types/dashboard').SearchLogParams = {}): Promise<import('@/types/dashboard').SearchLogPageResponse> {
+    const queryString = buildQueryString(params)
+    return apiFetch<import('@/types/dashboard').SearchLogPageResponse>(`/api/v1/search-logs${queryString}`)
+  },
+
+  // 필터 옵션 조회
+  async getFilterOptions(): Promise<import('@/types/dashboard').SearchLogFilterOptions> {
+    return apiFetch<import('@/types/dashboard').SearchLogFilterOptions>('/api/v1/search-logs/filter-options')
+  }
+} 

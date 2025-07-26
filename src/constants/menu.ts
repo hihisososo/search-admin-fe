@@ -1,4 +1,4 @@
-import { Home, Calendar, Search, Rocket } from "lucide-react"
+import { Home, Calendar, Search, Rocket, FileText } from "lucide-react"
 
 export interface MenuItem {
   id: string
@@ -48,6 +48,12 @@ export const MENU_ITEMS: MenuItem[] = [
         path: '/dictionary/typo'
       }
     ]
+  },
+  {
+    id: 'search-logs',
+    title: '검색로그',
+    path: '/search-logs',
+    icon: FileText,
   },
   {
     id: 'deploy',
