@@ -1,3 +1,7 @@
+// 🔄 리팩토링된 서비스로 이전
+// 새로운 API 서비스들을 사용하되, 하위 호환성을 위해 기존 API도 유지
+export * from '@/services'
+
 import { logger } from './logger'
 import { APIError, errorTracker } from './errorHandler'
 import { config } from './config'

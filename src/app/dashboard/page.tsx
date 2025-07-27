@@ -1,9 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, Search, PieChart } from "lucide-react";
 import * as React from "react";
-import type { StatItem, DashboardStats, PopularKeywordsResponse, TrendsResponse, IndexDistributionResponse, KeywordItem, TrendDataPoint } from "@/types/dashboard";
+import type { StatItem, KeywordItem, TrendDataPoint, DashboardStats, TrendsResponse, IndexDistributionResponse } from "@/services";
 import type { DateRange } from "react-day-picker";
-import { dashboardApi } from "@/lib/api";
+import { useDashboardData } from "@/hooks/use-dashboard";
 
 import DashboardHeader from "./components/DashboardHeader";
 import StatsCards from "./components/StatsCards";
@@ -41,16 +41,6 @@ export default function DashboardPage() {
   // 상태들
   const [selectedIndex, setSelectedIndex] = React.useState<string>("전체");
   const [dateRange, setDateRange] = React.useState<DateRange>({ from: start, to: today });
-  const [loading, setLoading] = React.useState(false);
-  const [lastUpdated, setLastUpdated] = React.useState(new Date());
-
-  // API 응답 데이터 상태
-  const [stats, setStats] = React.useState<StatItem[]>([]);
-  const [popularKeywords, setPopularKeywords] = React.useState<KeywordItem[]>([]);
-  const [trendingKeywords, setTrendingKeywords] = React.useState<KeywordItem[]>([]);
-  const [responseTimeData, setResponseTimeData] = React.useState<ResponseTimeData[]>([]);
-  const [searchVolumeData, setSearchVolumeData] = React.useState<SearchVolumeData[]>([]);
-  const [indexDistribution, setIndexDistribution] = React.useState<any[]>([]);
 
   // 날짜를 ISO 문자열로 변환하는 함수
   const formatDateForApi = (date: Date): string => {
@@ -76,6 +66,9 @@ export default function DashboardPage() {
     return params;
   };
 
+  // 🆕 React Query로 데이터 조회 (캐싱, 에러 처리, 로딩 상태 자동 관리)
+  const dashboardData = useDashboardData(getApiParams());
+
   // 통계 데이터를 StatItem 배열로 변환
   const convertStatsToStatItems = (dashboardStats: DashboardStats): StatItem[] => {
     return [
@@ -90,12 +83,12 @@ export default function DashboardPage() {
 
   // 트렌드 데이터를 차트 형식으로 변환
   const convertTrendsToChartData = (trendsData: TrendsResponse) => {
-    const responseTimeData = trendsData.responseTimeData.map(item => ({
+    const responseTimeData = trendsData.responseTimeData.map((item: any) => ({
       date: item.label,
       responseTime: item.averageResponseTime
     }));
 
-    const searchVolumeData = trendsData.searchVolumeData.map(item => ({
+    const searchVolumeData = trendsData.searchVolumeData.map((item: any) => ({
       date: item.label,
       searches: item.searchCount,
       successfulSearches: Math.round(item.searchCount * 0.98), // 성공률 98% 가정
@@ -107,7 +100,7 @@ export default function DashboardPage() {
 
   // 인덱스 분포를 차트 형식으로 변환
   const convertIndexDistributionToChartData = (distributionData: IndexDistributionResponse) => {
-    return distributionData.indices.map((item, index) => ({
+    return distributionData.indices.map((item: any, index: any) => ({
       name: item.indexName,
       value: item.percentage,
       color: COLORS[index % COLORS.length]
@@ -118,70 +111,40 @@ export default function DashboardPage() {
   const convertKeywordsToTableData = (keywords: KeywordItem[]): TopKeyword[] => {
     return keywords.map(item => ({
       keyword: item.keyword,
-      searches: item.count,
-      ctr: `${item.percentage}%`,
+      searches: item.searchCount,
+      ctr: `${item.percentage || 0}%`,
       trend: 'stable' as const // API에서 트렌드 정보가 없으므로 기본값
     }));
   };
 
-  // 데이터 로드 함수
-  const loadDashboardData = async () => {
-    try {
-      setLoading(true);
-      const params = getApiParams();
-
-      // 모든 API 병렬 호출
-      const [
-        statsResponse,
-        popularKeywordsResponse,
-        trendingKeywordsResponse,
-        trendsResponse,
-        distributionResponse
-      ] = await Promise.all([
-        dashboardApi.getStats(params),
-        dashboardApi.getPopularKeywords({ ...params, limit: 10 }),
-        dashboardApi.getTrendingKeywords({ ...params, limit: 5 }),
-        dashboardApi.getTrends({ ...params, interval: 'day' }),
-        dashboardApi.getIndexDistribution(params)
-      ]);
-
-      // 데이터 변환 및 상태 업데이트
-      setStats(convertStatsToStatItems(statsResponse));
-      setPopularKeywords(popularKeywordsResponse.keywords);
-      setTrendingKeywords(trendingKeywordsResponse.keywords);
-      
-      const { responseTimeData, searchVolumeData } = convertTrendsToChartData(trendsResponse);
-      setResponseTimeData(responseTimeData);
-      setSearchVolumeData(searchVolumeData);
-      
-      setIndexDistribution(convertIndexDistributionToChartData(distributionResponse));
-      
-      setLastUpdated(new Date());
-    } catch (error) {
-      console.error('대시보드 데이터 로드 실패:', error);
-      // 에러 발생시 빈 데이터로 초기화
-      setStats([]);
-      setPopularKeywords([]);
-      setTrendingKeywords([]);
-      setResponseTimeData([]);
-      setSearchVolumeData([]);
-      setIndexDistribution([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 컴포넌트 마운트시 및 필터 변경시 데이터 로드
-  React.useEffect(() => {
-    loadDashboardData();
-  }, [selectedIndex, dateRange]);
-
+  // 🆕 간단한 새로고침 핸들러 (React Query가 캐시 무효화 처리)
   const handleRefresh = () => {
-    loadDashboardData();
+    // React Query의 refetch 기능 사용
+    dashboardData.stats.refetch()
+    dashboardData.popularKeywords.refetch()
+    dashboardData.trendingKeywords.refetch()
+    dashboardData.trends.refetch()
+    dashboardData.indexDistribution.refetch()
   };
+
+  // 🆕 React Query 데이터를 UI 데이터로 변환
+  const stats = React.useMemo(() => {
+    return dashboardData.stats.data ? convertStatsToStatItems(dashboardData.stats.data) : []
+  }, [dashboardData.stats.data])
+
+  const { responseTimeData, searchVolumeData } = React.useMemo(() => {
+    return dashboardData.trends.data ? convertTrendsToChartData(dashboardData.trends.data) : { responseTimeData: [], searchVolumeData: [] }
+  }, [dashboardData.trends.data])
+
+  const indexDistribution = React.useMemo(() => {
+    return dashboardData.indexDistribution.data ? convertIndexDistributionToChartData(dashboardData.indexDistribution.data) : []
+  }, [dashboardData.indexDistribution.data])
 
   // 키워드 테이블용 데이터 (인기 + 급등 키워드 합친 것)
   const topKeywords = React.useMemo(() => {
+    const popularKeywords = dashboardData.popularKeywords.data?.keywords || []
+    const trendingKeywords = dashboardData.trendingKeywords.data?.keywords || []
+    
     const popular = convertKeywordsToTableData(popularKeywords);
     const trending = convertKeywordsToTableData(trendingKeywords).map(item => ({
       ...item,
@@ -197,7 +160,7 @@ export default function DashboardPage() {
     });
     
     return combined.slice(0, 10); // 상위 10개만
-  }, [popularKeywords, trendingKeywords]);
+  }, [dashboardData.popularKeywords.data, dashboardData.trendingKeywords.data]);
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 p-6">
@@ -209,12 +172,12 @@ export default function DashboardPage() {
           dateRange={dateRange}
           setDateRange={setDateRange}
           onRefresh={handleRefresh}
-          loading={loading}
-          lastUpdated={lastUpdated}
+          loading={dashboardData.isLoading}
+          lastUpdated={new Date()}
         />
         
         {/* 통계 카드 그리드 */}
-        <StatsCards stats={stats} loading={loading} />
+        <StatsCards stats={stats} loading={dashboardData.isLoading} />
         
         {/* 탭 기반 컨텐츠 */}
         <Tabs defaultValue="analytics" className="space-y-6">
@@ -237,16 +200,16 @@ export default function DashboardPage() {
             <AnalyticsCharts
               responseTimeData={responseTimeData}
               searchVolumeData={searchVolumeData}
-              loading={loading}
+              loading={dashboardData.isLoading}
             />
           </TabsContent>
 
           <TabsContent value="keywords" className="space-y-6">
-            <KeywordsTable keywords={topKeywords} loading={loading} />
+            <KeywordsTable keywords={topKeywords} loading={dashboardData.isLoading} />
           </TabsContent>
 
           <TabsContent value="distribution" className="space-y-6">
-            <DistributionChart data={indexDistribution} loading={loading} />
+            <DistributionChart data={indexDistribution} loading={dashboardData.isLoading} />
           </TabsContent>
         </Tabs>
       </div>
