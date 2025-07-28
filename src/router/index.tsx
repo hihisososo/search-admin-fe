@@ -9,6 +9,8 @@ import SearchLogs from "@/app/search-logs/page"
 import SearchSimulator from "@/app/search-simulator/page"
 import SearchDemo from "@/app/search-demo/page"
 import DeployManagement from "@/app/deploy/page"
+import AnswerSetManagement from "@/app/search-evaluation/answer-set/page"
+import EvaluationExecution from "@/app/search-evaluation/execution/page"
 
 // 관리도구 라우트들 (Layout 포함)
 export function AdminRoutes() {
@@ -24,6 +26,9 @@ export function AdminRoutes() {
       <Route path="/search-logs" element={<SearchLogs />} />
       <Route path="/deploy" element={<DeployManagement />} />
       <Route path="/search-simulator" element={<SearchSimulator />} />
+      <Route path="/search-evaluation" element={<Navigate to="/search-evaluation/answer-set" replace />} />
+      <Route path="/search-evaluation/answer-set" element={<AnswerSetManagement />} />
+      <Route path="/search-evaluation/execution" element={<EvaluationExecution />} />
     </Routes>
   )
 }

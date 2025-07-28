@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude config get model)",
+      "Bash(claude --model opus)",
+      "mcp__ide__getDiagnostics",
+      "Bash(npm run build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run dev:*)",
+      "Bash(pkill:*)",
+      "Bash(ls:*)"
+    ],
+    "deny": []
+  }
+}

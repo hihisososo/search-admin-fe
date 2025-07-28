@@ -1,0 +1,42 @@
+export const EVALUATION_CONFIG = {
+  // 페이지네이션 기본값
+  DEFAULT_PAGE_SIZE: 20,
+  AVAILABLE_PAGE_SIZES: [10, 20, 50, 100],
+  
+  // 쿼리 생성 기본값
+  DEFAULT_QUERY_COUNT: 10,
+  MAX_QUERY_COUNT: 100,
+  
+  // 평가 실행 기본값
+  DEFAULT_RETRIEVAL_SIZE: 50,
+  AVAILABLE_RETRIEVAL_SIZES: [10, 20, 50, 100, 200, 300],
+  
+  // 작업 상태 폴링 간격 (ms)
+  TASK_STATUS_POLL_INTERVAL: 2000,
+  RUNNING_TASKS_POLL_INTERVAL: 3000,
+  
+  // UI 설정
+  MAX_VISIBLE_PAGINATION_PAGES: 5,
+  MAX_DISPLAYED_QUERY_DETAILS: 10,
+  MAX_DISPLAYED_MISSING_DOCS: 3,
+  MAX_DISPLAYED_WRONG_DOCS: 3,
+} as const
+
+export const RELEVANCE_STATUS_LABELS = {
+  UNSPECIFIED: '미지정',
+  RELEVANT: '관련',
+  IRRELEVANT: '무관'
+} as const
+
+export const TASK_TYPE_LABELS = {
+  QUERY_GENERATION: '쿼리 생성',
+  CANDIDATE_GENERATION: '후보군 생성', 
+  LLM_EVALUATION: 'LLM 평가'
+} as const
+
+export const TASK_STATUS_LABELS = {
+  PENDING: '대기중',
+  IN_PROGRESS: '진행중',
+  COMPLETED: '완료',
+  FAILED: '실패'
+} as const 
