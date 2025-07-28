@@ -18,6 +18,14 @@ export class ApiClient {
 
     const url = endpoint.startsWith('http') ? endpoint : `${this.baseUrl}${endpoint}`
     
+    // 평가 API 호출 시 상세 로그
+    if (endpoint.includes('/evaluation/')) {
+      console.log(`🌐 API 호출: ${options.method || 'GET'} ${url}`)
+      if (options.body) {
+        console.log(`📝 요청 Body:`, options.body)
+      }
+    }
+    
     const requestOptions: RequestInit = {
       ...options,
       headers: {
@@ -63,6 +71,13 @@ export class ApiClient {
       if (contentType && contentType.includes('application/json')) {
         const data = await response.json()
         logger.debug('API 성공', { url })
+        
+        // 평가 API 응답 시 상세 로그
+        if (endpoint.includes('/evaluation/')) {
+          console.log(`✅ API 응답: ${options.method || 'GET'} ${url}`)
+          console.log(`📄 응답 데이터:`, data)
+        }
+        
         return data
       } else {
         const data = await response.text()

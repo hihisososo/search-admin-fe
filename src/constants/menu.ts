@@ -1,4 +1,4 @@
-import { Home, Calendar, Search, Rocket, FileText } from "lucide-react"
+import { Home, Calendar, Search, Rocket, FileText, Target } from "lucide-react"
 
 export interface MenuItem {
   id: string
@@ -66,6 +66,24 @@ export const MENU_ITEMS: MenuItem[] = [
     title: '검색시뮬레이터',
     path: '/search-simulator',
     icon: Search,
+  },
+  {
+    id: 'search-evaluation',
+    title: '검색평가',
+    path: '/search-evaluation',
+    icon: Target,
+    subItems: [
+      {
+        id: 'answer-set-management',
+        title: '평가셋관리',
+        path: '/search-evaluation/answer-set'
+      },
+      {
+        id: 'evaluation-execution',
+        title: '평가실행',
+        path: '/search-evaluation/execution'
+      }
+    ]
   }
 ]
 
