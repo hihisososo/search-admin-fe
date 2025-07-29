@@ -7,7 +7,7 @@ services:
     ports:
       - "80:80"
     environment:
-      - BACKEND_URL=${BACKEND_URL:-http://localhost:8080}
+      - BACKEND_URL=${BACKEND_URL}
     restart: unless-stopped
     networks:
       - search-admin-network
