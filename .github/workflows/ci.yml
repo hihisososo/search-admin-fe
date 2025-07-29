@@ -73,7 +73,7 @@ jobs:
             tar -xzf dist.tar.gz
             rm dist.tar.gz
             
-            # 네트워크 생성 (이미 있으면 무시)
+            # 네트워크 생성
             docker network create search-admin-network 2>/dev/null || true
             
             # Docker 빌드 및 재시작
