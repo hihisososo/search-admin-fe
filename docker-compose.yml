@@ -4,8 +4,6 @@ services:
     container_name: search-admin-fe
     ports:
       - "80:80"
-    environment:
-      - BACKEND_URL=${BACKEND_URL}
     restart: unless-stopped
     networks:
       - search-admin-network

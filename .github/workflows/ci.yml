@@ -29,6 +29,8 @@ jobs:
       #   run: npm run lint
       
       - name: Build application
+        env:
+          VITE_API_BASE_URL: ${{ secrets.BACKEND_URL }}
         run: npm run build
       
       - name: Upload build artifact
@@ -72,6 +74,9 @@ jobs:
             cd ~/search-admin-fe
             tar -xzf dist.tar.gz
             rm dist.tar.gz
+            
+            # nginx.conf에서 BACKEND_IP 치환
+            sed -i "s/BACKEND_IP/${{ secrets.BACKEND_HOST }}/g" nginx.conf
             
             # 네트워크 생성
             docker network create search-admin-network 2>/dev/null || true
