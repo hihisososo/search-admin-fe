@@ -217,7 +217,7 @@ export function TypoCorrectionDictionaryTable({
                                     <TableCell className="py-2">
                                         <div className="break-words">
                                             <span className="font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded text-xs">
-                                                {item.correctedWord || '-'}
+                                                {(item as any).correctedWord || '-'}
                                             </span>
                                         </div>
                                     </TableCell>

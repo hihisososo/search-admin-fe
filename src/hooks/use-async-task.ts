@@ -25,7 +25,7 @@ export function useAsyncTask(
   // 페이지 로드 시 실행 중인 작업 복구
   useEffect(() => {
     if (runningTasksQuery.data && runningTasksQuery.data.length > 0 && !taskId) {
-      const runningTask = runningTasksQuery.data.find(task => task.taskType === taskType)
+      const runningTask = runningTasksQuery.data.find(task => (task as any).taskType === taskType)
       if (runningTask) {
         setTaskId(runningTask.id)
         console.log(`🔄 ${taskType} 작업 복구:`, runningTask.id, runningTask.message)
@@ -57,13 +57,13 @@ export function useAsyncTask(
       
       setTaskId(null)
     } else if (taskStatus.data.status === 'FAILED') {
-      console.error(`❌ ${taskType} 실패:`, taskStatus.data.errorMessage)
+      console.error(`❌ ${taskType} 실패:`, (taskStatus.data as any).errorMessage)
       
       // 실패한 작업 ID 기록
       setCompletedTaskIds(prev => new Set(prev).add(taskId))
       
       if (onError) {
-        onError(taskStatus.data.errorMessage || '알 수 없는 오류')
+        onError((taskStatus.data as any).errorMessage || '알 수 없는 오류')
       }
       
       setTaskId(null)
