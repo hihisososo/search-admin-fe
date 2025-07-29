@@ -89,7 +89,7 @@ export function calculatePaginationRange(
   maxVisible: number = 5
 ): { startPage: number; endPage: number } {
   let startPage = Math.max(0, currentPage - Math.floor(maxVisible / 2))
-  let endPage = Math.min(totalPages - 1, startPage + maxVisible - 1)
+  const endPage = Math.min(totalPages - 1, startPage + maxVisible - 1)
   
   // 끝에서 역산하여 시작 페이지 조정
   if (endPage - startPage + 1 < maxVisible) {
