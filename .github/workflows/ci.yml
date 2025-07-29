@@ -22,7 +22,7 @@ jobs:
           cache: 'npm'
       
       - name: Install dependencies
-        run: npm ci
+        run: npm install
       
       # TODO: lint 오류 수정 필요
       # - name: Run linter
@@ -65,7 +65,7 @@ jobs:
           # 파일 전송 
           tar -czf dist.tar.gz dist/
           ssh -o StrictHostKeyChecking=no -i key.pem ${USER}@${HOST} "mkdir -p ~/search-admin-fe"
-          scp -o StrictHostKeyChecking=no -i key.pem dist.tar.gz Dockerfile docker-compose.yml nginx.conf ${USER}@${HOST}:~/search-admin-fe/
+          scp -o StrictHostKeyChecking=no -i key.pem dist.tar.gz Dockerfile docker-compose.yml nginx.conf package.json package-lock.json ${USER}@${HOST}:~/search-admin-fe/
           
           # 배포 실행
           ssh -o StrictHostKeyChecking=no -i key.pem ${USER}@${HOST} << 'EOF'

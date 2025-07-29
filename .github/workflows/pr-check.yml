@@ -17,7 +17,7 @@ jobs:
           cache: 'npm'
       
       - name: Install dependencies
-        run: npm ci
+        run: npm install
       
       # TODO: lint 오류 수정 필요
       # - name: Run linter

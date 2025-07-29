@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   search-admin-fe:
     image: search-admin-fe:latest
