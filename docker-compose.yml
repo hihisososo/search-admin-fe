@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  search-admin-fe:
+    image: search-admin-fe:latest
+    container_name: search-admin-fe
+    ports:
+      - "80:80"
+    environment:
+      - BACKEND_URL=${BACKEND_URL:-http://localhost:8080}
+    restart: unless-stopped
+    networks:
+      - search-admin-network
+
+networks:
+  search-admin-network:
+    external: true

@@ -60,36 +60,32 @@ jobs:
           KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           HOST: ${{ secrets.EC2_HOST }}
           USER: ${{ secrets.EC2_USER }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
           echo "$KEY" > key.pem
           chmod 600 key.pem
           
-          # dist 폴더 압축
-          tar -czf dist.tar.gz dist/
-          
           # 파일 전송
-          scp -o StrictHostKeyChecking=no -i key.pem dist.tar.gz ${USER}@${HOST}:~/
+          tar -czf dist.tar.gz dist/
+          ssh -o StrictHostKeyChecking=no -i key.pem ${USER}@${HOST} "mkdir -p ~/search-admin-fe"
+          scp -o StrictHostKeyChecking=no -i key.pem dist.tar.gz Dockerfile docker-compose.yml nginx.conf ${USER}@${HOST}:~/search-admin-fe/
           
           # 배포 실행
           ssh -o StrictHostKeyChecking=no -i key.pem ${USER}@${HOST} << 'EOF'
-            # 기존 백업
-            if [ -d "$DEPLOY_PATH" ]; then
-              sudo mv $DEPLOY_PATH ${DEPLOY_PATH}_backup_$(date +%Y%m%d_%H%M%S)
-            fi
+            cd ~/search-admin-fe
+            tar -xzf dist.tar.gz
+            rm dist.tar.gz
             
-            # 새 파일 압축 해제
-            tar -xzf ~/dist.tar.gz
-            sudo mv ~/dist $DEPLOY_PATH
+            # 네트워크 생성 (이미 있으면 무시)
+            docker network create search-admin-network 2>/dev/null || true
             
-            # 권한 설정
-            sudo chown -R www-data:www-data $DEPLOY_PATH
+            # Docker 빌드 및 재시작
+            docker compose down
+            docker build -t search-admin-fe .
+            docker compose up -d
             
-            # Nginx 재시작
-            sudo systemctl reload nginx
-            
-            # 정리
-            rm ~/dist.tar.gz
+            # 이전 이미지 정리
+            docker image prune -f
           EOF
           
           rm key.pem
+          rm dist.tar.gz
