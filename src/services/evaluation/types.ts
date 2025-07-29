@@ -153,6 +153,12 @@ export interface EvaluationExecuteResponse {
   totalQueries: number
   evaluatedQueries: number
   createdAt: string
+  averagePrecision: number
+  averageRecall: number
+  averageF1Score: number
+  totalRelevantDocuments: number
+  totalRetrievedDocuments: number
+  totalCorrectDocuments: number
 }
 
 // 리포트 상세 조회 응답 (리포트 리스트와 동일)

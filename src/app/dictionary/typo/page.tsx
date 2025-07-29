@@ -131,7 +131,7 @@ export default function TypoCorrectionDictionary() {
                 : { ...i, isEditing: false }
         ))
         setEditingKeyword(item.keyword)
-        setEditingCorrectedWord(item.correctedWord || "")
+        setEditingCorrectedWord((item as any).correctedWord || "")
     }
 
     const handleSaveEdit = async (item: DictionaryItem) => {

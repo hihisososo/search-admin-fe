@@ -6,7 +6,7 @@ import type {
 } from './types'
 
 class SearchLogService {
-  private readonly baseEndpoint = '/api/v1/search-logs'
+  private readonly baseEndpoint = '/v1/search-logs'
 
   // 검색 로그 목록 조회
   async getList(params: SearchLogParams = {}): Promise<SearchLogPageResponse> {

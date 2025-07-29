@@ -9,7 +9,7 @@ import type {
 } from './types'
 
 class DashboardService {
-  private readonly baseEndpoint = '/api/v1'
+  private readonly baseEndpoint = '/v1'
 
   // 기본 통계 조회
   async getStats(params: DashboardApiParams = {}): Promise<DashboardStats> {

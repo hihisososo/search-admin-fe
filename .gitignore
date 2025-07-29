@@ -11,9 +11,12 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.production
 
 # Editor directories and files
 .cursorrules
+.claude
 .vscode/*
 !.vscode/extensions.json
 .idea
