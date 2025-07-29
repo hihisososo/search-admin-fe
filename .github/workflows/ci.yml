@@ -1,0 +1,95 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop, 'ci/**' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run linter
+        run: npm run lint
+      
+      - name: Run type check
+        run: npm run type-check
+      
+      - name: Build application
+        run: npm run build
+      
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 1
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/ci/'))
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      
+      - name: Deploy to EC2
+        env:
+          KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          HOST: ${{ secrets.EC2_HOST }}
+          USER: ${{ secrets.EC2_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          echo "$KEY" > key.pem
+          chmod 600 key.pem
+          
+          # dist 폴더 압축
+          tar -czf dist.tar.gz dist/
+          
+          # 파일 전송
+          scp -o StrictHostKeyChecking=no -i key.pem dist.tar.gz ${USER}@${HOST}:~/
+          
+          # 배포 실행
+          ssh -o StrictHostKeyChecking=no -i key.pem ${USER}@${HOST} << 'EOF'
+            # 기존 백업
+            if [ -d "$DEPLOY_PATH" ]; then
+              sudo mv $DEPLOY_PATH ${DEPLOY_PATH}_backup_$(date +%Y%m%d_%H%M%S)
+            fi
+            
+            # 새 파일 압축 해제
+            tar -xzf ~/dist.tar.gz
+            sudo mv ~/dist $DEPLOY_PATH
+            
+            # 권한 설정
+            sudo chown -R www-data:www-data $DEPLOY_PATH
+            
+            # Nginx 재시작
+            sudo systemctl reload nginx
+            
+            # 정리
+            rm ~/dist.tar.gz
+          EOF
+          
+          rm key.pem
