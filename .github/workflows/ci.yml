@@ -62,7 +62,7 @@ jobs:
           echo "$KEY" > key.pem
           chmod 600 key.pem
           
-          # 파일 전송
+          # 파일 전송 
           tar -czf dist.tar.gz dist/
           ssh -o StrictHostKeyChecking=no -i key.pem ${USER}@${HOST} "mkdir -p ~/search-admin-fe"
           scp -o StrictHostKeyChecking=no -i key.pem dist.tar.gz Dockerfile docker-compose.yml nginx.conf ${USER}@${HOST}:~/search-admin-fe/
