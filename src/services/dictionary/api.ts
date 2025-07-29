@@ -46,7 +46,7 @@ class SynonymDictionaryService extends BaseDictionaryService<
   CreateDictionaryRequest,
   UpdateDictionaryRequest
 > {
-  protected readonly endpoint = '/api/v1/dictionaries/synonym'
+  protected readonly endpoint = '/v1/dictionaries/synonym'
 }
 
 // 오타교정 사전 서비스
@@ -55,7 +55,7 @@ class TypoCorrectionDictionaryService extends BaseDictionaryService<
   CreateTypoCorrectionRequest,
   UpdateTypoCorrectionRequest
 > {
-  protected readonly endpoint = '/api/v1/dictionaries/typo'
+  protected readonly endpoint = '/v1/dictionaries/typo'
 
   // 실시간 동기화
   async realtimeSync(environment: Environment): Promise<RealtimeSyncResponse> {
@@ -74,7 +74,7 @@ class StopwordDictionaryService extends BaseDictionaryService<
   CreateDictionaryRequest,
   UpdateDictionaryRequest
 > {
-  protected readonly endpoint = '/api/v1/dictionaries/stopword'
+  protected readonly endpoint = '/v1/dictionaries/stopword'
 }
 
 // 사용자 사전 서비스
@@ -83,12 +83,12 @@ class UserDictionaryService extends BaseDictionaryService<
   CreateDictionaryRequest,
   UpdateDictionaryRequest
 > {
-  protected readonly endpoint = '/api/v1/dictionaries/user'
+  protected readonly endpoint = '/v1/dictionaries/user'
 }
 
 // 실시간 동기화 서비스
 class RealtimeSyncService {
-  private readonly baseEndpoint = '/api/v1/dictionaries/realtime-sync'
+  private readonly baseEndpoint = '/v1/dictionaries/realtime-sync'
 
   // 동의어 사전 실시간 반영
   async syncSynonym(environment: Environment): Promise<RealtimeSyncResponse> {

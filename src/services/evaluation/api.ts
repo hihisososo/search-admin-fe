@@ -22,7 +22,7 @@ import type {
 } from './types'
 
 class EvaluationService {
-  private readonly baseEndpoint = '/api/v1/evaluation'
+  private readonly baseEndpoint = '/v1/evaluation'
 
   // 1. 쿼리 관리
   
