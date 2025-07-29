@@ -81,7 +81,7 @@ jobs:
             docker build -t search-admin-fe .
             docker compose up -d
             
-            # 이전 이미지 정리
+            # 이전 이미지 정리 
             docker image prune -f
           EOF
           
