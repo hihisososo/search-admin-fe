@@ -30,7 +30,6 @@ interface UserDictionaryTableProps {
     onSaveNew: () => void
     onCancelNew: () => void
     validateKeyword: (keyword: string) => boolean
-    environment: DictionaryEnvironmentType
     canEdit: boolean
 }
 
@@ -74,7 +73,6 @@ export function UserDictionaryTable({
     onSaveNew,
     onCancelNew,
     validateKeyword,
-    _environment,
     canEdit
 }: UserDictionaryTableProps) {
     return (

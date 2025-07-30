@@ -30,7 +30,6 @@ interface SynonymDictionaryTableProps {
     onSaveNew: () => void
     onCancelNew: () => void
     validateKeyword: (keyword: string) => boolean
-    environment: DictionaryEnvironmentType
     canEdit: boolean
 }
 
@@ -90,7 +89,6 @@ export function SynonymDictionaryTable({
     onSaveNew,
     onCancelNew,
     validateKeyword,
-    _environment,
     canEdit
 }: SynonymDictionaryTableProps) {
     return (

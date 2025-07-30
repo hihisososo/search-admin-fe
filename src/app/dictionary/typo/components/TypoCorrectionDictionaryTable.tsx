@@ -35,7 +35,6 @@ interface TypoCorrectionDictionaryTableProps {
     onSaveNew: () => void
     onCancelNew: () => void
     validateTypoCorrection: (keyword: string, correctedWord: string) => boolean
-    environment: DictionaryEnvironmentType
     canEdit: boolean
 }
 
@@ -75,7 +74,6 @@ export function TypoCorrectionDictionaryTable({
     onSaveNew,
     onCancelNew,
     validateTypoCorrection,
-    _environment,
     canEdit
 }: TypoCorrectionDictionaryTableProps) {
     return (

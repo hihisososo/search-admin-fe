@@ -9,7 +9,6 @@ interface TypoCorrectionDictionaryHeaderProps {
     onSearch: () => void
     onAdd: () => void
     addingItem: boolean
-    environment: DictionaryEnvironmentType
     canEdit: boolean
 }
 
@@ -19,10 +18,8 @@ export function TypoCorrectionDictionaryHeader({
     onSearch,
     onAdd,
     addingItem,
-    environment,
     canEdit
 }: TypoCorrectionDictionaryHeaderProps) {
-    const _environmentInfo = ENVIRONMENT_LABELS[environment]
     
     return (
         <div className="space-y-3">

@@ -230,7 +230,6 @@ export default function SynonymDictionary() {
                         onSearch={handleSearch}
                         onAdd={handleAdd}
                         addingItem={addingItem}
-                        environment={environment}
                         canEdit={canEdit}
                     />
                 </CardHeader>
@@ -268,7 +267,6 @@ export default function SynonymDictionary() {
                                 onSaveNew={handleSaveNew}
                                 onCancelNew={handleCancelNew}
                                 validateKeyword={validateKeyword}
-                                environment={environment}
                                 canEdit={canEdit}
                             />
 

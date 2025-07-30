@@ -30,7 +30,6 @@ interface StopwordDictionaryTableProps {
     onSaveNew: () => void
     onCancelNew: () => void
     validateKeyword: (keyword: string) => boolean
-    environment: DictionaryEnvironmentType
     canEdit: boolean
 }
 
@@ -74,7 +73,6 @@ export function StopwordDictionaryTable({
     onSaveNew,
     onCancelNew,
     validateKeyword,
-    _environment,
     canEdit
 }: StopwordDictionaryTableProps) {
     return (

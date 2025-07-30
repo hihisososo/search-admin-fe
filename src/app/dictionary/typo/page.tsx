@@ -226,7 +226,6 @@ export default function TypoCorrectionDictionary() {
                         onSearch={handleSearch}
                         onAdd={handleAdd}
                         addingItem={addingItem}
-                        environment={environment}
                         canEdit={canEdit}
                     />
                 </CardHeader>
@@ -278,7 +277,6 @@ export default function TypoCorrectionDictionary() {
                                 onSaveNew={handleSaveNew}
                                 onCancelNew={handleCancelNew}
                                 validateTypoCorrection={validateTypoCorrection}
-                                environment={environment}
                                 canEdit={canEdit}
                             />
 

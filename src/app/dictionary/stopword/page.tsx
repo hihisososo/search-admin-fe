@@ -206,7 +206,6 @@ export default function StopwordDictionary() {
                         onSearch={handleSearch}
                         onAdd={handleAdd}
                         addingItem={addingItem}
-                        environment={environment}
                         canEdit={canEdit}
                     />
                 </CardHeader>
@@ -244,7 +243,6 @@ export default function StopwordDictionary() {
                                 onSaveNew={handleSaveNew}
                                 onCancelNew={handleCancelNew}
                                 validateKeyword={validateKeyword}
-                                environment={environment}
                                 canEdit={canEdit}
                             />
 

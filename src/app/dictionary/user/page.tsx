@@ -203,7 +203,6 @@ export default function UserDictionary() {
                         onSearch={handleSearch}
                         onAdd={handleAdd}
                         addingItem={addingItem}
-                        environment={environment}
                         canEdit={canEdit}
                     />
                 </CardHeader>
@@ -241,7 +240,6 @@ export default function UserDictionary() {
                                 onSaveNew={handleSaveNew}
                                 onCancelNew={handleCancelNew}
                                 validateKeyword={validateKeyword}
-                                environment={environment}
                                 canEdit={canEdit}
                             />
 
