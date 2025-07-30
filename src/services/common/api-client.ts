@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger'
 import { APIError, errorTracker } from '@/lib/errorHandler'
 import { config } from '@/lib/config'
-import type { ApiResponse } from './types'
 
 export class ApiClient {
   private baseUrl: string
@@ -169,6 +168,6 @@ export const apiFetchJson = <T>(url: string, data: any, method = 'POST'): Promis
     : apiClient.post<T>(url, data)
 }
 
-export const apiFetchMultipart = <T>(url: string, formData: FormData, method = 'POST'): Promise<T> => {
+export const apiFetchMultipart = <T>(url: string, formData: FormData, _method = 'POST'): Promise<T> => {
   return apiClient.post<T>(url, formData)
 } 

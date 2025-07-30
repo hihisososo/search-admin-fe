@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Card, CardHeader, CardDescription, CardContent } from "@/components/ui/card"
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { apiFetch } from "@/lib/api"
 import { DictionaryEnvironmentType } from "@/types/dashboard"

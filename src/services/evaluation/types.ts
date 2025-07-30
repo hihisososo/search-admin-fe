@@ -1,4 +1,3 @@
-import type { PageResponse, PageParams } from '../common/types'
 
 // 쿼리 관련 타입 (실제 백엔드 응답 구조에 맞게 수정)
 export interface EvaluationQuery {

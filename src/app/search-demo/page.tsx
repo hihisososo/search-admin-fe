@@ -1,5 +1,5 @@
 import * as React from "react";
-import { searchApi, dashboardApi, enhancedSearchApi, type Product, type SearchRequest, type AggregationBucket } from "@/lib/api";
+import { dashboardApi, enhancedSearchApi, type Product, type AggregationBucket } from "@/lib/api";
 import { type KeywordItem } from "@/types/dashboard";
 import { SearchHeader } from "./components/SearchHeader";
 import { PopularKeywords } from "./components/PopularKeywords";
@@ -20,8 +20,8 @@ export default function SearchDemo() {
   const [applyTypoCorrection, setApplyTypoCorrection] = React.useState(true); // 🆕 오타교정 옵션
   const [products, setProducts] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(false);
-  const [brandAgg, setBrandAgg] = React.useState<AggregationBucket[]>([]);
-  const [categoryAgg, setCategoryAgg] = React.useState<AggregationBucket[]>([]);
+  const [_brandAgg, setBrandAgg] = React.useState<AggregationBucket[]>([]);
+  const [_categoryAgg, setCategoryAgg] = React.useState<AggregationBucket[]>([]);
   const [baseBrandAgg, setBaseBrandAgg] = React.useState<AggregationBucket[]>([]); // 최초 검색 시 aggregation 저장
   const [baseCategoryAgg, setBaseCategoryAgg] = React.useState<AggregationBucket[]>([]); // 최초 검색 시 aggregation 저장
   const [totalResults, setTotalResults] = React.useState(0);
@@ -34,26 +34,22 @@ export default function SearchDemo() {
     rankChange: number | null, 
     changeStatus: "UP" | "DOWN" | "NEW" | "SAME" 
   }>>([]);
-  const [relatedKeywords, setRelatedKeywords] = React.useState<string[]>([]);
-  const [hasSearched, setHasSearched] = React.useState(false); // 검색 실행 여부 추적
+  const [_relatedKeywords, _setRelatedKeywords] = React.useState<string[]>([]);
+  const [_hasSearched, setHasSearched] = React.useState(false); // 검색 실행 여부 추적
 
   // 최소 로딩 시간을 보장하는 헬퍼 함수
-  const ensureMinimumLoadingTime = React.useCallback(async (apiCall: Promise<any>, minTime: number = 500) => {
+  const ensureMinimumLoadingTime = React.useCallback(async <T,>(apiCall: Promise<T>, minTime: number = 500): Promise<T> => {
     const startTime = Date.now();
     
-    try {
-      const result = await apiCall;
-      const elapsedTime = Date.now() - startTime;
-      
-      if (elapsedTime < minTime) {
-        // 최소 시간이 되지 않았으면 추가 대기
-        await new Promise(resolve => setTimeout(resolve, minTime - elapsedTime));
-      }
-      
-      return result;
-    } catch (error) {
-      throw error;
+    const result = await apiCall;
+    const elapsedTime = Date.now() - startTime;
+    
+    if (elapsedTime < minTime) {
+      // 최소 시간이 되지 않았으면 추가 대기
+      await new Promise(resolve => setTimeout(resolve, minTime - elapsedTime));
     }
+    
+    return result;
   }, []);
 
   // 초기 검색 실행 (새 검색어로 검색 시 - aggregation 업데이트)
@@ -92,12 +88,12 @@ export default function SearchDemo() {
       );
 
       // API 응답을 Product 타입에 맞게 변환
-      const transformedProducts = response.hits.data.map((item: any) => ({
+      const transformedProducts = response.hits.data.map((item) => ({
         ...item,
         id: item.id || String(Math.floor(Math.random() * 1000000)),
-        categoryName: item.categoryName || item.category || '',
-        specsRaw: item.specsRaw || item.descriptionRaw || item.description || '',
-        specs: item.specs || item.description || ''
+        categoryName: item.categoryName || '',
+        specsRaw: item.specsRaw || '',
+        specs: item.specs || ''
       }));
 
       setProducts(transformedProducts);
@@ -170,12 +166,12 @@ export default function SearchDemo() {
       );
 
       // API 응답을 Product 타입에 맞게 변환
-      const transformedProducts = response.hits.data.map((item: any) => ({
+      const transformedProducts = response.hits.data.map((item) => ({
         ...item,
         id: item.id || String(Math.floor(Math.random() * 1000000)),
-        categoryName: item.categoryName || item.category || '',
-        specsRaw: item.specsRaw || item.descriptionRaw || item.description || '',
-        specs: item.specs || item.description || ''
+        categoryName: item.categoryName || '',
+        specsRaw: item.specsRaw || '',
+        specs: item.specs || ''
       }));
 
       setProducts(transformedProducts);

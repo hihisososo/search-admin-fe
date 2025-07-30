@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Card, CardHeader, CardDescription, CardContent } from "@/components/ui/card"
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { apiFetch, realtimeSyncApi } from "@/lib/api"
 import { useNavigate } from "react-router-dom"
@@ -10,7 +10,7 @@ import { SynonymDictionaryHeader } from "./components/SynonymDictionaryHeader"
 import { SynonymDictionaryTable } from "./components/SynonymDictionaryTable"
 
 export default function SynonymDictionary() {
-    const navigate = useNavigate()
+    const _navigate = useNavigate()
     
     const [items, setItems] = useState<DictionaryItem[]>([])
     const [loading, setLoading] = useState(true)

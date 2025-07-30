@@ -169,7 +169,7 @@ export function DocumentTable({
   }
 
   // 문서 삭제 핸들러
-  const handleDeleteDocument = (productId: string) => {
+  const handleDeleteDocument = (_productId: string) => {
     if (confirm('정답 문서를 삭제하시겠습니까?')) {
       alert('삭제 기능은 준비중입니다.')
     }

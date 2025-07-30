@@ -1,7 +1,6 @@
 import { Search, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import { DictionaryEnvironmentType, ENVIRONMENT_LABELS } from "@/types/dashboard"
 
 interface TypoCorrectionDictionaryHeaderProps {
@@ -23,7 +22,7 @@ export function TypoCorrectionDictionaryHeader({
     environment,
     canEdit
 }: TypoCorrectionDictionaryHeaderProps) {
-    const environmentInfo = ENVIRONMENT_LABELS[environment]
+    const _environmentInfo = ENVIRONMENT_LABELS[environment]
     
     return (
         <div className="space-y-3">

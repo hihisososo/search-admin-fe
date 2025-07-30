@@ -22,7 +22,7 @@ export function getPerformanceColor(score: number): string {
 export function getTaskProgressText(
   taskStatus: AsyncTaskStatus | undefined,
   defaultText: string,
-  startingText: string = '시작중...'
+  _startingText: string = '시작중...'
 ): string {
   if (!taskStatus) return defaultText
   
@@ -142,7 +142,7 @@ export function parseEvaluationDetails(detailedResults: string): {
         error: '쿼리별 상세 결과 데이터가 없거나 형식이 올바르지 않습니다.' 
       }
     }
-  } catch (e) {
+  } catch (_e) {
     return { 
       success: false, 
       error: '상세 결과 데이터를 해석할 수 없습니다. 백엔드 데이터 형식을 확인해주세요.' 
