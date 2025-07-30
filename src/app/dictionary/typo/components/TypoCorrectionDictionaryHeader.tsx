@@ -1,7 +1,6 @@
 import { Search, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { DictionaryEnvironmentType, ENVIRONMENT_LABELS } from "@/types/dashboard"
 
 interface TypoCorrectionDictionaryHeaderProps {
     search: string
