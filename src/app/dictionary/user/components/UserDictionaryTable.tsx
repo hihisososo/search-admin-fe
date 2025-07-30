@@ -74,7 +74,7 @@ export function UserDictionaryTable({
     onSaveNew,
     onCancelNew,
     validateKeyword,
-    environment,
+    _environment,
     canEdit
 }: UserDictionaryTableProps) {
     return (

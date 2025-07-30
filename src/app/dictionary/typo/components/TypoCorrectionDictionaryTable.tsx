@@ -75,7 +75,7 @@ export function TypoCorrectionDictionaryTable({
     onSaveNew,
     onCancelNew,
     validateTypoCorrection,
-    environment,
+    _environment,
     canEdit
 }: TypoCorrectionDictionaryTableProps) {
     return (

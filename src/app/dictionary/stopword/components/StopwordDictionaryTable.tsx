@@ -74,7 +74,7 @@ export function StopwordDictionaryTable({
     onSaveNew,
     onCancelNew,
     validateKeyword,
-    environment,
+    _environment,
     canEdit
 }: StopwordDictionaryTableProps) {
     return (

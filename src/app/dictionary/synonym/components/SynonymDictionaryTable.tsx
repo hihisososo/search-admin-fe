@@ -90,7 +90,7 @@ export function SynonymDictionaryTable({
     onSaveNew,
     onCancelNew,
     validateKeyword,
-    environment,
+    _environment,
     canEdit
 }: SynonymDictionaryTableProps) {
     return (

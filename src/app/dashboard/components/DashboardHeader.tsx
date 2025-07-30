@@ -25,7 +25,7 @@ export default function DashboardHeader({
   setDateRange,
   onRefresh,
   loading,
-  lastUpdated
+  lastUpdated: _lastUpdated
 }: DashboardHeaderProps) {
   const handleDateRange = (value: DateRange | undefined) => {
     setDateRange(value || { from: undefined, to: undefined });
