@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
 import { calculatePaginationRange } from "@/utils/evaluation-helpers"
 import { EVALUATION_CONFIG } from "@/constants/evaluation"
@@ -16,10 +15,10 @@ interface PaginationControlsProps {
 export function PaginationControls({
   currentPage,
   totalPages,
-  totalCount,
-  pageSize,
+  totalCount: _totalCount,
+  pageSize: _pageSize,
   onPageChange,
-  onPageSizeChange
+  onPageSizeChange: _onPageSizeChange
 }: PaginationControlsProps) {
   if (totalPages <= 1) return null
 

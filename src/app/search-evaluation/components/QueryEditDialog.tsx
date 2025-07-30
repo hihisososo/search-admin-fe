@@ -38,7 +38,7 @@ export function QueryEditDialog({
     try {
       await onSave(editingQuery.id, queryText.trim())
       onClose()
-    } catch (error) {
+    } catch (_error) {
       // 에러는 부모에서 처리
     }
   }

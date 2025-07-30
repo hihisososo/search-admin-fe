@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react"
-import { Card, CardHeader, CardDescription, CardContent } from "@/components/ui/card"
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { apiFetch, realtimeSyncApi, typoCorrectionDictionaryApi } from "@/lib/api"
+import { realtimeSyncApi, typoCorrectionDictionaryApi } from "@/lib/api"
 import { DictionaryEnvironmentType } from "@/types/dashboard"
-import type { DictionaryItem, DictionaryPageResponse, DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
+import type { DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
+import type { TypoCorrectionDictionaryItem } from "@/services/dictionary/types"
 import { EnvironmentSelector } from "../user/components/EnvironmentSelector"
 import { TypoCorrectionDictionaryHeader } from "./components/TypoCorrectionDictionaryHeader"
 import { TypoCorrectionDictionaryTable } from "./components/TypoCorrectionDictionaryTable"
 
 export default function TypoCorrectionDictionary() {
-    const [items, setItems] = useState<DictionaryItem[]>([])
+    const [items, setItems] = useState<TypoCorrectionDictionaryItem[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
     const [page, setPage] = useState(1)
@@ -124,17 +125,17 @@ export default function TypoCorrectionDictionary() {
         setError("")
     }
 
-    const handleEdit = (item: DictionaryItem) => {
+    const handleEdit = (item: TypoCorrectionDictionaryItem) => {
         setItems(prev => prev.map(i => 
             i.id === item.id 
                 ? { ...i, isEditing: true }
                 : { ...i, isEditing: false }
         ))
         setEditingKeyword(item.keyword)
-        setEditingCorrectedWord((item as any).correctedWord || "")
+        setEditingCorrectedWord(item.correctedWord || "")
     }
 
-    const handleSaveEdit = async (item: DictionaryItem) => {
+    const handleSaveEdit = async (item: TypoCorrectionDictionaryItem) => {
         if (!validateTypoCorrection(editingKeyword, editingCorrectedWord)) {
             setError("오타 단어와 교정어를 모두 입력해주세요.")
             return
@@ -160,7 +161,7 @@ export default function TypoCorrectionDictionary() {
         }
     }
 
-    const handleCancelEdit = (item: DictionaryItem) => {
+    const handleCancelEdit = (item: TypoCorrectionDictionaryItem) => {
         setItems(prev => prev.map(i => 
             i.id === item.id 
                 ? { ...i, isEditing: false }
@@ -225,7 +226,6 @@ export default function TypoCorrectionDictionary() {
                         onSearch={handleSearch}
                         onAdd={handleAdd}
                         addingItem={addingItem}
-                        environment={environment}
                         canEdit={canEdit}
                     />
                 </CardHeader>
@@ -277,7 +277,6 @@ export default function TypoCorrectionDictionary() {
                                 onSaveNew={handleSaveNew}
                                 onCancelNew={handleCancelNew}
                                 validateTypoCorrection={validateTypoCorrection}
-                                environment={environment}
                                 canEdit={canEdit}
                             />
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Card, CardHeader, CardDescription, CardContent } from "@/components/ui/card"
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { apiFetch } from "@/lib/api"
 import { DictionaryEnvironmentType } from "@/types/dashboard"
@@ -206,7 +206,6 @@ export default function StopwordDictionary() {
                         onSearch={handleSearch}
                         onAdd={handleAdd}
                         addingItem={addingItem}
-                        environment={environment}
                         canEdit={canEdit}
                     />
                 </CardHeader>
@@ -244,7 +243,6 @@ export default function StopwordDictionary() {
                                 onSaveNew={handleSaveNew}
                                 onCancelNew={handleCancelNew}
                                 validateKeyword={validateKeyword}
-                                environment={environment}
                                 canEdit={canEdit}
                             />
 

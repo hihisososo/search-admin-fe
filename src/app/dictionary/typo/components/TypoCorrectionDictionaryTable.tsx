@@ -9,11 +9,11 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, Check, X } from "lucide-react"
-import { DictionaryEnvironmentType } from "@/types/dashboard"
-import type { DictionaryItem, DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
+import type { DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
+import type { TypoCorrectionDictionaryItem } from "@/services/dictionary/types"
 
 interface TypoCorrectionDictionaryTableProps {
-    items: DictionaryItem[]
+    items: TypoCorrectionDictionaryItem[]
     addingItem: boolean
     newKeyword: string
     newCorrectedWord: string
@@ -23,9 +23,9 @@ interface TypoCorrectionDictionaryTableProps {
     sortField: DictionarySortField
     sortDirection: DictionarySortDirection
     onSort: (field: DictionarySortField) => void
-    onEdit: (item: DictionaryItem) => void
-    onSaveEdit: (item: DictionaryItem) => void
-    onCancelEdit: (item: DictionaryItem) => void
+    onEdit: (item: TypoCorrectionDictionaryItem) => void
+    onSaveEdit: (item: TypoCorrectionDictionaryItem) => void
+    onCancelEdit: (item: TypoCorrectionDictionaryItem) => void
     onDelete: (id: number) => void
     onNewKeywordChange: (value: string) => void
     onNewCorrectedWordChange: (value: string) => void
@@ -34,7 +34,6 @@ interface TypoCorrectionDictionaryTableProps {
     onSaveNew: () => void
     onCancelNew: () => void
     validateTypoCorrection: (keyword: string, correctedWord: string) => boolean
-    environment: DictionaryEnvironmentType
     canEdit: boolean
 }
 
@@ -74,7 +73,6 @@ export function TypoCorrectionDictionaryTable({
     onSaveNew,
     onCancelNew,
     validateTypoCorrection,
-    environment,
     canEdit
 }: TypoCorrectionDictionaryTableProps) {
     return (
@@ -217,7 +215,7 @@ export function TypoCorrectionDictionaryTable({
                                     <TableCell className="py-2">
                                         <div className="break-words">
                                             <span className="font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded text-xs">
-                                                {(item as any).correctedWord || '-'}
+                                                {item.correctedWord || '-'}
                                             </span>
                                         </div>
                                     </TableCell>

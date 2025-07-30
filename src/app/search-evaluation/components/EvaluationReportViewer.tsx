@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { formatDate, parseEvaluationDetails, getPerformanceColor } from "@/utils/evaluation-helpers"
+import { formatDate, parseEvaluationDetails } from "@/utils/evaluation-helpers"
 import { EVALUATION_CONFIG } from "@/constants/evaluation"
 import { PerformanceScore } from "./PerformanceScore"
 import type { EvaluationReport } from "@/services/evaluation/types"

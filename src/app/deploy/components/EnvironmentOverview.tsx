@@ -16,7 +16,7 @@ export default function EnvironmentOverview({
   environments, 
   onDeploy, 
   onReindex, 
-  isIndexing,
+  isIndexing: _isIndexing,
   isDeploying 
 }: EnvironmentOverviewProps) {
   const formatNumber = (num: number) => {

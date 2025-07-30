@@ -32,7 +32,7 @@ export function QueryGenerationDialog({
     try {
       await onGenerate(queryCount)
       setIsOpen(false)
-    } catch (error) {
+    } catch (_error) {
       // 에러는 부모에서 처리
     }
   }

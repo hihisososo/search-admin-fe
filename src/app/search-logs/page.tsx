@@ -5,7 +5,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { searchLogApi } from "@/lib/api"
 import type { 
   SearchLogItem, 
-  SearchLogPageResponse, 
   SearchLogFilterOptions,
   SearchLogParams,
   SearchLogSortField, 
@@ -142,8 +141,8 @@ export default function SearchLogs() {
   }, [page, pageSize, sortField, sortDirection])
 
   // 페이지네이션 계산
-  const startPage = Math.max(1, page - 2)
-  const endPage = Math.min(totalPages, page + 2)
+  const _startPage = Math.max(1, page - 2)
+  const _endPage = Math.min(totalPages, page + 2)
 
   return (
     <div className="p-1 space-y-1 bg-gray-50 min-h-screen">

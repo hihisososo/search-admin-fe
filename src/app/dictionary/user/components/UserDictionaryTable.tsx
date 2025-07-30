@@ -9,7 +9,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, Check, X } from "lucide-react"
-import { DictionaryEnvironmentType } from "@/types/dashboard"
 import type { DictionaryItem, DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
 
 interface UserDictionaryTableProps {
@@ -30,7 +29,6 @@ interface UserDictionaryTableProps {
     onSaveNew: () => void
     onCancelNew: () => void
     validateKeyword: (keyword: string) => boolean
-    environment: DictionaryEnvironmentType
     canEdit: boolean
 }
 
@@ -74,7 +72,6 @@ export function UserDictionaryTable({
     onSaveNew,
     onCancelNew,
     validateKeyword,
-    environment,
     canEdit
 }: UserDictionaryTableProps) {
     return (

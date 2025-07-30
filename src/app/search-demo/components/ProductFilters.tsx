@@ -25,8 +25,8 @@ interface ProductFiltersProps {
 export function ProductFilters({
   category,
   setCategory,
-  categorySub,
-  setCategorySub,
+  categorySub: _categorySub,
+  setCategorySub: _setCategorySub,
   brand,
   setBrand,
   price,

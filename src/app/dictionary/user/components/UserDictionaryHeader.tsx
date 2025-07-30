@@ -1,8 +1,6 @@
 import { Search, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { DictionaryEnvironmentType, ENVIRONMENT_LABELS } from "@/types/dashboard"
 
 interface UserDictionaryHeaderProps {
     search: string
@@ -10,7 +8,6 @@ interface UserDictionaryHeaderProps {
     onSearch: () => void
     onAdd: () => void
     addingItem: boolean
-    environment: DictionaryEnvironmentType
     canEdit: boolean
 }
 
@@ -20,10 +17,8 @@ export function UserDictionaryHeader({
     onSearch,
     onAdd,
     addingItem,
-    environment,
     canEdit
 }: UserDictionaryHeaderProps) {
-    const environmentInfo = ENVIRONMENT_LABELS[environment]
     
     return (
         <div className="space-y-3">

@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { RefreshCw, Zap, Trash2 } from "lucide-react"
 import { useAsyncTask } from "@/hooks/use-async-task"
 import { getTaskProgressText, getTaskCompletionMessage } from "@/utils/evaluation-helpers"

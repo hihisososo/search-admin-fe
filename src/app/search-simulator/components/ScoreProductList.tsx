@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -244,7 +243,7 @@ export function ScoreProductList({
                                                                             parsedData = JSON.parse(p.explain)
                                                                         }
                                                                         return JSON.stringify(parsedData, null, 2)
-                                                                    } catch (error) {
+                                                                    } catch (_error) {
                                                                         // 파싱 실패 시 원본 그대로
                                                                         return typeof p.explain === 'string' ? p.explain : JSON.stringify(p.explain, null, 2)
                                                                     }

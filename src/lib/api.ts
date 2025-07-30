@@ -210,7 +210,7 @@ export async function apiFetchMultipart<T>(url: string, formData: FormData, meth
 // API 서버 헬스체크
 export async function healthCheck(): Promise<{ status: 'ok' | 'error', message: string }> {
   try {
-    const response = await apiFetch<any>('/api/v1/health')
+    const _response = await apiFetch<unknown>('/api/v1/health')
     return { status: 'ok', message: '서버 정상' }
   } catch (error) {
     console.error('헬스체크 실패:', error)

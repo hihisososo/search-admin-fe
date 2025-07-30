@@ -12,7 +12,6 @@ import type {
   EvaluateLlmRequest,
   EvaluationRequest,
   ProductSearchParams,
-  AsyncTaskStatus
 } from '@/services/evaluation/types'
 
 // 쿼리 키 팩토리

@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, Search, PieChart } from "lucide-react";
 import * as React from "react";
-import type { StatItem, KeywordItem, TrendDataPoint, DashboardStats, TrendsResponse, IndexDistributionResponse } from "@/services";
+import type { StatItem, KeywordItem, DashboardStats, TrendsResponse, IndexDistributionResponse } from "@/services";
 import type { DateRange } from "react-day-picker";
 import { useDashboardData } from "@/hooks/use-dashboard";
 
@@ -11,17 +11,6 @@ import AnalyticsCharts from "./components/AnalyticsCharts";
 import KeywordsTable from "./components/KeywordsTable";
 import DistributionChart from "./components/DistributionChart";
 
-interface ResponseTimeData {
-  date: string;
-  responseTime: number;
-}
-
-interface SearchVolumeData {
-  date: string;
-  searches: number;
-  successfulSearches: number;
-  failedSearches: number;
-}
 
 interface TopKeyword {
   keyword: string;
@@ -49,7 +38,7 @@ export default function DashboardPage() {
 
   // API 파라미터 생성
   const getApiParams = () => {
-    const params: any = {};
+    const params: Record<string, unknown> = {};
     
     if (selectedIndex !== "전체") {
       params.indexName = selectedIndex;
@@ -83,12 +72,12 @@ export default function DashboardPage() {
 
   // 트렌드 데이터를 차트 형식으로 변환
   const convertTrendsToChartData = (trendsData: TrendsResponse) => {
-    const responseTimeData = trendsData.responseTimeData.map((item: any) => ({
+    const responseTimeData = trendsData.responseTimeData.map((item) => ({
       date: item.label,
       responseTime: item.averageResponseTime
     }));
 
-    const searchVolumeData = trendsData.searchVolumeData.map((item: any) => ({
+    const searchVolumeData = trendsData.searchVolumeData.map((item) => ({
       date: item.label,
       searches: item.searchCount,
       successfulSearches: Math.round(item.searchCount * 0.98), // 성공률 98% 가정
@@ -100,7 +89,7 @@ export default function DashboardPage() {
 
   // 인덱스 분포를 차트 형식으로 변환
   const convertIndexDistributionToChartData = (distributionData: IndexDistributionResponse) => {
-    return distributionData.indices.map((item: any, index: any) => ({
+    return distributionData.indices.map((item, index) => ({
       name: item.indexName,
       value: item.percentage,
       color: COLORS[index % COLORS.length]
