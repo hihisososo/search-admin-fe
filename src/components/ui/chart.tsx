@@ -45,7 +45,7 @@ const ChartTooltip = React.forwardRef<
     cursor?: boolean
     content?: React.ComponentType<any>
   }
->(({ className, cursor, content, ...props }, ref) => {
+>(({ className, cursor: _cursor, content: _content, ...props }, ref) => {
   return (
     <div ref={ref} className={cn("", className)} {...props}>
       {/* Recharts will handle this */}
@@ -59,7 +59,7 @@ const ChartTooltipContent = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement> & {
     hideLabel?: boolean
   }
->(({ className, hideLabel, ...props }, ref) => {
+>(({ className, hideLabel: _hideLabel, ...props }, ref) => {
   return (
     <div
       ref={ref}

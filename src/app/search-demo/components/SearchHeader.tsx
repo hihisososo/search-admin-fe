@@ -33,7 +33,7 @@ function highlight(text: string, keyword: string) {
   );
 }
 
-export function SearchHeader({ query, setQuery, onSearch, relatedKeywords, applyTypoCorrection: _applyTypoCorrection = true, setApplyTypoCorrection }: SearchHeaderProps) {
+export function SearchHeader({ query, setQuery, onSearch, relatedKeywords: _relatedKeywords, applyTypoCorrection: _applyTypoCorrection = true, setApplyTypoCorrection }: SearchHeaderProps) {
   const [suggestions, setSuggestions] = React.useState<string[]>([]);
   const [showSuggest, setShowSuggest] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(-1);

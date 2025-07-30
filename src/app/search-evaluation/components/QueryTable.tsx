@@ -48,7 +48,7 @@ export function QueryTable({
   pageSize,
   onPageChange,
   onPageSizeChange,
-  onRefresh,
+  onRefresh: _onRefresh,
   isLoading
 }: QueryTableProps) {
   const [editingQuery, setEditingQuery] = useState<{ id: number, text: string } | null>(null)

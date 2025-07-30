@@ -15,10 +15,10 @@ interface PaginationControlsProps {
 export function PaginationControls({
   currentPage,
   totalPages,
-  totalCount,
-  pageSize,
+  totalCount: _totalCount,
+  pageSize: _pageSize,
   onPageChange,
-  onPageSizeChange
+  onPageSizeChange: _onPageSizeChange
 }: PaginationControlsProps) {
   if (totalPages <= 1) return null
 

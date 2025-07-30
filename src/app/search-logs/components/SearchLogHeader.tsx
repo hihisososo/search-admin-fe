@@ -35,7 +35,7 @@ interface SearchLogHeaderProps {
 
 export function SearchLogHeader({
   keyword,
-  indexName,
+  indexName: _indexName,
   isError,
   clientIp,
   startDate,
@@ -44,9 +44,9 @@ export function SearchLogHeader({
   maxResponseTime,
   minResultCount,
   maxResultCount,
-  filterOptions,
+  filterOptions: _filterOptions,
   onKeywordChange,
-  onIndexNameChange,
+  onIndexNameChange: _onIndexNameChange,
   onIsErrorChange,
   onClientIpChange,
   onStartDateChange,

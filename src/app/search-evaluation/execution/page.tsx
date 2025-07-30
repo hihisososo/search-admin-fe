@@ -25,7 +25,7 @@ import {
 import { Play, BarChart3, CheckCircle, RefreshCw, Plus, Trash2 } from "lucide-react"
 import { useEvaluationReports, useEvaluate } from "@/hooks/use-evaluation"
 import { evaluationService } from "@/services/evaluation/api"
-import { formatDate, getPerformanceColor } from "@/utils/evaluation-helpers"
+import { formatDate } from "@/utils/evaluation-helpers"
 import { EVALUATION_CONFIG } from "@/constants/evaluation"
 import { PerformanceScore } from "../components/PerformanceScore"
 import { EvaluationReportViewer } from "../components/EvaluationReportViewer"
