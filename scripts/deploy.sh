@@ -3,13 +3,12 @@
 set -e
 
 BACKEND_HOST="${BACKEND_HOST:-localhost}"
-VITE_API_BASE_URL="${VITE_API_BASE_URL:-http://localhost:8080}"
 
 cd /home/ec2-user/search-admin-fe
 
 npm install
 
-VITE_API_BASE_URL=$VITE_API_BASE_URL npm run build
+npm run build
 
 sed -i "s/BACKEND_IP/${BACKEND_HOST}/g" nginx.conf
 
