@@ -231,7 +231,7 @@ export default function SearchSimulator() {
                 params.append('priceTo', searchParams.price.to)
             }
 
-            const response = await apiFetch<SimulationSearchResponse>(`/api/v1/search/simulation?${params.toString()}`, {
+            const response = await apiFetch<SimulationSearchResponse>(`/v1/search/simulation?${params.toString()}`, {
                 method: 'GET'
             })
 
