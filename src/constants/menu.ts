@@ -1,4 +1,5 @@
-import { Home, Calendar, Search, Rocket, FileText, Target, LucideIcon } from "lucide-react"
+import { Home, Calendar, Search, Rocket, FileText, Target } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 
 export interface MenuItem {
   id: string

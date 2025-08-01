@@ -1,7 +1,8 @@
 import { memo } from 'react'
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Search, Clock, AlertTriangle, Database, Activity, LucideIcon } from 'lucide-react'
+import { Search, Clock, AlertTriangle, Database, Activity } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import type { StatItem } from '@/types/dashboard'
 
 interface StatsCardsProps {

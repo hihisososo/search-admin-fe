@@ -53,10 +53,16 @@ export default function DashboardPage() {
   }, [dashboardData.popularKeywords.data, dashboardData.trendingKeywords.data, transformers])
 
   const handleRefresh = useCallback(() => {
-    Object.values(dashboardData).forEach(query => query.refetch())
+    Object.values(dashboardData).forEach(query => {
+      if (query && typeof query === 'object' && 'refetch' in query) {
+        query.refetch()
+      }
+    })
   }, [dashboardData])
 
-  const isLoading = Object.values(dashboardData).some(query => query.isLoading)
+  const isLoading = Object.values(dashboardData).some(query => {
+    return query && typeof query === 'object' && 'isLoading' in query && query.isLoading
+  })
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 p-6">

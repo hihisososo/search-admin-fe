@@ -98,10 +98,12 @@ export default function UserDictionary() {
           ) : (
             <>
               <UserDictionaryTable
-                items={items}
+                items={items.map(item => ({
+                  ...item,
+                  isEditing: item.id === editingId
+                }))}
                 addingItem={addingItem}
                 newKeyword={newKeyword}
-                editingId={editingId}
                 editingKeyword={editingKeyword}
                 highlightedId={highlightedId}
                 sortField={sortField}
@@ -115,6 +117,7 @@ export default function UserDictionary() {
                 onEditingKeywordChange={setEditingKeyword}
                 onSaveNew={handleSaveNew}
                 onCancelNew={handleCancelNew}
+                validateKeyword={(keyword: string) => keyword.trim() !== ''}
                 canEdit={canEdit}
               />
 
