@@ -210,7 +210,7 @@ export async function apiFetchMultipart<T>(url: string, formData: FormData, meth
 // API 서버 헬스체크
 export async function healthCheck(): Promise<{ status: 'ok' | 'error', message: string }> {
   try {
-    const _response = await apiFetch<unknown>('/api/v1/health')
+    const _response = await apiFetch<unknown>('/v1/health')
     return { status: 'ok', message: '서버 정상' }
   } catch (error) {
     console.error('헬스체크 실패:', error)
@@ -250,31 +250,31 @@ export const dashboardApi = {
   // 기본 통계 조회
   async getStats(params: DashboardApiParams = {}): Promise<DashboardStats> {
     const queryString = buildQueryString(params)
-    return apiFetch<DashboardStats>(`/api/v1/stats${queryString}`)
+    return apiFetch<DashboardStats>(`/v1/stats${queryString}`)
   },
 
   // 인기검색어 조회
   async getPopularKeywords(params: DashboardApiParams = {}): Promise<PopularKeywordsResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<PopularKeywordsResponse>(`/api/v1/stats/popular-keywords${queryString}`)
+    return apiFetch<PopularKeywordsResponse>(`/v1/stats/popular-keywords${queryString}`)
   },
 
   // 급등검색어 조회
   async getTrendingKeywords(params: DashboardApiParams = {}): Promise<TrendingKeywordsResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<TrendingKeywordsResponse>(`/api/v1/stats/trending-keywords${queryString}`)
+    return apiFetch<TrendingKeywordsResponse>(`/v1/stats/trending-keywords${queryString}`)
   },
 
   // 시계열 추이 조회
   async getTrends(params: DashboardApiParams = {}): Promise<TrendsResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<TrendsResponse>(`/api/v1/stats/trends${queryString}`)
+    return apiFetch<TrendsResponse>(`/v1/stats/trends${queryString}`)
   },
 
   // 인덱스별 분포 조회
   async getIndexDistribution(params: Omit<DashboardApiParams, 'indexName' | 'limit' | 'interval'> = {}): Promise<IndexDistributionResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<IndexDistributionResponse>(`/api/v1/stats/index-distribution${queryString}`)
+    return apiFetch<IndexDistributionResponse>(`/v1/stats/index-distribution${queryString}`)
   }
 }
 
@@ -283,7 +283,7 @@ export const searchApi = {
   // 자동완성
   async getAutocomplete(keyword: string): Promise<AutocompleteResponse> {
     const queryString = buildQueryString({ keyword })
-    return apiFetch<AutocompleteResponse>(`/api/v1/search/autocomplete${queryString}`)
+    return apiFetch<AutocompleteResponse>(`/v1/search/autocomplete${queryString}`)
   },
 
   // 상품 검색 - GET 방식으로 변경
@@ -322,25 +322,25 @@ export const searchApi = {
     })
     
     const queryString = params.toString()
-    return apiFetch<SearchResponse>(`/api/v1/search?${queryString}`)
+    return apiFetch<SearchResponse>(`/v1/search?${queryString}`)
   },
 
   // 인기 검색어 조회
   async getPopularKeywords(params: { fromDate?: string; toDate?: string; limit?: number } = {}): Promise<PopularKeywordsApiResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<PopularKeywordsApiResponse>(`/api/v1/keywords/popular${queryString}`)
+    return apiFetch<PopularKeywordsApiResponse>(`/v1/keywords/popular${queryString}`)
   },
 
   // 급등 검색어 조회
   async getTrendingKeywords(params: { currentFromDate?: string; currentToDate?: string; limit?: number } = {}): Promise<TrendingKeywordsApiResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<TrendingKeywordsApiResponse>(`/api/v1/keywords/trending${queryString}`)
+    return apiFetch<TrendingKeywordsApiResponse>(`/v1/keywords/trending${queryString}`)
   },
 
   // 실시간 인기 검색어 조회
   async getRealtimeKeywords(params: { limit?: number } = {}): Promise<RealtimeKeywordsResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<RealtimeKeywordsResponse>(`/api/v1/keywords/realtime${queryString}`)
+    return apiFetch<RealtimeKeywordsResponse>(`/v1/keywords/realtime${queryString}`)
   }
 } 
 
@@ -348,12 +348,12 @@ export const searchApi = {
 export const deploymentApi = {
   // 환경 정보 조회
   async getEnvironments(): Promise<import('@/types/deploy').EnvironmentsResponse> {
-    return apiFetch<import('@/types/deploy').EnvironmentsResponse>('/api/v1/deployment/environments')
+    return apiFetch<import('@/types/deploy').EnvironmentsResponse>('/v1/deployment/environments')
   },
 
   // 색인 실행 (개발환경만)
   async executeIndexing(request: import('@/types/deploy').IndexingRequest = {}): Promise<import('@/types/deploy').OperationResponse> {
-    return apiFetch<import('@/types/deploy').OperationResponse>('/api/v1/deployment/indexing', {
+    return apiFetch<import('@/types/deploy').OperationResponse>('/v1/deployment/indexing', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(request)
@@ -362,7 +362,7 @@ export const deploymentApi = {
 
   // 배포 실행
   async executeDeploy(request: import('@/types/deploy').DeploymentRequest = {}): Promise<import('@/types/deploy').OperationResponse> {
-    return apiFetch<import('@/types/deploy').OperationResponse>('/api/v1/deployment/deploy', {
+    return apiFetch<import('@/types/deploy').OperationResponse>('/v1/deployment/deploy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(request)
@@ -372,7 +372,7 @@ export const deploymentApi = {
   // 배포 이력 조회
   async getDeploymentHistory(params: import('@/types/deploy').DeploymentHistoryParams = {}): Promise<import('@/types/deploy').DeploymentHistoryResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<import('@/types/deploy').DeploymentHistoryResponse>(`/api/v1/deployment/history${queryString}`)
+    return apiFetch<import('@/types/deploy').DeploymentHistoryResponse>(`/v1/deployment/history${queryString}`)
   }
 } 
 
@@ -452,12 +452,12 @@ export const synonymDictionaryApi = {
     environment?: string
   } = {}): Promise<DictionaryPageResponse<SynonymDictionaryItem>> {
     const queryString = buildQueryString(params)
-    return apiFetch<DictionaryPageResponse<SynonymDictionaryItem>>(`/api/v1/dictionaries/synonym${queryString}`)
+    return apiFetch<DictionaryPageResponse<SynonymDictionaryItem>>(`/v1/dictionaries/synonym${queryString}`)
   },
 
   // 생성
   async create(data: { keyword: string; description?: string }): Promise<SynonymDictionaryItem> {
-    return apiFetch<SynonymDictionaryItem>('/api/v1/dictionaries/synonym', {
+    return apiFetch<SynonymDictionaryItem>('/v1/dictionaries/synonym', {
       method: 'POST',
       body: JSON.stringify(data)
     })
@@ -465,12 +465,12 @@ export const synonymDictionaryApi = {
 
   // 상세 조회
   async getById(id: number): Promise<SynonymDictionaryItem> {
-    return apiFetch<SynonymDictionaryItem>(`/api/v1/dictionaries/synonym/${id}`)
+    return apiFetch<SynonymDictionaryItem>(`/v1/dictionaries/synonym/${id}`)
   },
 
   // 수정
   async update(id: number, data: { keyword: string; description?: string }): Promise<SynonymDictionaryItem> {
-    return apiFetch<SynonymDictionaryItem>(`/api/v1/dictionaries/synonym/${id}`, {
+    return apiFetch<SynonymDictionaryItem>(`/v1/dictionaries/synonym/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data)
     })
@@ -478,7 +478,7 @@ export const synonymDictionaryApi = {
 
   // 삭제
   async delete(id: number): Promise<void> {
-    return apiFetch<void>(`/api/v1/dictionaries/synonym/${id}`, {
+    return apiFetch<void>(`/v1/dictionaries/synonym/${id}`, {
       method: 'DELETE'
     })
   }
@@ -496,12 +496,12 @@ export const typoCorrectionDictionaryApi = {
     environment?: string
   } = {}): Promise<DictionaryPageResponse<TypoCorrectionDictionaryItem>> {
     const queryString = buildQueryString(params)
-    return apiFetch<DictionaryPageResponse<TypoCorrectionDictionaryItem>>(`/api/v1/dictionaries/typo${queryString}`)
+    return apiFetch<DictionaryPageResponse<TypoCorrectionDictionaryItem>>(`/v1/dictionaries/typo${queryString}`)
   },
 
   // 생성
   async create(data: { keyword: string; correctedWord: string; description?: string }): Promise<TypoCorrectionDictionaryItem> {
-    return apiFetch<TypoCorrectionDictionaryItem>('/api/v1/dictionaries/typo', {
+    return apiFetch<TypoCorrectionDictionaryItem>('/v1/dictionaries/typo', {
       method: 'POST',
       body: JSON.stringify(data)
     })
@@ -509,12 +509,12 @@ export const typoCorrectionDictionaryApi = {
 
   // 상세 조회
   async getById(id: number): Promise<TypoCorrectionDictionaryItem> {
-    return apiFetch<TypoCorrectionDictionaryItem>(`/api/v1/dictionaries/typo/${id}`)
+    return apiFetch<TypoCorrectionDictionaryItem>(`/v1/dictionaries/typo/${id}`)
   },
 
   // 수정
   async update(id: number, data: { keyword: string; correctedWord: string; description?: string }): Promise<TypoCorrectionDictionaryItem> {
-    return apiFetch<TypoCorrectionDictionaryItem>(`/api/v1/dictionaries/typo/${id}`, {
+    return apiFetch<TypoCorrectionDictionaryItem>(`/v1/dictionaries/typo/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data)
     })
@@ -522,7 +522,7 @@ export const typoCorrectionDictionaryApi = {
 
   // 삭제
   async delete(id: number): Promise<void> {
-    return apiFetch<void>(`/api/v1/dictionaries/typo/${id}`, {
+    return apiFetch<void>(`/v1/dictionaries/typo/${id}`, {
       method: 'DELETE'
     })
   },
@@ -530,14 +530,14 @@ export const typoCorrectionDictionaryApi = {
   // 🆕 실시간 동기화
   async realtimeSync(environment: string): Promise<RealtimeSyncResponse> {
     const params = new URLSearchParams({ environment })
-    return apiFetch<RealtimeSyncResponse>(`/api/v1/dictionaries/typo/realtime-sync?${params}`, {
+    return apiFetch<RealtimeSyncResponse>(`/v1/dictionaries/typo/realtime-sync?${params}`, {
       method: 'POST'
     })
   },
 
   // 🆕 동기화 상태 조회
   async getSyncStatus(): Promise<SyncStatusResponse> {
-    return apiFetch<SyncStatusResponse>('/api/v1/dictionaries/typo/sync-status')
+    return apiFetch<SyncStatusResponse>('/v1/dictionaries/typo/sync-status')
   }
 }
 
@@ -553,12 +553,12 @@ export const stopwordDictionaryApi = {
     environment?: string
   } = {}): Promise<DictionaryPageResponse<StopwordDictionaryItem>> {
     const queryString = buildQueryString(params)
-    return apiFetch<DictionaryPageResponse<StopwordDictionaryItem>>(`/api/v1/dictionaries/stopword${queryString}`)
+    return apiFetch<DictionaryPageResponse<StopwordDictionaryItem>>(`/v1/dictionaries/stopword${queryString}`)
   },
 
   // 생성
   async create(data: { keyword: string; description?: string }): Promise<StopwordDictionaryItem> {
-    return apiFetch<StopwordDictionaryItem>('/api/v1/dictionaries/stopword', {
+    return apiFetch<StopwordDictionaryItem>('/v1/dictionaries/stopword', {
       method: 'POST',
       body: JSON.stringify(data)
     })
@@ -566,12 +566,12 @@ export const stopwordDictionaryApi = {
 
   // 상세 조회
   async getById(id: number): Promise<StopwordDictionaryItem> {
-    return apiFetch<StopwordDictionaryItem>(`/api/v1/dictionaries/stopword/${id}`)
+    return apiFetch<StopwordDictionaryItem>(`/v1/dictionaries/stopword/${id}`)
   },
 
   // 수정
   async update(id: number, data: { keyword: string; description?: string }): Promise<StopwordDictionaryItem> {
-    return apiFetch<StopwordDictionaryItem>(`/api/v1/dictionaries/stopword/${id}`, {
+    return apiFetch<StopwordDictionaryItem>(`/v1/dictionaries/stopword/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data)
     })
@@ -579,7 +579,7 @@ export const stopwordDictionaryApi = {
 
   // 삭제
   async delete(id: number): Promise<void> {
-    return apiFetch<void>(`/api/v1/dictionaries/stopword/${id}`, {
+    return apiFetch<void>(`/v1/dictionaries/stopword/${id}`, {
       method: 'DELETE'
     })
   }
@@ -597,12 +597,12 @@ export const userDictionaryApi = {
     environment?: string
   } = {}): Promise<DictionaryPageResponse<UserDictionaryItem>> {
     const queryString = buildQueryString(params)
-    return apiFetch<DictionaryPageResponse<UserDictionaryItem>>(`/api/v1/dictionaries/user${queryString}`)
+    return apiFetch<DictionaryPageResponse<UserDictionaryItem>>(`/v1/dictionaries/user${queryString}`)
   },
 
   // 생성
   async create(data: { keyword: string; description?: string }): Promise<UserDictionaryItem> {
-    return apiFetch<UserDictionaryItem>('/api/v1/dictionaries/user', {
+    return apiFetch<UserDictionaryItem>('/v1/dictionaries/user', {
       method: 'POST',
       body: JSON.stringify(data)
     })
@@ -610,12 +610,12 @@ export const userDictionaryApi = {
 
   // 상세 조회
   async getById(id: number): Promise<UserDictionaryItem> {
-    return apiFetch<UserDictionaryItem>(`/api/v1/dictionaries/user/${id}`)
+    return apiFetch<UserDictionaryItem>(`/v1/dictionaries/user/${id}`)
   },
 
   // 수정
   async update(id: number, data: { keyword: string; description?: string }): Promise<UserDictionaryItem> {
-    return apiFetch<UserDictionaryItem>(`/api/v1/dictionaries/user/${id}`, {
+    return apiFetch<UserDictionaryItem>(`/v1/dictionaries/user/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data)
     })
@@ -623,7 +623,7 @@ export const userDictionaryApi = {
 
   // 삭제
   async delete(id: number): Promise<void> {
-    return apiFetch<void>(`/api/v1/dictionaries/user/${id}`, {
+    return apiFetch<void>(`/v1/dictionaries/user/${id}`, {
       method: 'DELETE'
     })
   }
@@ -634,7 +634,7 @@ export const realtimeSyncApi = {
   // 동의어 사전 실시간 반영
   async syncSynonym(environment: string): Promise<RealtimeSyncResponse> {
     const params = new URLSearchParams({ environment })
-    return apiFetch<RealtimeSyncResponse>(`/api/v1/dictionaries/realtime-sync/synonym?${params}`, {
+    return apiFetch<RealtimeSyncResponse>(`/v1/dictionaries/realtime-sync/synonym?${params}`, {
       method: 'POST'
     })
   },
@@ -647,14 +647,14 @@ export const realtimeSyncApi = {
   // 모든 사전 실시간 반영
   async syncAll(environment: string): Promise<RealtimeSyncResponse> {
     const params = new URLSearchParams({ environment })
-    return apiFetch<RealtimeSyncResponse>(`/api/v1/dictionaries/realtime-sync/all?${params}`, {
+    return apiFetch<RealtimeSyncResponse>(`/v1/dictionaries/realtime-sync/all?${params}`, {
       method: 'POST'
     })
   },
 
   // 동기화 상태 조회
   async getStatus(): Promise<SyncStatusResponse> {
-    return apiFetch<SyncStatusResponse>('/api/v1/dictionaries/realtime-sync/status')
+    return apiFetch<SyncStatusResponse>('/v1/dictionaries/realtime-sync/status')
   }
 }
 
@@ -674,7 +674,7 @@ export const enhancedSearchApi = {
     priceTo?: number
   }): Promise<SearchResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<SearchResponse>(`/api/v1/search${queryString}`)
+    return apiFetch<SearchResponse>(`/v1/search${queryString}`)
   },
 
   // 검색 시뮬레이션 (오타교정 옵션 포함)
@@ -693,7 +693,7 @@ export const enhancedSearchApi = {
     priceTo?: number
   }): Promise<SearchResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<SearchResponse>(`/api/v1/search/simulation${queryString}`)
+    return apiFetch<SearchResponse>(`/v1/search/simulation${queryString}`)
   },
 
   // 🆕 자동완성 시뮬레이션
@@ -702,7 +702,7 @@ export const enhancedSearchApi = {
     environmentType: string
   }): Promise<AutocompleteResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<AutocompleteResponse>(`/api/v1/search/autocomplete/simulation${queryString}`)
+    return apiFetch<AutocompleteResponse>(`/v1/search/autocomplete/simulation${queryString}`)
   }
 } 
 
@@ -711,11 +711,11 @@ export const searchLogApi = {
   // 검색 로그 목록 조회
   async getList(params: import('@/types/dashboard').SearchLogParams = {}): Promise<import('@/types/dashboard').SearchLogPageResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<import('@/types/dashboard').SearchLogPageResponse>(`/api/v1/search-logs${queryString}`)
+    return apiFetch<import('@/types/dashboard').SearchLogPageResponse>(`/v1/search-logs${queryString}`)
   },
 
   // 필터 옵션 조회
   async getFilterOptions(): Promise<import('@/types/dashboard').SearchLogFilterOptions> {
-    return apiFetch<import('@/types/dashboard').SearchLogFilterOptions>('/api/v1/search-logs/filter-options')
+    return apiFetch<import('@/types/dashboard').SearchLogFilterOptions>('/v1/search-logs/filter-options')
   }
 } 
