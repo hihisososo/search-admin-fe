@@ -28,8 +28,6 @@ jobs:
         run: npm run lint
       
       - name: Build application
-        env:
-          VITE_API_BASE_URL: ${{ secrets.BACKEND_URL }}
         run: npm run build
       
       - name: Upload build artifact
@@ -63,7 +61,7 @@ jobs:
             --parameters '{
               "commands": [
                 "sudo -u ec2-user git -C /home/ec2-user/search-admin-fe pull origin main",
-                "sudo -u ec2-user BACKEND_HOST=${{ secrets.BACKEND_HOST }} VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }} bash /home/ec2-user/search-admin-fe/scripts/deploy.sh"
+                "sudo -u ec2-user BACKEND_HOST=${{ secrets.BACKEND_HOST }} bash /home/ec2-user/search-admin-fe/scripts/deploy.sh"
               ]
             }' \
             --timeout-seconds 1200 \
