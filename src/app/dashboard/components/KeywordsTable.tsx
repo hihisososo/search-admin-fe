@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
@@ -52,11 +52,8 @@ KeywordTableSkeleton.displayName = 'KeywordTableSkeleton'
 export default memo(function KeywordsTable({ keywords, loading }: KeywordsTableProps) {
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="pb-3">
         <CardTitle className="text-base">인기 검색 키워드</CardTitle>
-        <CardDescription className="text-sm">
-          최근 검색량 상위 키워드
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>

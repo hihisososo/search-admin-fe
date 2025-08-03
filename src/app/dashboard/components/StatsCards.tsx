@@ -52,13 +52,13 @@ const STAT_CONFIG: Record<string, StatConfig> = {
 
 const StatCardSkeleton = memo(() => (
   <Card>
-    <CardContent className="p-4">
+    <CardContent className="p-3">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-6 w-20" />
+          <Skeleton className="h-3 w-14" />
+          <Skeleton className="h-5 w-16" />
         </div>
-        <Skeleton className="h-8 w-8 rounded" />
+        <Skeleton className="h-6 w-6 rounded" />
       </div>
     </CardContent>
   </Card>
@@ -75,13 +75,13 @@ const StatCard = memo(({ stat }: { stat: StatItem }) => {
 
   return (
     <Card>
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">{stat.label}</p>
-            <p className="text-xl font-semibold">{stat.value}</p>
+          <div>
+            <p className="text-xs text-muted-foreground">{stat.label}</p>
+            <p className="text-lg font-semibold">{stat.value}</p>
           </div>
-          <Icon className={`h-8 w-8 ${config.color} opacity-20`} />
+          <Icon className={`h-6 w-6 ${config.color} opacity-20`} />
         </div>
       </CardContent>
     </Card>

@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChartContainer } from '@/components/ui/chart'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -142,14 +142,11 @@ export default memo(function AnalyticsCharts({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-3">
           <CardTitle className="text-base">검색 응답시간</CardTitle>
-          <CardDescription className="text-sm">
-            최근 7일간 평균 응답시간 (ms)
-          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-64">
+          <div className="h-48">
             {loading ? (
               <ChartSkeleton />
             ) : responseTimeData.length === 0 ? (
@@ -164,14 +161,11 @@ export default memo(function AnalyticsCharts({
       </Card>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-3">
           <CardTitle className="text-base">검색량 추이</CardTitle>
-          <CardDescription className="text-sm">
-            성공/실패 검색 건수
-          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-64">
+          <div className="h-48">
             {loading ? (
               <ChartSkeleton />
             ) : searchVolumeData.length === 0 ? (
