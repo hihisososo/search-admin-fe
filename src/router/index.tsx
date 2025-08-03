@@ -14,7 +14,6 @@ const SearchDemo = lazy(() => import("@/app/search-demo/page"))
 const DeployManagement = lazy(() => import("@/app/deploy/page"))
 const AnswerSetManagement = lazy(() => import("@/app/search-evaluation/answer-set/page"))
 const EvaluationExecution = lazy(() => import("@/app/search-evaluation/execution/page"))
-const TestDeployment = lazy(() => import("@/app/test-deployment/page"))
 
 function PageLoader() {
   return (
@@ -41,7 +40,6 @@ export function AdminRoutes() {
         <Route path="/search-evaluation" element={<Navigate to="/search-evaluation/answer-set" replace />} />
         <Route path="/search-evaluation/answer-set" element={<AnswerSetManagement />} />
         <Route path="/search-evaluation/execution" element={<EvaluationExecution />} />
-        <Route path="/test-deployment" element={<TestDeployment />} />
       </Routes>
     </Suspense>
   )

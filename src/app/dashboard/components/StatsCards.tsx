@@ -1,7 +1,7 @@
 import { memo } from 'react'
-import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Search, Clock, AlertTriangle, Database, Activity } from 'lucide-react'
+import { Search, Clock, AlertTriangle, Database, Activity, MousePointerClick, BarChart3 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { StatItem } from '@/types/dashboard'
 
@@ -12,62 +12,53 @@ interface StatsCardsProps {
 
 interface StatConfig {
   icon: LucideIcon
-  colorClass: string
-  bgGradient: string
+  color: string
 }
 
 const STAT_CONFIG: Record<string, StatConfig> = {
   검색량: {
     icon: Search,
-    colorClass: 'text-blue-600',
-    bgGradient: 'from-blue-100 to-blue-200',
+    color: 'text-blue-600',
   },
   문서량: {
     icon: Database,
-    colorClass: 'text-green-600',
-    bgGradient: 'from-green-100 to-green-200',
+    color: 'text-green-600',
   },
   검색실패: {
     icon: AlertTriangle,
-    colorClass: 'text-red-600',
-    bgGradient: 'from-red-100 to-red-200',
+    color: 'text-red-600',
   },
   에러건수: {
     icon: AlertTriangle,
-    colorClass: 'text-orange-600',
-    bgGradient: 'from-orange-100 to-orange-200',
+    color: 'text-orange-600',
   },
   평균응답시간: {
     icon: Clock,
-    colorClass: 'text-indigo-600',
-    bgGradient: 'from-indigo-100 to-indigo-200',
+    color: 'text-indigo-600',
   },
   성공률: {
     icon: Activity,
-    colorClass: 'text-emerald-600',
-    bgGradient: 'from-emerald-100 to-emerald-200',
+    color: 'text-emerald-600',
   },
   클릭수: {
-    icon: Activity,
-    colorClass: 'text-purple-600',
-    bgGradient: 'from-purple-100 to-purple-200',
+    icon: MousePointerClick,
+    color: 'text-purple-600',
   },
   CTR: {
-    icon: Activity,
-    colorClass: 'text-teal-600',
-    bgGradient: 'from-teal-100 to-teal-200',
+    icon: BarChart3,
+    color: 'text-cyan-600',
   },
 }
 
 const StatCardSkeleton = memo(() => (
-  <Card className="border-0 shadow-lg">
-    <CardContent className="p-6">
+  <Card>
+    <CardContent className="px-3 py-2">
       <div className="flex items-center justify-between">
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-8 w-16" />
+        <div>
+          <Skeleton className="h-3 w-12" />
+          <Skeleton className="h-4 w-14 mt-0.5" />
         </div>
-        <Skeleton className="h-12 w-12 rounded-full" />
+        <Skeleton className="h-4 w-4 rounded" />
       </div>
     </CardContent>
   </Card>
@@ -78,30 +69,19 @@ StatCardSkeleton.displayName = 'StatCardSkeleton'
 const StatCard = memo(({ stat }: { stat: StatItem }) => {
   const config = STAT_CONFIG[stat.label] || {
     icon: Activity,
-    colorClass: 'text-gray-600',
-    bgGradient: 'from-gray-100 to-gray-200',
+    color: 'text-gray-600',
   }
   const Icon = config.icon
 
   return (
-    <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
-      <div className="absolute inset-0 bg-gradient-to-br from-white to-gray-50/50 group-hover:from-white group-hover:to-blue-50/30 transition-all duration-300" />
-      <CardContent className="relative p-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <Icon className={`h-5 w-5 ${config.colorClass}`} />
-              <CardDescription className="text-sm font-medium text-gray-600">
-                {stat.label}
-              </CardDescription>
-            </div>
-            <CardTitle className={`text-2xl font-bold ${config.colorClass} group-hover:scale-105 transition-transform duration-200`}>
-              {stat.value}
-            </CardTitle>
+    <Card>
+      <CardContent className="px-3 py-2">
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <p className="text-xs text-muted-foreground leading-none">{stat.label}</p>
+            <p className="text-sm font-semibold mt-0.5">{stat.value}</p>
           </div>
-          <div className={`h-12 w-12 rounded-full bg-gradient-to-br ${config.bgGradient} flex items-center justify-center group-hover:scale-110 transition-transform duration-200`}>
-            <Icon className={`h-5 w-5 ${config.colorClass}`} />
-          </div>
+          <Icon className={`h-4 w-4 ${config.color} opacity-20`} />
         </div>
       </CardContent>
     </Card>
@@ -112,7 +92,7 @@ StatCard.displayName = 'StatCard'
 
 export default memo(function StatsCards({ stats, loading }: StatsCardsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-4 gap-2">
       {loading
         ? Array.from({ length: 8 }).map((_, index) => (
             <StatCardSkeleton key={index} />

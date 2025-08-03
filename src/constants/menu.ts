@@ -85,12 +85,6 @@ export const MENU_ITEMS: MenuItem[] = [
         path: '/search-evaluation/execution'
       }
     ]
-  },
-  {
-    id: 'test-deployment',
-    title: '배포테스트',
-    path: '/test-deployment',
-    icon: Target,
   }
 ]
 

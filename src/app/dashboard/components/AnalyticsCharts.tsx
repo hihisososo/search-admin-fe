@@ -1,8 +1,7 @@
 import { memo } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChartContainer } from '@/components/ui/chart'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Clock, BarChart3 } from 'lucide-react'
 import {
   LineChart,
   Line,
@@ -36,78 +35,52 @@ interface AnalyticsChartsProps {
 const CHART_CONFIG = {
   responseTime: {
     label: '응답시간',
-    color: '#6366f1',
+    color: '#4f46e5',
   },
   successfulSearches: {
-    label: '성공한 검색',
+    label: '성공',
     color: '#10b981',
   },
   failedSearches: {
-    label: '실패한 검색',
+    label: '실패',
     color: '#ef4444',
   },
 } as const
 
 const ChartSkeleton = memo(() => (
-  <div className="space-y-3">
-    <Skeleton className="h-4 w-full" />
-    <Skeleton className="h-4 w-4/5" />
-    <Skeleton className="h-4 w-3/5" />
+  <div className="h-full w-full p-2">
+    <Skeleton className="h-full w-full" />
   </div>
 ))
 
 ChartSkeleton.displayName = 'ChartSkeleton'
 
-const NoDataMessage = memo(() => (
-  <div className="flex items-center justify-center h-full">
-    <span className="text-gray-400 text-sm">데이터가 없습니다</span>
-  </div>
-))
-
-NoDataMessage.displayName = 'NoDataMessage'
-
-const formatDateTick = (value: string) => value.slice(3)
+const formatDateTick = (value: string) => value.slice(5)
 
 const ResponseTimeChart = memo(({ data }: { data: ResponseTimeData[] }) => (
   <ChartContainer config={{ responseTime: CHART_CONFIG.responseTime }} className="h-full w-full">
     <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-        <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+      <LineChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis
           dataKey="date"
           tickLine={false}
           axisLine={false}
-          tickMargin={8}
-          className="text-sm"
+          fontSize={12}
           tickFormatter={formatDateTick}
         />
         <YAxis
           tickLine={false}
           axisLine={false}
-          tickMargin={8}
-          className="text-sm"
-          domain={['auto', 'auto']}
+          fontSize={12}
         />
         <Tooltip />
         <Line
           dataKey="responseTime"
           type="monotone"
           stroke={CHART_CONFIG.responseTime.color}
-          strokeWidth={3}
-          dot={{
-            fill: CHART_CONFIG.responseTime.color,
-            strokeWidth: 3,
-            stroke: '#ffffff',
-            r: 6,
-          }}
-          activeDot={{
-            r: 8,
-            fill: CHART_CONFIG.responseTime.color,
-            stroke: '#ffffff',
-            strokeWidth: 3,
-            className: 'drop-shadow-lg',
-          }}
-          className="drop-shadow-sm"
+          strokeWidth={2}
+          dot={false}
         />
       </LineChart>
     </ResponsiveContainer>
@@ -125,17 +98,20 @@ const SearchVolumeChart = memo(({ data }: { data: SearchVolumeData[] }) => (
     className="h-full w-full"
   >
     <ResponsiveContainer width="100%" height="100%">
-      <AreaChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-        <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+      <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis
           dataKey="date"
           tickLine={false}
           axisLine={false}
-          tickMargin={8}
-          className="text-sm"
+          fontSize={12}
           tickFormatter={formatDateTick}
         />
-        <YAxis tickLine={false} axisLine={false} tickMargin={8} className="text-sm" />
+        <YAxis 
+          tickLine={false} 
+          axisLine={false} 
+          fontSize={12}
+        />
         <Tooltip />
         <Area
           dataKey="successfulSearches"
@@ -164,25 +140,19 @@ export default memo(function AnalyticsCharts({
   loading,
 }: AnalyticsChartsProps) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card className="border-0 shadow-lg">
-        <CardHeader className="pb-4">
-          <div className="flex items-center space-x-2">
-            <Clock className="h-5 w-5 text-indigo-500" />
-            <CardTitle className="text-xl font-semibold text-gray-900">
-              검색 응답시간 추이
-            </CardTitle>
-          </div>
-          <CardDescription className="text-gray-600">
-            최근 7일간 평균 응답시간 변화 (단위: ms)
-          </CardDescription>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+      <Card>
+        <CardHeader className="pb-2 pt-3">
+          <CardTitle className="text-sm font-medium">검색 응답시간</CardTitle>
         </CardHeader>
-        <CardContent className="pt-0">
-          <div className="h-80 w-full">
+        <CardContent>
+          <div className="h-36">
             {loading ? (
               <ChartSkeleton />
             ) : responseTimeData.length === 0 ? (
-              <NoDataMessage />
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                데이터 없음
+              </div>
             ) : (
               <ResponseTimeChart data={responseTimeData} />
             )}
@@ -190,22 +160,18 @@ export default memo(function AnalyticsCharts({
         </CardContent>
       </Card>
 
-      <Card className="border-0 shadow-lg">
-        <CardHeader className="pb-4">
-          <div className="flex items-center space-x-2">
-            <BarChart3 className="h-5 w-5 text-blue-500" />
-            <CardTitle className="text-xl font-semibold text-gray-900">검색량 추이</CardTitle>
-          </div>
-          <CardDescription className="text-gray-600">
-            성공/실패 검색 추이 (최근 7일)
-          </CardDescription>
+      <Card>
+        <CardHeader className="pb-2 pt-3">
+          <CardTitle className="text-sm font-medium">검색량 추이</CardTitle>
         </CardHeader>
-        <CardContent className="pt-0">
-          <div className="h-80 w-full">
+        <CardContent>
+          <div className="h-36">
             {loading ? (
               <ChartSkeleton />
             ) : searchVolumeData.length === 0 ? (
-              <NoDataMessage />
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                데이터 없음
+              </div>
             ) : (
               <SearchVolumeChart data={searchVolumeData} />
             )}

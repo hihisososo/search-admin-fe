@@ -14,7 +14,6 @@ interface DashboardHeaderProps {
   lastUpdated: Date
 }
 
-
 const formatDateRange = (dateRange: DateRange): string => {
   if (!dateRange.from || !dateRange.to) return '날짜 범위 선택'
   
@@ -36,39 +35,39 @@ export default memo(function DashboardHeader({
   }, [setDateRange])
 
   return (
-    <div className="flex items-center space-x-4">
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className="flex items-center gap-2 text-sm font-normal hover:bg-blue-50 hover:border-blue-300 transition-colors duration-200"
-          >
-            <CalendarIcon className="h-4 w-4" />
-            {formatDateRange(dateRange)}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent align="end" className="p-0 w-auto">
-          <Calendar
-            mode="range"
-            selected={dateRange}
-            onSelect={handleDateRange}
-            numberOfMonths={2}
-            locale={ko}
-            className="border-0"
-          />
-        </PopoverContent>
-      </Popover>
+    <div className="flex items-center gap-2">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs"
+            >
+              <CalendarIcon className="h-3 w-3 mr-1.5" />
+              {formatDateRange(dateRange)}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="p-0 w-auto">
+            <Calendar
+              mode="range"
+              selected={dateRange}
+              onSelect={handleDateRange}
+              numberOfMonths={2}
+              locale={ko}
+              className="border-0"
+            />
+          </PopoverContent>
+        </Popover>
 
-      <Button
-        onClick={onRefresh}
-        disabled={loading}
-        variant="outline"
-        size="sm"
-        className="hover:bg-blue-50 hover:border-blue-300"
-      >
-        <RefreshCw className={loading ? 'animate-spin' : ''} />
-        새로고침
-      </Button>
+        <Button
+          onClick={onRefresh}
+          disabled={loading}
+          variant="outline"
+          size="sm"
+          className="h-8 px-2"
+        >
+          <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
+        </Button>
     </div>
   )
 })
