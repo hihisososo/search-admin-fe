@@ -16,16 +16,31 @@ export interface TopKeyword {
 }
 
 export function useDashboardTransformers() {
-  const convertStatsToStatItems = useCallback((dashboardStats: DashboardStats): StatItem[] => [
-    { label: '검색량', value: dashboardStats.totalSearchCount.toLocaleString() },
-    { label: '문서량', value: dashboardStats.totalDocumentCount.toLocaleString() },
-    { label: '검색실패', value: `${dashboardStats.searchFailureRate}%` },
-    { label: '에러건수', value: dashboardStats.errorCount },
-    { label: '평균응답시간', value: `${Math.round(dashboardStats.averageResponseTimeMs)}ms` },
-    { label: '성공률', value: `${dashboardStats.successRate}%` },
-    { label: '클릭수', value: dashboardStats.clickCount?.toLocaleString() || '0' },
-    { label: 'CTR', value: `${dashboardStats.clickThroughRate?.toFixed(1) || '0'}%` },
-  ], [])
+  const convertStatsToStatItems = useCallback((dashboardStats: DashboardStats | null | undefined): StatItem[] => {
+    if (!dashboardStats) {
+      return [
+        { label: '검색량', value: '0' },
+        { label: '문서량', value: '0' },
+        { label: '검색실패', value: '0%' },
+        { label: '에러건수', value: 0 },
+        { label: '평균응답시간', value: '0ms' },
+        { label: '성공률', value: '0%' },
+        { label: '클릭수', value: '0' },
+        { label: 'CTR', value: '0%' },
+      ]
+    }
+    
+    return [
+      { label: '검색량', value: (dashboardStats.totalSearchCount || 0).toLocaleString() },
+      { label: '문서량', value: (dashboardStats.totalDocumentCount || 0).toLocaleString() },
+      { label: '검색실패', value: `${dashboardStats.searchFailureRate || 0}%` },
+      { label: '에러건수', value: dashboardStats.errorCount || 0 },
+      { label: '평균응답시간', value: `${Math.round(dashboardStats.averageResponseTimeMs || 0)}ms` },
+      { label: '성공률', value: `${dashboardStats.successRate || 0}%` },
+      { label: '클릭수', value: (dashboardStats.clickCount || 0).toLocaleString() },
+      { label: 'CTR', value: `${(dashboardStats.clickThroughRate || 0).toFixed(1)}%` },
+    ]
+  }, [])
 
   const convertTrendsToChartData = useCallback((trendsData: TrendsResponse) => {
     const responseTimeData = trendsData.responseTimeData.map((item) => ({
