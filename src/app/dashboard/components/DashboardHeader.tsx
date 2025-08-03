@@ -35,10 +35,7 @@ export default memo(function DashboardHeader({
   }, [setDateRange])
 
   return (
-    <div className="flex items-center justify-between">
-      <h1 className="text-xl font-semibold">대시보드</h1>
-      
-      <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2">
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -71,7 +68,6 @@ export default memo(function DashboardHeader({
         >
           <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
         </Button>
-      </div>
     </div>
   )
 })

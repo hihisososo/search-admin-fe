@@ -56,7 +56,7 @@ export default function DashboardPage() {
   })
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-3">
         <DashboardHeader
           dateRange={dateRange}
           setDateRange={setDateRange}
@@ -67,7 +67,7 @@ export default function DashboardPage() {
         
         <StatsCards stats={stats} loading={isLoading} />
         
-        <Tabs defaultValue="analytics" className="space-y-4">
+        <Tabs defaultValue="analytics" className="space-y-3">
           <TabsList className="grid w-full grid-cols-2 lg:w-fit">
             <TabsTrigger value="analytics" className="text-sm">
               분석

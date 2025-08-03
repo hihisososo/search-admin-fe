@@ -140,13 +140,13 @@ export default memo(function AnalyticsCharts({
   loading,
 }: AnalyticsChartsProps) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
       <Card>
-        <CardHeader className="pb-2 pt-4">
+        <CardHeader className="pb-2 pt-3">
           <CardTitle className="text-sm font-medium">검색 응답시간</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-40">
+          <div className="h-36">
             {loading ? (
               <ChartSkeleton />
             ) : responseTimeData.length === 0 ? (
@@ -161,11 +161,11 @@ export default memo(function AnalyticsCharts({
       </Card>
 
       <Card>
-        <CardHeader className="pb-2 pt-4">
+        <CardHeader className="pb-2 pt-3">
           <CardTitle className="text-sm font-medium">검색량 추이</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-40">
+          <div className="h-36">
             {loading ? (
               <ChartSkeleton />
             ) : searchVolumeData.length === 0 ? (
