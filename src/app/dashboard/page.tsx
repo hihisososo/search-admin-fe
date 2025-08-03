@@ -1,6 +1,5 @@
 import { useMemo, useCallback, useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { BarChart3, Search } from 'lucide-react'
 import type { DateRange } from 'react-day-picker'
 import { useDashboardData } from '@/hooks/use-dashboard'
 import { useDashboardTransformers } from './hooks/use-dashboard-transformers'
@@ -57,8 +56,7 @@ export default function DashboardPage() {
   })
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="p-6 space-y-6">
         <DashboardHeader
           dateRange={dateRange}
           setDateRange={setDateRange}
@@ -69,19 +67,17 @@ export default function DashboardPage() {
         
         <StatsCards stats={stats} loading={isLoading} />
         
-        <Tabs defaultValue="analytics" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-2 lg:w-fit lg:grid-cols-2 bg-white/50 backdrop-blur-sm p-1 rounded-xl shadow-sm">
-            <TabsTrigger value="analytics" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-200">
-              <BarChart3 className="h-4 w-4" />
-              <span className="font-medium">분석</span>
+        <Tabs defaultValue="analytics" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2 lg:w-fit">
+            <TabsTrigger value="analytics" className="text-sm">
+              분석
             </TabsTrigger>
-            <TabsTrigger value="keywords" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-200">
-              <Search className="h-4 w-4" />
-              <span className="font-medium">키워드</span>
+            <TabsTrigger value="keywords" className="text-sm">
+              키워드
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="analytics" className="space-y-6">
+          <TabsContent value="analytics">
             <AnalyticsCharts
               responseTimeData={responseTimeData}
               searchVolumeData={searchVolumeData}
@@ -89,11 +85,10 @@ export default function DashboardPage() {
             />
           </TabsContent>
 
-          <TabsContent value="keywords" className="space-y-6">
+          <TabsContent value="keywords">
             <KeywordsTable keywords={topKeywords} loading={isLoading} />
           </TabsContent>
         </Tabs>
-      </div>
     </div>
   )
 }
