@@ -47,6 +47,16 @@ const STAT_CONFIG: Record<string, StatConfig> = {
     colorClass: 'text-emerald-600',
     bgGradient: 'from-emerald-100 to-emerald-200',
   },
+  클릭수: {
+    icon: Activity,
+    colorClass: 'text-purple-600',
+    bgGradient: 'from-purple-100 to-purple-200',
+  },
+  CTR: {
+    icon: Activity,
+    colorClass: 'text-teal-600',
+    bgGradient: 'from-teal-100 to-teal-200',
+  },
 }
 
 const StatCardSkeleton = memo(() => (
@@ -102,9 +112,9 @@ StatCard.displayName = 'StatCard'
 
 export default memo(function StatsCards({ stats, loading }: StatsCardsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {loading
-        ? Array.from({ length: 6 }).map((_, index) => (
+        ? Array.from({ length: 8 }).map((_, index) => (
             <StatCardSkeleton key={index} />
           ))
         : stats.map((stat) => (
