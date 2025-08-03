@@ -1,5 +1,4 @@
 import { QueryClient } from '@tanstack/react-query'
-import { APIError } from './errorHandler'
 
 interface QueryParams {
   [key: string]: string | number | boolean | undefined
@@ -8,17 +7,6 @@ interface QueryParams {
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,
-      gcTime: 30 * 60 * 1000,
-      retry: (failureCount, error) => {
-        if (error instanceof APIError && error.status >= 400 && error.status < 500) {
-          return false
-        }
-        return failureCount < 3
-      },
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    },
-    mutations: {
       retry: false,
     },
   },

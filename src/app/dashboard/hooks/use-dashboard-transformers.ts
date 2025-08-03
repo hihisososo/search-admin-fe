@@ -23,6 +23,8 @@ export function useDashboardTransformers() {
     { label: '에러건수', value: dashboardStats.errorCount },
     { label: '평균응답시간', value: `${Math.round(dashboardStats.averageResponseTimeMs)}ms` },
     { label: '성공률', value: `${dashboardStats.successRate}%` },
+    { label: '클릭수', value: dashboardStats.clickCount?.toLocaleString() || '0' },
+    { label: 'CTR', value: `${dashboardStats.clickThroughRate?.toFixed(1) || '0'}%` },
   ], [])
 
   const convertTrendsToChartData = useCallback((trendsData: TrendsResponse) => {
@@ -47,6 +49,7 @@ export function useDashboardTransformers() {
         name: item.indexName,
         value: item.percentage,
         color: DASHBOARD_CONSTANTS.COLORS[index % DASHBOARD_CONSTANTS.COLORS.length],
+        ctr: item.clickThroughRate,
       })),
     []
   )

@@ -9,6 +9,7 @@ interface IndexDistribution {
   name: string
   value: number
   color: string
+  ctr?: number
 }
 
 interface DistributionChartProps {
@@ -42,6 +43,9 @@ const LegendItem = memo(({ item }: { item: IndexDistribution }) => (
     <div className="w-4 h-4 rounded" style={{ backgroundColor: item.color }} />
     <span className="text-sm font-medium text-gray-700 w-16">{item.name}</span>
     <span className="text-sm text-gray-500 font-mono">{item.value}%</span>
+    {item.ctr !== undefined && (
+      <span className="text-sm text-blue-600 font-mono">CTR: {item.ctr.toFixed(1)}%</span>
+    )}
   </div>
 ))
 
@@ -64,10 +68,10 @@ export default memo(function DistributionChart({ data, loading }: DistributionCh
         <div className="flex items-center space-x-2">
           <PieChart className="h-5 w-5 text-purple-500" />
           <CardTitle className="text-xl font-semibold text-gray-900">
-            인덱스별 검색 분포
+            검색 쿼리 분포
           </CardTitle>
         </div>
-        <CardDescription className="text-gray-600">인덱스별 검색량 비율</CardDescription>
+        <CardDescription className="text-gray-600">검색 쿼리별 검색량 비율</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col lg:flex-row items-center space-y-6 lg:space-y-0 lg:space-x-8">
@@ -92,7 +96,23 @@ export default memo(function DistributionChart({ data, loading }: DistributionCh
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip 
+                        content={({ payload }) => {
+                          if (payload && payload[0]) {
+                            const data = payload[0].payload as IndexDistribution
+                            return (
+                              <div className="bg-white p-2 border rounded shadow">
+                                <p className="text-sm font-medium">{data.name}</p>
+                                <p className="text-sm">검색 비율: {data.value}%</p>
+                                {data.ctr !== undefined && (
+                                  <p className="text-sm text-blue-600">CTR: {data.ctr.toFixed(1)}%</p>
+                                )}
+                              </div>
+                            )
+                          }
+                          return null
+                        }}
+                      />
                     </RechartsPieChart>
                   </ResponsiveContainer>
                 </ChartContainer>

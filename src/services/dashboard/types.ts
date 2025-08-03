@@ -8,6 +8,8 @@ export interface DashboardStats {
   errorCount: number
   averageResponseTimeMs: number
   successRate: number
+  clickCount: number
+  clickThroughRate: number
   period: string
   indexName?: string
 }
@@ -22,6 +24,8 @@ export interface KeywordItem {
   changeStatus: "UP" | "DOWN" | "NEW" | "SAME"
   count?: number
   percentage?: number
+  clickCount?: number
+  clickThroughRate?: number
 }
 
 // 인기 키워드 응답
@@ -44,6 +48,8 @@ export interface TrendDataPoint {
   searchCount: number
   averageResponseTime: number
   label: string
+  clickCount?: number
+  clickThroughRate?: number
 }
 
 // 트렌드 응답
@@ -63,6 +69,8 @@ export interface IndexDistributionItem {
   averageResponseTime: number
   errorCount: number
   successRate: number
+  clickCount?: number
+  clickThroughRate?: number
 }
 
 // 인덱스 분포 응답
