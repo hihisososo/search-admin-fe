@@ -100,20 +100,20 @@ export class ApiClient {
     }
   }
 
-  async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
+  async get<T>(endpoint: string, params?: Record<string, string | number | boolean | string[] | undefined>): Promise<T> {
     const queryString = params ? this.buildQueryString(params) : ''
     const url = queryString ? `${endpoint}?${queryString}` : endpoint
     return this.request<T>(url, { method: 'GET' })
   }
 
-  async post<T>(endpoint: string, data?: any): Promise<T> {
+  async post<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data instanceof FormData ? data : JSON.stringify(data)
     })
   }
 
-  async put<T>(endpoint: string, data?: any): Promise<T> {
+  async put<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: data instanceof FormData ? data : JSON.stringify(data)
@@ -124,7 +124,7 @@ export class ApiClient {
     return this.request<T>(endpoint, { method: 'DELETE' })
   }
 
-  private buildQueryString(params: Record<string, any>): string {
+  private buildQueryString(params: Record<string, string | number | boolean | string[] | undefined>): string {
     const searchParams = new URLSearchParams()
     
     Object.entries(params).forEach(([key, value]) => {
@@ -158,13 +158,13 @@ export const apiFetch = <T>(url: string, options?: RequestInit): Promise<T> => {
     return apiClient.delete<T>(url)
   } else {
     // 기타 메소드는 직접 처리
-    return apiClient['request' as keyof ApiClient]<T>(url, options) as Promise<T>
+    return apiClient.request<T>(url, options)
   }
 }
 
-export const apiFetchJson = <T>(url: string, data: any, method = 'POST'): Promise<T> => {
+export const apiFetchJson = <T>(url: string, data: unknown, method = 'POST'): Promise<T> => {
   return method === 'GET' 
-    ? apiClient.get<T>(url, data)
+    ? apiClient.get<T>(url, data as Record<string, string | number | boolean | string[] | undefined>)
     : apiClient.post<T>(url, data)
 }
 

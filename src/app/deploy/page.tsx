@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import type { Environment, DeployHistory } from '@/types/deploy'
 import { deploymentApi } from '@/lib/api'
 import EnvironmentOverview from './components/EnvironmentOverview'
@@ -19,7 +19,7 @@ export default function DeployManagement() {
   }
 
   // 환경 정보 조회
-  const fetchEnvironments = async () => {
+  const fetchEnvironments = useCallback(async () => {
     try {
       const response = await deploymentApi.getEnvironments()
       setEnvironments(response.environments)
@@ -33,10 +33,10 @@ export default function DeployManagement() {
       console.error('환경 정보 조회 실패:', error)
       return []
     }
-  }
+  }, [])
 
   // 배포 이력 조회
-  const fetchDeploymentHistory = async () => {
+  const fetchDeploymentHistory = useCallback(async () => {
     try {
       const response = await deploymentApi.getDeploymentHistory({
         page: 0,
@@ -47,7 +47,7 @@ export default function DeployManagement() {
     } catch (error) {
       console.error('배포 이력 조회 실패:', error)
     }
-  }
+  }, [])
 
   // 초기 데이터 로드
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function DeployManagement() {
     }
 
     loadInitialData()
-  }, [])
+  }, [fetchEnvironments, fetchDeploymentHistory])
 
   // 색인 실행 (개발환경만)
   const handleReindex = async (environment: Environment, description?: string) => {
@@ -115,7 +115,7 @@ export default function DeployManagement() {
   }
 
   // 색인 진행 상황 모니터링 - 백엔드 상태 우선
-  const startIndexingMonitoring = () => {
+  const startIndexingMonitoring = useCallback(() => {
     const checkStatus = async () => {
       try {
         const response = await deploymentApi.getEnvironments()
@@ -163,7 +163,7 @@ export default function DeployManagement() {
       setIsIndexing(false)
       console.log('색인 모니터링 시간 초과로 중단됨')
     }, 60000)
-  }
+  }, [fetchDeploymentHistory])
 
   if (isLoading) {
     return (

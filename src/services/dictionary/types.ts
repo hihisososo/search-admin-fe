@@ -33,6 +33,7 @@ export interface DictionarySearchParams extends SearchParams {
   environment?: Environment
   sortBy?: 'keyword' | 'createdAt' | 'updatedAt'
   sortDir?: 'asc' | 'desc'
+  [key: string]: string | number | boolean | undefined
 }
 
 // 사전 생성 요청

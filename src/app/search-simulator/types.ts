@@ -7,7 +7,7 @@ export interface SearchResult {
     _index: string
     _id: string
     _score: number
-    _source: Record<string, any>
+    _source: Record<string, unknown>
 }
 
 export interface ElasticsearchResponse {
@@ -27,7 +27,7 @@ export interface ElasticsearchResponse {
         max_score: number
         hits: SearchResult[]
     }
-    aggregations?: Record<string, any>
+    aggregations?: Record<string, unknown>
 }
 
 export interface SearchResponse {

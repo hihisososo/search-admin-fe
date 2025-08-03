@@ -7,10 +7,7 @@ import type { TypoCorrectionDictionaryItem } from "@/services/dictionary/types"
 import { EnvironmentSelector } from "../user/components/EnvironmentSelector"
 import { TypoCorrectionDictionaryHeader } from "./components/TypoCorrectionDictionaryHeader"
 import { TypoCorrectionDictionaryTable } from "./components/TypoCorrectionDictionaryTable"
-import { ErrorMessage } from "./components/ErrorMessage"
-import { LoadingSpinner } from "./components/LoadingSpinner"
-import { EmptyState } from "./components/EmptyState"
-import { TypoCorrectionDictionaryPagination } from "./components/TypoCorrectionDictionaryPagination"
+import { ErrorMessage, LoadingSpinner, EmptyState, DictionaryPagination } from "@/components/dictionary/common"
 import { useDictionaryTypo } from "./hooks/use-dictionary-typo"
 import { useTypoActions } from "./hooks/use-typo-actions"
 import { TYPO_CONSTANTS } from "./constants"
@@ -176,10 +173,13 @@ export default function TypoCorrectionDictionary() {
 
                             {items.length === 0 && !addingItem && <EmptyState hasError={!!error} />}
 
-                            <TypoCorrectionDictionaryPagination
-                                page={page}
+                            <DictionaryPagination
+                                currentPage={page}
                                 totalPages={totalPages}
+                                itemsPerPage={TYPO_CONSTANTS.PAGE_SIZE}
+                                totalItems={total}
                                 onPageChange={setPage}
+                                onItemsPerPageChange={() => {}}
                             />
                         </>
                     )}

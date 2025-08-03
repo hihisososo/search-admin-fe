@@ -23,6 +23,7 @@ export interface PageParams {
   size?: number
   sort?: string
   order?: 'asc' | 'desc'
+  [key: string]: string | number | boolean | undefined
 }
 
 // 검색 파라미터
@@ -37,6 +38,7 @@ export interface DateRangeParams {
   to?: string
   startDate?: string
   endDate?: string
+  [key: string]: string | number | boolean | undefined
 }
 
 // 환경 타입

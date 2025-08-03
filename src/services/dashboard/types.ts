@@ -77,6 +77,7 @@ export interface DashboardApiParams extends DateRangeParams {
   indexName?: string
   limit?: number
   interval?: 'hour' | 'day'
+  [key: string]: string | number | boolean | undefined
 }
 
 // UI용 통계 아이템

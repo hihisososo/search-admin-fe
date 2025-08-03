@@ -6,10 +6,7 @@ import { useDictionaryActions } from './hooks/use-dictionary-actions'
 import { EnvironmentSelector } from './components/EnvironmentSelector'
 import { UserDictionaryHeader } from './components/UserDictionaryHeader'
 import { UserDictionaryTable } from './components/UserDictionaryTable'
-import { UserDictionaryPagination } from './components/UserDictionaryPagination'
-import { ErrorMessage } from './components/ErrorMessage'
-import { LoadingSpinner } from './components/LoadingSpinner'
-import { EmptyState } from './components/EmptyState'
+import { ErrorMessage, LoadingSpinner, EmptyState, DictionaryPagination } from '@/components/dictionary/common'
 import type { DictionarySortField, DictionarySortDirection } from '@/types/dashboard'
 
 export default function UserDictionary() {
@@ -124,10 +121,13 @@ export default function UserDictionary() {
               {items.length === 0 && !addingItem && <EmptyState />}
 
               {totalPages > 1 && (
-                <UserDictionaryPagination
-                  page={page}
+                <DictionaryPagination
+                  currentPage={page}
                   totalPages={totalPages}
+                  itemsPerPage={20}
+                  totalItems={data?.totalElements || 0}
                   onPageChange={setPage}
+                  onItemsPerPageChange={() => {}}
                 />
               )}
             </>
