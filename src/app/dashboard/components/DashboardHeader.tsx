@@ -36,16 +36,17 @@ export default memo(function DashboardHeader({
 
   return (
     <div className="flex items-center justify-between">
-      <h1 className="text-2xl font-semibold">대시보드</h1>
+      <h1 className="text-xl font-semibold">대시보드</h1>
       
       <div className="flex items-center gap-2">
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="h-9 px-3 text-sm"
+              size="sm"
+              className="h-8 text-xs"
             >
-              <CalendarIcon className="h-4 w-4 mr-2" />
+              <CalendarIcon className="h-3 w-3 mr-1.5" />
               {formatDateRange(dateRange)}
             </Button>
           </PopoverTrigger>
@@ -66,9 +67,9 @@ export default memo(function DashboardHeader({
           disabled={loading}
           variant="outline"
           size="sm"
-          className="h-9 px-3"
+          className="h-8 px-2"
         >
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
         </Button>
       </div>
     </div>

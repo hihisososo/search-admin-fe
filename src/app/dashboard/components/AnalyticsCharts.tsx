@@ -48,7 +48,7 @@ const CHART_CONFIG = {
 } as const
 
 const ChartSkeleton = memo(() => (
-  <div className="h-full w-full p-4">
+  <div className="h-full w-full p-2">
     <Skeleton className="h-full w-full" />
   </div>
 ))
@@ -142,11 +142,11 @@ export default memo(function AnalyticsCharts({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">검색 응답시간</CardTitle>
+        <CardHeader className="pb-2 pt-4">
+          <CardTitle className="text-sm font-medium">검색 응답시간</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-48">
+          <div className="h-40">
             {loading ? (
               <ChartSkeleton />
             ) : responseTimeData.length === 0 ? (
@@ -161,11 +161,11 @@ export default memo(function AnalyticsCharts({
       </Card>
 
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">검색량 추이</CardTitle>
+        <CardHeader className="pb-2 pt-4">
+          <CardTitle className="text-sm font-medium">검색량 추이</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-48">
+          <div className="h-40">
             {loading ? (
               <ChartSkeleton />
             ) : searchVolumeData.length === 0 ? (

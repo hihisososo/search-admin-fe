@@ -52,13 +52,13 @@ const STAT_CONFIG: Record<string, StatConfig> = {
 
 const StatCardSkeleton = memo(() => (
   <Card>
-    <CardContent className="p-3">
+    <CardContent className="p-2">
       <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <Skeleton className="h-3 w-14" />
-          <Skeleton className="h-5 w-16" />
+        <div>
+          <Skeleton className="h-3 w-12" />
+          <Skeleton className="h-4 w-14 mt-0.5" />
         </div>
-        <Skeleton className="h-6 w-6 rounded" />
+        <Skeleton className="h-5 w-5 rounded" />
       </div>
     </CardContent>
   </Card>
@@ -75,13 +75,13 @@ const StatCard = memo(({ stat }: { stat: StatItem }) => {
 
   return (
     <Card>
-      <CardContent className="p-3">
-        <div className="flex items-center justify-between">
+      <CardContent className="p-2">
+        <div className="flex items-center justify-between gap-2">
           <div>
-            <p className="text-xs text-muted-foreground">{stat.label}</p>
-            <p className="text-lg font-semibold">{stat.value}</p>
+            <p className="text-xs text-muted-foreground leading-none">{stat.label}</p>
+            <p className="text-sm font-semibold mt-0.5">{stat.value}</p>
           </div>
-          <Icon className={`h-6 w-6 ${config.color} opacity-20`} />
+          <Icon className={`h-5 w-5 ${config.color} opacity-20`} />
         </div>
       </CardContent>
     </Card>
@@ -92,7 +92,7 @@ StatCard.displayName = 'StatCard'
 
 export default memo(function StatsCards({ stats, loading }: StatsCardsProps) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
       {loading
         ? Array.from({ length: 8 }).map((_, index) => (
             <StatCardSkeleton key={index} />

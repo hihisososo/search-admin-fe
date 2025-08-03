@@ -52,8 +52,8 @@ KeywordTableSkeleton.displayName = 'KeywordTableSkeleton'
 export default memo(function KeywordsTable({ keywords, loading }: KeywordsTableProps) {
   return (
     <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base">인기 검색 키워드</CardTitle>
+      <CardHeader className="pb-2 pt-4">
+        <CardTitle className="text-sm font-medium">인기 검색 키워드</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
