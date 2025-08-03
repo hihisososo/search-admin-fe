@@ -83,6 +83,10 @@ export function ProductList({
   onSortChange,
   searchQuery
 }: ProductListProps) {
+  const handleProductClick = (product: Product) => {
+    console.log(`[상품 클릭] ${product.name} (ID: ${product.id})`);
+    // 여기에 실제 클릭 로깅 API 호출을 추가할 수 있습니다
+  };
   return (
     <>
       {/* 간단한 로딩 애니메이션 */}
@@ -139,7 +143,12 @@ export function ProductList({
               <TableCell colSpan={3} className="text-center text-gray-400 py-8">검색 결과가 없습니다.</TableCell>
             </TableRow>
           ) : products.map(p => (
-            <TableRow key={p.id} className="transition-colors hover:bg-blue-50/60 cursor-pointer rounded-xl">
+            <TableRow 
+              key={p.id} 
+              className="transition-colors hover:bg-blue-50/60 cursor-pointer rounded-xl" 
+              data-product-id={p.id}
+              onClick={() => handleProductClick(p)}
+            >
               <TableCell className="py-4">
                 <img 
                   src={p.thumbnailUrl} 
