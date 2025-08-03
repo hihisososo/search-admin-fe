@@ -138,7 +138,7 @@ export default function SearchLogs() {
   // 페이지, 정렬, 페이지 크기 변경 시에만 목록 재조회
   useEffect(() => {
     fetchItems()
-  }, [page, pageSize, sortField, sortDirection, fetchItems])
+  }, [page, pageSize, sortField, sortDirection])
 
   // 페이지네이션 계산
   const _startPage = Math.max(1, page - 2)
