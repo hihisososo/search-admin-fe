@@ -6,10 +6,7 @@ import type { DictionaryItem, DictionarySortField, DictionarySortDirection } fro
 import { EnvironmentSelector } from "../user/components/EnvironmentSelector"
 import { SynonymDictionaryHeader } from "./components/SynonymDictionaryHeader"
 import { SynonymDictionaryTable } from "./components/SynonymDictionaryTable"
-import { ErrorMessage } from "./components/ErrorMessage"
-import { LoadingSpinner } from "./components/LoadingSpinner"
-import { EmptyState } from "./components/EmptyState"
-import { SynonymDictionaryPagination } from "./components/SynonymDictionaryPagination"
+import { ErrorMessage, LoadingSpinner, EmptyState, DictionaryPagination } from "@/components/dictionary/common"
 import { useDictionarySynonym } from "./hooks/use-dictionary-synonym"
 import { useSynonymActions } from "./hooks/use-synonym-actions"
 import { SYNONYM_CONSTANTS } from "./constants"
@@ -167,10 +164,13 @@ export default function SynonymDictionary() {
 
                             {items.length === 0 && !addingItem && <EmptyState />}
 
-                            <SynonymDictionaryPagination
-                                page={page}
+                            <DictionaryPagination
+                                currentPage={page}
                                 totalPages={totalPages}
+                                itemsPerPage={SYNONYM_CONSTANTS.PAGE_SIZE}
+                                totalItems={total}
                                 onPageChange={setPage}
+                                onItemsPerPageChange={() => {}}
                             />
                         </>
                     )}

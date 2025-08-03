@@ -193,4 +193,5 @@ export interface EvaluationReportSummary {
 export interface ProductSearchParams {
   query: string
   size?: number
+  [key: string]: string | number | boolean | string[] | undefined
 } 

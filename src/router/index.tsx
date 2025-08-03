@@ -1,46 +1,59 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from "@/components/layout/Layout"
-import Dashboard from "@/app/dashboard/page"
-import UserDictionary from "@/app/dictionary/user/page"
-import SynonymDictionary from "@/app/dictionary/synonym/page"
-import StopwordDictionary from "@/app/dictionary/stopword/page"
-import TypoCorrectionDictionary from "@/app/dictionary/typo/page"
-import SearchLogs from "@/app/search-logs/page"
-import SearchSimulator from "@/app/search-simulator/page"
-import SearchDemo from "@/app/search-demo/page"
-import DeployManagement from "@/app/deploy/page"
-import AnswerSetManagement from "@/app/search-evaluation/answer-set/page"
-import EvaluationExecution from "@/app/search-evaluation/execution/page"
+import { LoadingSpinner } from "@/components/dictionary/common"
 
-// 관리도구 라우트들 (Layout 포함)
-export function AdminRoutes() {
+const Dashboard = lazy(() => import("@/app/dashboard/page"))
+const UserDictionary = lazy(() => import("@/app/dictionary/user/page"))
+const SynonymDictionary = lazy(() => import("@/app/dictionary/synonym/page"))
+const StopwordDictionary = lazy(() => import("@/app/dictionary/stopword/page"))
+const TypoCorrectionDictionary = lazy(() => import("@/app/dictionary/typo/page"))
+const SearchLogs = lazy(() => import("@/app/search-logs/page"))
+const SearchSimulator = lazy(() => import("@/app/search-simulator/page"))
+const SearchDemo = lazy(() => import("@/app/search-demo/page"))
+const DeployManagement = lazy(() => import("@/app/deploy/page"))
+const AnswerSetManagement = lazy(() => import("@/app/search-evaluation/answer-set/page"))
+const EvaluationExecution = lazy(() => import("@/app/search-evaluation/execution/page"))
+
+function PageLoader() {
   return (
-    <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/dictionary" element={<Navigate to="/dictionary/user" replace />} />
-      <Route path="/dictionary/user" element={<UserDictionary />} />
-      <Route path="/dictionary/synonym" element={<SynonymDictionary />} />
-      <Route path="/dictionary/stopword" element={<StopwordDictionary />} />
-      <Route path="/dictionary/typo" element={<TypoCorrectionDictionary />} />
-      <Route path="/search-logs" element={<SearchLogs />} />
-      <Route path="/deploy" element={<DeployManagement />} />
-      <Route path="/search-simulator" element={<SearchSimulator />} />
-      <Route path="/search-evaluation" element={<Navigate to="/search-evaluation/answer-set" replace />} />
-      <Route path="/search-evaluation/answer-set" element={<AnswerSetManagement />} />
-      <Route path="/search-evaluation/execution" element={<EvaluationExecution />} />
-    </Routes>
+    <div className="flex items-center justify-center min-h-screen">
+      <LoadingSpinner />
+    </div>
   )
 }
 
-// 전체 앱 라우트들
+export function AdminRoutes() {
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dictionary" element={<Navigate to="/dictionary/user" replace />} />
+        <Route path="/dictionary/user" element={<UserDictionary />} />
+        <Route path="/dictionary/synonym" element={<SynonymDictionary />} />
+        <Route path="/dictionary/stopword" element={<StopwordDictionary />} />
+        <Route path="/dictionary/typo" element={<TypoCorrectionDictionary />} />
+        <Route path="/search-logs" element={<SearchLogs />} />
+        <Route path="/deploy" element={<DeployManagement />} />
+        <Route path="/search-simulator" element={<SearchSimulator />} />
+        <Route path="/search-evaluation" element={<Navigate to="/search-evaluation/answer-set" replace />} />
+        <Route path="/search-evaluation/answer-set" element={<AnswerSetManagement />} />
+        <Route path="/search-evaluation/execution" element={<EvaluationExecution />} />
+      </Routes>
+    </Suspense>
+  )
+}
+
 export function AppRoutes() {
   return (
     <Routes>
-      {/* 검색 데모는 별도 레이아웃 (전체 영역 사용) */}
-      <Route path="/search-demo" element={<SearchDemo />} />
+      <Route path="/search-demo" element={
+        <Suspense fallback={<PageLoader />}>
+          <SearchDemo />
+        </Suspense>
+      } />
       
-      {/* 관리도구 레이아웃 */}
       <Route path="*" element={
         <Layout>
           <AdminRoutes />
@@ -48,4 +61,4 @@ export function AppRoutes() {
       } />
     </Routes>
   )
-} 
+}

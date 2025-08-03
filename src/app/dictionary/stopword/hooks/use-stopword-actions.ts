@@ -22,7 +22,7 @@ interface UseStopwordActionsReturn {
   validateKeyword: (keyword: string) => boolean
 }
 
-export function useStopwordActions(onRefetch: () => Promise<void>): UseStopwordActionsReturn {
+export function useStopwordActions(onRefetch: () => void): UseStopwordActionsReturn {
   const [addingItem, setAddingItem] = useState(false)
   const [newKeyword, setNewKeyword] = useState('')
   const [editingKeyword, setEditingKeyword] = useState('')

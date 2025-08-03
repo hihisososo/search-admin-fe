@@ -5,10 +5,7 @@ import type { DictionaryItem, DictionarySortField, DictionarySortDirection } fro
 import { EnvironmentSelector } from "../user/components/EnvironmentSelector"
 import { StopwordDictionaryHeader } from "./components/StopwordDictionaryHeader"
 import { StopwordDictionaryTable } from "./components/StopwordDictionaryTable"
-import { ErrorMessage } from "./components/ErrorMessage"
-import { LoadingSpinner } from "./components/LoadingSpinner"
-import { EmptyState } from "./components/EmptyState"
-import { StopwordDictionaryPagination } from "./components/StopwordDictionaryPagination"
+import { ErrorMessage, LoadingSpinner, EmptyState, DictionaryPagination } from "@/components/dictionary/common"
 import { useDictionaryStopword } from "./hooks/use-dictionary-stopword"
 import { useStopwordActions } from "./hooks/use-stopword-actions"
 import { STOPWORD_CONSTANTS } from "./constants"
@@ -144,10 +141,13 @@ export default function StopwordDictionary() {
 
                             {items.length === 0 && !addingItem && <EmptyState />}
 
-                            <StopwordDictionaryPagination
-                                page={page}
+                            <DictionaryPagination
+                                currentPage={page}
                                 totalPages={totalPages}
+                                itemsPerPage={STOPWORD_CONSTANTS.PAGE_SIZE}
+                                totalItems={total}
                                 onPageChange={setPage}
+                                onItemsPerPageChange={() => {}}
                             />
                         </>
                     )}
