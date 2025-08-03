@@ -42,7 +42,11 @@ export function useDashboardTransformers() {
     ]
   }, [])
 
-  const convertTrendsToChartData = useCallback((trendsData: TrendsResponse) => {
+  const convertTrendsToChartData = useCallback((trendsData: TrendsResponse | null | undefined) => {
+    if (!trendsData || !trendsData.responseTimeData || !trendsData.searchVolumeData) {
+      return { responseTimeData: [], searchVolumeData: [] }
+    }
+
     const responseTimeData = trendsData.responseTimeData.map((item) => ({
       date: item.label,
       responseTime: item.averageResponseTime,
@@ -59,31 +63,41 @@ export function useDashboardTransformers() {
   }, [])
 
   const convertIndexDistributionToChartData = useCallback(
-    (distributionData: IndexDistributionResponse) =>
-      distributionData.indices.map((item, index) => ({
+    (distributionData: IndexDistributionResponse | null | undefined) => {
+      if (!distributionData || !distributionData.indices) {
+        return []
+      }
+      
+      return distributionData.indices.map((item, index) => ({
         name: item.indexName,
         value: item.percentage,
         color: DASHBOARD_CONSTANTS.COLORS[index % DASHBOARD_CONSTANTS.COLORS.length],
         ctr: item.clickThroughRate,
-      })),
+      }))
+    },
     []
   )
 
   const convertKeywordsToTableData = useCallback(
-    (keywords: KeywordItem[]): TopKeyword[] =>
-      keywords.map((item) => ({
+    (keywords: KeywordItem[] | null | undefined): TopKeyword[] => {
+      if (!keywords || !Array.isArray(keywords)) {
+        return []
+      }
+      
+      return keywords.map((item) => ({
         keyword: item.keyword,
         searches: item.searchCount,
         ctr: `${item.percentage || 0}%`,
         trend: 'stable' as const,
-      })),
+      }))
+    },
     []
   )
 
   const mergeKeywords = useCallback(
-    (popularKeywords: KeywordItem[], trendingKeywords: KeywordItem[]): TopKeyword[] => {
-      const popular = convertKeywordsToTableData(popularKeywords)
-      const trending = convertKeywordsToTableData(trendingKeywords).map((item) => ({
+    (popularKeywords: KeywordItem[] | null | undefined, trendingKeywords: KeywordItem[] | null | undefined): TopKeyword[] => {
+      const popular = convertKeywordsToTableData(popularKeywords || [])
+      const trending = convertKeywordsToTableData(trendingKeywords || []).map((item) => ({
         ...item,
         trend: 'up' as const,
       }))
