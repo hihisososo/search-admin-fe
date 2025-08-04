@@ -27,7 +27,7 @@ export function useAsyncTask(
       const runningTask = runningTasksQuery.data.find(task => (task as any).taskType === taskType)
       if (runningTask) {
         setTaskId(runningTask.id)
-        console.log(`🔄 ${taskType} 작업 복구:`, runningTask.id, runningTask.message)
+        // Task recovery: ${taskType}
       }
     }
   }, [runningTasksQuery.data, taskId, taskType])
@@ -40,7 +40,7 @@ export function useAsyncTask(
     if (completedTaskIds.has(taskId)) return
     
     if (taskStatus.data.status === 'COMPLETED') {
-      console.log(`✅ ${taskType} 완료:`, taskStatus.data.message)
+      // Task completed: ${taskType}
       
       // 완료된 작업 ID 기록
       setCompletedTaskIds(prev => new Set(prev).add(taskId))

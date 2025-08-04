@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react"
 import type { DictionaryItem } from "@/types/dashboard"
+import { useToast } from "@/components/ui/use-toast"
 
 interface UseDictionaryActionsOptions<T extends DictionaryItem> {
   refetch: () => void
@@ -13,6 +14,7 @@ interface UseDictionaryActionsOptions<T extends DictionaryItem> {
 export function useDictionaryActions<T extends DictionaryItem>(
   options: UseDictionaryActionsOptions<T>
 ) {
+  const { toast } = useToast()
   const [addingItem, setAddingItem] = useState(false)
   const [newItem, setNewItem] = useState<Partial<T>>({})
   const [editingItem, setEditingItem] = useState<Partial<T>>({})
@@ -95,7 +97,11 @@ export function useDictionaryActions<T extends DictionaryItem>(
       await options.deleteItem(item.id)
       options.refetch()
     } catch (error) {
-      alert(error instanceof Error ? error.message : "삭제 실패")
+      toast({
+        title: "삭제 실패",
+        description: error instanceof Error ? error.message : "삭제에 실패했습니다.",
+        variant: "destructive"
+      })
     }
   }, [options])
 
@@ -109,7 +115,10 @@ export function useDictionaryActions<T extends DictionaryItem>(
     }
 
     await options.applyChanges(environment)
-    alert("실시간 반영이 완료되었습니다.")
+    toast({
+      title: "실시간 반영 완료",
+      description: "변경사항이 실시간으로 반영되었습니다."
+    })
   }, [options])
 
   return {

@@ -83,8 +83,8 @@ export function ProductList({
   onSortChange,
   searchQuery
 }: ProductListProps) {
-  const handleProductClick = (product: Product) => {
-    console.log(`[상품 클릭] ${product.name} (ID: ${product.id})`);
+  const handleProductClick = (_product: Product) => {
+    // Product clicked: ${_product.name} (ID: ${_product.id})
     // 여기에 실제 클릭 로깅 API 호출을 추가할 수 있습니다
   };
   return (
