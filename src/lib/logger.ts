@@ -29,8 +29,12 @@ class Logger {
     console.warn(`[WARN] ${message}`, data)
   }
 
-  error(message: string, error?: Error, data?: LogMeta): void {
-    console.error(`[ERROR] ${message}`, error, data)
+  error(message: string, errorOrData?: Error | LogMeta, data?: LogMeta): void {
+    if (errorOrData instanceof Error) {
+      console.error(`[ERROR] ${message}`, errorOrData, data)
+    } else {
+      console.error(`[ERROR] ${message}`, errorOrData)
+    }
   }
 
   debug(message: string, data?: LogMeta): void {

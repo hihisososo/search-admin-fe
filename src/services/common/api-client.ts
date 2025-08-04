@@ -19,10 +19,7 @@ export class ApiClient {
     
     // 평가 API 호출 시 상세 로그
     if (endpoint.includes('/evaluation/')) {
-      console.log(`🌐 API 호출: ${options.method || 'GET'} ${url}`)
-      if (options.body) {
-        console.log(`📝 요청 Body:`, options.body)
-      }
+      logger.debug('API 호출', { method: options.method || 'GET', url, body: options.body })
     }
     
     const requestOptions: RequestInit = {
@@ -50,13 +47,11 @@ export class ApiClient {
         }
         
         if (config.isDevelopment()) {
-          console.error('API 에러 상세:', {
-            url,
+          logger.error('API 에러 상세', {
             status: response.status,
             statusText: response.statusText,
             errorMessage,
-            errorDetails,
-            requestOptions
+            errorDetails
           })
         }
         
@@ -73,8 +68,7 @@ export class ApiClient {
         
         // 평가 API 응답 시 상세 로그
         if (endpoint.includes('/evaluation/')) {
-          console.log(`✅ API 응답: ${options.method || 'GET'} ${url}`)
-          console.log(`📄 응답 데이터:`, data)
+          logger.debug('API 응답', { method: options.method || 'GET', url, data })
         }
         
         return data

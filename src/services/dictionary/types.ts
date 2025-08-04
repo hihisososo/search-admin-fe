@@ -17,13 +17,13 @@ export interface TypoCorrectionDictionaryItem extends DictionaryItem {
 }
 
 // 동의어 사전 아이템
-export interface SynonymDictionaryItem extends DictionaryItem {}
+export type SynonymDictionaryItem = DictionaryItem
 
 // 불용어 사전 아이템  
-export interface StopwordDictionaryItem extends DictionaryItem {}
+export type StopwordDictionaryItem = DictionaryItem
 
 // 사용자 사전 아이템
-export interface UserDictionaryItem extends DictionaryItem {}
+export type UserDictionaryItem = DictionaryItem
 
 // 사전 페이지 응답
 export type DictionaryPageResponse<T> = PageResponse<T>

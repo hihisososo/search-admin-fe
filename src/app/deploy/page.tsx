@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Environment, DeployHistory } from '@/types/deploy'
 import { deploymentApi } from '@/lib/api'
+import { useToast } from '@/components/ui/use-toast'
+import { logger } from '@/lib/logger'
 import EnvironmentOverview from './components/EnvironmentOverview'
 import DeploymentHistory from './components/DeploymentHistory'
 
@@ -10,6 +12,7 @@ export default function DeployManagement() {
   const [isLoading, setIsLoading] = useState(true)
   const [isIndexing, setIsIndexing] = useState(false)
   const [isDeploying, setIsDeploying] = useState(false)
+  const { toast } = useToast()
 
   // 개발 환경이 색인 중인지 확인하는 헬퍼 함수
   const checkIfIndexing = (envs: Environment[]) => {
@@ -30,7 +33,7 @@ export default function DeployManagement() {
       
       return response.environments
     } catch (error) {
-      console.error('환경 정보 조회 실패:', error)
+      logger.error('환경 정보 조회 실패', error as Error)
       return []
     }
   }, [])
@@ -45,7 +48,7 @@ export default function DeployManagement() {
       })
       setDeployHistory(response.deploymentHistories)
     } catch (error) {
-      console.error('배포 이력 조회 실패:', error)
+      logger.error('배포 이력 조회 실패', error as Error)
     }
   }, [])
 
@@ -58,7 +61,7 @@ export default function DeployManagement() {
       
       // 페이지 로드 시 색인 중이면 모니터링 시작
       if (checkIfIndexing(envs)) {
-        console.log('페이지 로드 시 색인이 진행 중입니다. 모니터링을 시작합니다.')
+        logger.info('페이지 로드 시 색인이 진행 중입니다. 모니터링을 시작합니다.')
         startIndexingMonitoring()
       }
       
@@ -76,18 +79,26 @@ export default function DeployManagement() {
     try {
       const response = await deploymentApi.executeIndexing({ description })
       if (response.success) {
-        console.log('색인 시작:', response.message)
+        logger.info('색인 시작', { message: response.message })
         // 즉시 환경 상태 새로고침 후 모니터링 시작
         await fetchEnvironments()
         startIndexingMonitoring()
       } else {
-        console.error('색인 실패:', response.message)
-        alert(`색인 시작에 실패했습니다: ${response.message}`)
+        logger.error('색인 실패', new Error(response.message))
+        toast({
+          title: "색인 실패",
+          description: response.message,
+          variant: "destructive"
+        })
         setIsIndexing(false)
       }
     } catch (error) {
-      console.error('색인 요청 실패:', error)
-      alert('색인 요청 중 네트워크 오류가 발생했습니다. 다시 시도해주세요.')
+      logger.error('색인 요청 실패', error as Error)
+      toast({
+          title: "네트워크 오류",
+          description: "색인 요청 중 오류가 발생했습니다. 다시 시도해주세요.",
+          variant: "destructive"
+        })
       setIsIndexing(false)
     }
   }
@@ -98,17 +109,17 @@ export default function DeployManagement() {
     try {
       const response = await deploymentApi.executeDeploy({ description })
       if (response.success) {
-        console.log('배포 완료:', response.message)
+        logger.info('배포 완료', { message: response.message })
         // 환경 정보 및 이력 새로고침
         await Promise.all([
           fetchEnvironments(),
           fetchDeploymentHistory()
         ])
       } else {
-        console.error('배포 실패:', response.message)
+        logger.error('배포 실패', new Error(response.message))
       }
     } catch (error) {
-      console.error('배포 요청 실패:', error)
+      logger.error('배포 요청 실패', error as Error)
     } finally {
       setIsDeploying(false)
     }
@@ -131,20 +142,24 @@ export default function DeployManagement() {
         if (devEnv && !backendIndexing && devEnv.indexStatus === 'ACTIVE') {
           // 색인 완료
           await fetchDeploymentHistory()
-          console.log('색인 완료!')
+          logger.info('색인 완료!')
           return true
         }
         
         if (devEnv && !backendIndexing && devEnv.indexStatus === 'FAILED') {
           // 색인 실패
-          console.error('색인 실패!')
-          alert('색인이 실패했습니다. 다시 시도해주세요.')
+          logger.error('색인 실패!')
+          toast({
+            title: "색인 실패",
+            description: "색인이 실패했습니다. 다시 시도해주세요.",
+            variant: "destructive"
+          })
           return true
         }
         
         return false
       } catch (error) {
-        console.error('상태 확인 실패:', error)
+        logger.error('상태 확인 실패', error as Error)
         return true
       }
     }
@@ -161,7 +176,7 @@ export default function DeployManagement() {
     setTimeout(() => {
       clearInterval(interval)
       setIsIndexing(false)
-      console.log('색인 모니터링 시간 초과로 중단됨')
+      logger.warn('색인 모니터링 시간 초과로 중단됨')
     }, 60000)
   }, [fetchDeploymentHistory])
 

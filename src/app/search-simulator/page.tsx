@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { apiFetch } from "@/lib/api"
+import { apiClient } from "@/services/common/api-client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -231,9 +231,7 @@ export default function SearchSimulator() {
                 params.append('priceTo', searchParams.price.to)
             }
 
-            const response = await apiFetch<SimulationSearchResponse>(`/v1/search/simulation?${params.toString()}`, {
-                method: 'GET'
-            })
+            const response = await apiClient.get<SimulationSearchResponse>('/v1/search/simulation', Object.fromEntries(params))
 
             const endTime = Date.now()
 

@@ -14,6 +14,7 @@ import {
 } from "@/hooks/use-evaluation"
 import type { EvaluationDocument, EvaluationProduct, RelevanceStatus } from "@/services"
 import React from "react"
+import { useToast } from "@/components/ui/use-toast"
 
 // 평가 상태 타입 정의 (UI용)
 type EvaluationStatus = 'correct' | 'incorrect' | 'unspecified'
@@ -45,6 +46,7 @@ export function DocumentTable({
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedProduct, setSelectedProduct] = useState<EvaluationProduct | null>(null)
   const [expandedDocument, setExpandedDocument] = useState<string | null>(null)
+  const { toast } = useToast()
   
   // 편집 상태 관리
   const [editingDocument, setEditingDocument] = useState<string | null>(null)
@@ -109,7 +111,11 @@ export function DocumentTable({
   // 상품 추가 핸들러
   const handleAddProduct = async () => {
     if (!selectedProduct) {
-      alert('상품을 선택해주세요.')
+      toast({
+        title: "선택 필요",
+        description: "상품을 선택해주세요.",
+        variant: "destructive"
+      })
       return
     }
 
@@ -121,9 +127,17 @@ export function DocumentTable({
       setShowProductDialog(false)
       setSelectedProduct(null)
       setSearchTerm("")
-      alert('상품 추가완료')
+      toast({
+        title: "상품 추가 완료",
+        description: "정답 문서가 성공적으로 추가되었습니다.",
+        variant: "success"
+      })
     } catch (error) {
-      alert('상품 추가 실패: ' + (error as Error).message)
+      toast({
+        title: "상품 추가 실패",
+        description: (error as Error).message,
+        variant: "destructive"
+      })
     }
   }
 
@@ -161,17 +175,29 @@ export function DocumentTable({
         evaluationReason: ''
       })
       // 문서 데이터 새로고침을 위해 부모 컴포넌트에서 처리하도록 함
-      alert('평가 정보 수정 완료')
+      toast({
+        title: "수정 완료",
+        description: "평가 정보가 성공적으로 수정되었습니다.",
+        variant: "success"
+      })
       // 페이지 새로고침 대신 상태 업데이트를 위해 onRefresh가 있다면 호출
     } catch (error) {
-      alert('수정 실패: ' + (error as Error).message)
+      toast({
+        title: "수정 실패",
+        description: (error as Error).message,
+        variant: "destructive"
+      })
     }
   }
 
   // 문서 삭제 핸들러
   const handleDeleteDocument = (_productId: string) => {
     if (confirm('정답 문서를 삭제하시겠습니까?')) {
-      alert('삭제 기능은 준비중입니다.')
+      toast({
+        title: "기능 준비 중",
+        description: "삭제 기능은 현재 준비 중입니다.",
+        variant: "default"
+      })
     }
   }
 

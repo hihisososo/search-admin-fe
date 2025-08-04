@@ -3,6 +3,7 @@ import { RefreshCw, Zap, Trash2 } from "lucide-react"
 import { useAsyncTask } from "@/hooks/use-async-task"
 import { getTaskProgressText, getTaskCompletionMessage } from "@/utils/evaluation-helpers"
 import { QueryGenerationDialog } from "./QueryGenerationDialog"
+import { useToast } from "@/components/ui/use-toast"
 
 interface ActionButtonsProps {
   selectedQueryIds: number[]
@@ -21,30 +22,56 @@ export function ActionButtons({
   onDeleteSelected,
   isDeleting
 }: ActionButtonsProps) {
+  const { toast } = useToast()
+  
   const queryGenTask = useAsyncTask('QUERY_GENERATION', {
     onComplete: (result) => {
-      alert(getTaskCompletionMessage('QUERY_GENERATION', result))
+      toast({
+        title: "쿼리 생성 완료",
+        description: getTaskCompletionMessage('QUERY_GENERATION', result),
+        variant: "success"
+      })
     },
     onError: (error) => {
-      alert(`❌ 쿼리 생성 실패: ${error}`)
+      toast({
+        title: "쿼리 생성 실패",
+        description: error,
+        variant: "destructive"
+      })
     }
   })
 
   const candidateGenTask = useAsyncTask('CANDIDATE_GENERATION', {
     onComplete: () => {
-      alert(getTaskCompletionMessage('CANDIDATE_GENERATION'))
+      toast({
+        title: "후보군 생성 완료",
+        description: getTaskCompletionMessage('CANDIDATE_GENERATION'),
+        variant: "success"
+      })
     },
     onError: (error) => {
-      alert(`❌ 후보군 생성 실패: ${error}`)
+      toast({
+        title: "후보군 생성 실패",
+        description: error,
+        variant: "destructive"
+      })
     }
   })
 
   const llmEvalTask = useAsyncTask('LLM_EVALUATION', {
     onComplete: () => {
-      alert(getTaskCompletionMessage('LLM_EVALUATION'))
+      toast({
+        title: "LLM 평가 완료",
+        description: getTaskCompletionMessage('LLM_EVALUATION'),
+        variant: "success"
+      })
     },
     onError: (error) => {
-      alert(`❌ LLM 평가 실패: ${error}`)
+      toast({
+        title: "LLM 평가 실패",
+        description: error,
+        variant: "destructive"
+      })
     }
   })
 
@@ -55,7 +82,11 @@ export function ActionButtons({
 
   const handleGenerateCandidates = async () => {
     if (selectedQueryIds.length === 0) {
-      alert('쿼리를 선택해주세요.')
+      toast({
+        title: "선택 필요",
+        description: "쿼리를 선택해주세요.",
+        variant: "destructive"
+      })
       return
     }
     
@@ -65,7 +96,11 @@ export function ActionButtons({
 
   const handleEvaluateLlm = async () => {
     if (selectedQueryIds.length === 0) {
-      alert('쿼리를 선택해주세요.')
+      toast({
+        title: "선택 필요",
+        description: "쿼리를 선택해주세요.",
+        variant: "destructive"
+      })
       return
     }
     
@@ -75,7 +110,11 @@ export function ActionButtons({
 
   const handleDeleteSelected = async () => {
     if (selectedQueryIds.length === 0) {
-      alert('삭제할 쿼리를 선택해주세요.')
+      toast({
+        title: "선택 필요",
+        description: "삭제할 쿼리를 선택해주세요.",
+        variant: "destructive"
+      })
       return
     }
     
