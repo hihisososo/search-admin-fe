@@ -22,7 +22,7 @@ class Logger {
   private isDevelopment = import.meta.env.MODE === 'development'
 
   info(message: string, data?: LogMeta): void {
-    console.log(`[INFO] ${message}`, data)
+    // Info log: ${message}
   }
 
   warn(message: string, data?: LogMeta): void {

@@ -97,7 +97,7 @@ export default function EvaluationExecutionPage() {
     try {
       // TODO: 백엔드에 deleteReport API 추가 필요
       // await evaluationService.deleteReport(reportId)
-      console.log('🗑️ 리포트 삭제 요청:', reportId)
+      // Delete report request
       alert('리포트 삭제 기능은 준비중입니다.')
       // 삭제 성공 시 목록 새로고침
       // await fetchReports()

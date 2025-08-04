@@ -224,9 +224,9 @@ export async function healthCheck(): Promise<{ status: 'ok' | 'error', message: 
 // 개발 환경용 API 상태 확인
 export async function checkApiStatus() {
   if (config.isDevelopment()) {
-    console.log('API 상태 확인 중...')
+    // Checking API status
     const health = await healthCheck()
-    console.log('API 상태:', health)
+    // API status checked
     return health
   }
 }

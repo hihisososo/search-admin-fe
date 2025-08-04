@@ -18,7 +18,7 @@ class ConfigManager {
 
     // 개발 환경에서만 설정 출력
     if (this.config.environment === 'development') {
-      console.log('앱 설정:', this.config)
+      // App configuration loaded
     }
   }
 

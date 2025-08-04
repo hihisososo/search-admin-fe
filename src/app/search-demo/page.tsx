@@ -298,7 +298,7 @@ export default function SearchDemo() {
       const randomKeyword = popularKeywords[randomIndex]?.keyword;
       
       if (randomKeyword) {
-        console.log(`[자동 검색] 키워드: ${randomKeyword}`);
+        // Auto search keyword: ${randomKeyword}
         handleSearch(randomKeyword);
       }
     }, searchInterval);

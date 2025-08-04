@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { realtimeSyncApi, typoCorrectionDictionaryApi } from '@/lib/api'
+import { useToast } from '@/components/ui/use-toast'
 import type { DictionaryEnvironmentType } from '@/types/dashboard'
 import type { TypoCorrectionDictionaryItem } from '@/services/dictionary/types'
 
@@ -29,6 +30,7 @@ interface UseTypoActionsReturn {
 }
 
 export function useTypoActions(onRefetch: () => Promise<void>): UseTypoActionsReturn {
+  const { toast } = useToast()
   const [addingItem, setAddingItem] = useState(false)
   const [newKeyword, setNewKeyword] = useState('')
   const [newCorrectedWord, setNewCorrectedWord] = useState('')
@@ -49,7 +51,10 @@ export function useTypoActions(onRefetch: () => Promise<void>): UseTypoActionsRe
 
   const handleApplyChanges = useCallback(async (environment: DictionaryEnvironmentType) => {
     const response = await realtimeSyncApi.syncTypoCorrection(environment)
-    alert(response.message || '오타교정 사전이 실시간으로 반영되었습니다.')
+    toast({
+      title: "실시간 반영 완료",
+      description: response.message || '오타교정 사전이 실시간으로 반영되었습니다.'
+    })
   }, [])
 
   const handleSaveNew = useCallback(async () => {
@@ -122,7 +127,10 @@ export function useTypoActions(onRefetch: () => Promise<void>): UseTypoActionsRe
     if (!confirm('정말로 삭제하시겠습니까?')) return
     
     await typoCorrectionDictionaryApi.delete(id)
-    alert('사전 항목이 성공적으로 삭제되었습니다.')
+    toast({
+      title: "삭제 완료",
+      description: "사전 항목이 성공적으로 삭제되었습니다."
+    })
     await onRefetch()
   }, [onRefetch])
 

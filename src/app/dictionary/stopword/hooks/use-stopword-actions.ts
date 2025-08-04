@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { apiFetch } from '@/lib/api'
+import { useToast } from '@/components/ui/use-toast'
 import type { DictionaryItem } from '@/types/dashboard'
 
 interface UseStopwordActionsReturn {
@@ -23,6 +24,7 @@ interface UseStopwordActionsReturn {
 }
 
 export function useStopwordActions(onRefetch: () => void): UseStopwordActionsReturn {
+  const { toast } = useToast()
   const [addingItem, setAddingItem] = useState(false)
   const [newKeyword, setNewKeyword] = useState('')
   const [editingKeyword, setEditingKeyword] = useState('')
@@ -106,7 +108,10 @@ export function useStopwordActions(onRefetch: () => void): UseStopwordActionsRet
     if (!confirm('정말로 삭제하시겠습니까?')) return
     
     await apiFetch(`/api/v1/dictionaries/stopword/${id}`, { method: 'DELETE' })
-    alert('사전 항목이 성공적으로 삭제되었습니다.')
+    toast({
+      title: "삭제 완료",
+      description: "사전 항목이 성공적으로 삭제되었습니다."
+    })
     await onRefetch()
   }, [onRefetch])
 

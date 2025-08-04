@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { apiFetch } from '@/lib/api'
+import { useToast } from '@/components/ui/use-toast'
 import type { DictionaryItem } from '@/types/dashboard'
 
 interface UseDictionaryActionsParams {
@@ -7,6 +8,7 @@ interface UseDictionaryActionsParams {
 }
 
 export function useDictionaryActions({ refetch }: UseDictionaryActionsParams) {
+  const { toast } = useToast()
   const [addingItem, setAddingItem] = useState(false)
   const [newKeyword, setNewKeyword] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -86,10 +88,17 @@ export function useDictionaryActions({ refetch }: UseDictionaryActionsParams) {
 
     try {
       await apiFetch(`/api/v1/dictionaries/user/${id}`, { method: 'DELETE' })
-      alert('사전 항목이 성공적으로 삭제되었습니다.')
+      toast({
+        title: "삭제 완료",
+        description: "사전 항목이 성공적으로 삭제되었습니다."
+      })
       await refetch()
     } catch (err) {
-      alert(err instanceof Error ? err.message : '삭제 실패')
+      toast({
+        title: "삭제 실패",
+        description: err instanceof Error ? err.message : "삭제에 실패했습니다.",
+        variant: "destructive"
+      })
     }
   }, [refetch])
 

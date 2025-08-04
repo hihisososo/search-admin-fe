@@ -133,7 +133,7 @@ export default function SearchSimulator() {
         
         // explain 데이터 디버깅
         if (item.explain) {
-            console.log('🔍 변환된 상품의 explain:', item.id, item.explain)
+            // Product explain data
         }
         
         return product
@@ -236,11 +236,11 @@ export default function SearchSimulator() {
             const endTime = Date.now()
 
             // API 응답 디버깅
-            console.log('🔍 검색 API 응답:', response)
+            // Search API response
             if (response.hits?.data?.length > 0) {
-                console.log('🔍 첫 번째 상품 데이터:', response.hits.data[0])
+                // First product data
                 if (response.hits.data[0].explain) {
-                    console.log('🔍 Explain 데이터:', response.hits.data[0].explain)
+                    // Explain data
                 }
             }
 
