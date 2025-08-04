@@ -21,7 +21,6 @@ interface EditingState<T extends BaseDictionaryItem> {
 
 export function useDictionaryActions<T extends BaseDictionaryItem>({
   type,
-  environment,
   refetch
 }: UseDictionaryActionsParams): DictionaryActions<T> & { editingState: EditingState<T>, setEditingState: React.Dispatch<React.SetStateAction<EditingState<T>>> } {
   const config = getDictionaryConfig(type)
@@ -113,7 +112,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
     }))
   }, [])
 
-  const handleCancelEdit = useCallback((item: T) => {
+  const handleCancelEdit = useCallback((_item: T) => {
     setEditingState(prev => ({ 
       ...prev, 
       editingItem: {} 
@@ -195,11 +194,10 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
     }
 
     try {
-      let response
       if (type === 'synonym') {
-        response = await realtimeSyncApi.syncSynonym(env)
+        await realtimeSyncApi.syncSynonym(env)
       } else if (type === 'typo') {
-        response = await realtimeSyncApi.syncTypoCorrection(env)
+        await realtimeSyncApi.syncTypoCorrection(env)
       }
       
       toast({
@@ -215,19 +213,19 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
     }
   }, [config, type, toast])
 
-  const handleSort = useCallback((field: any) => {
+  const handleSort = useCallback((_field: any) => {
     // This will be handled by the parent component
   }, [])
 
-  const handleSearch = useCallback((value: string) => {
+  const handleSearch = useCallback((_value: string) => {
     // This will be handled by the parent component
   }, [])
 
-  const handlePageChange = useCallback((page: number) => {
+  const handlePageChange = useCallback((_page: number) => {
     // This will be handled by the parent component
   }, [])
 
-  const handleEnvironmentChange = useCallback((env: DictionaryEnvironmentType) => {
+  const handleEnvironmentChange = useCallback((_env: DictionaryEnvironmentType) => {
     // This will be handled by the parent component
   }, [])
 

@@ -37,8 +37,7 @@ export function DictionaryFieldRenderer<T extends BaseDictionaryItem>({
   item,
   isEditing,
   editingValues,
-  onEditingChange,
-  isNewItem
+  onEditingChange
 }: DictionaryFieldRendererProps<T>) {
   const badgeClass = getThemeBadgeClass(config.theme.color)
   

@@ -21,8 +21,8 @@ export interface LogEntry {
 class Logger {
   private isDevelopment = import.meta.env.MODE === 'development'
 
-  info(message: string, data?: LogMeta): void {
-    // Info log: ${message}
+  info(_message: string, _data?: LogMeta): void {
+    // Info log: ${_message}
   }
 
   warn(message: string, data?: LogMeta): void {

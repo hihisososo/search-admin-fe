@@ -5,7 +5,7 @@ import { DictionaryHeader } from './DictionaryHeader'
 import { DictionaryTable } from './DictionaryTable'
 import { useDictionary } from '../hooks/useDictionary'
 import { getDictionaryConfig } from '../configs/dictionaryConfigs'
-import type { DictionaryType, BaseDictionaryItem } from '../types/dictionary.types'
+import type { DictionaryType } from '../types/dictionary.types'
 import type { DictionaryEnvironmentType } from '@/types/dashboard'
 import { Pagination } from '@/components/ui/pagination'
 

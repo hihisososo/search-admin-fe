@@ -13,9 +13,9 @@ export interface BaseDictionaryItem {
   isEditing?: boolean
 }
 
-export interface UserDictionaryItem extends BaseDictionaryItem {}
+export type UserDictionaryItem = BaseDictionaryItem
 
-export interface StopwordDictionaryItem extends BaseDictionaryItem {}
+export type StopwordDictionaryItem = BaseDictionaryItem
 
 export interface SynonymDictionaryItem extends BaseDictionaryItem {
   synonyms: string[]
