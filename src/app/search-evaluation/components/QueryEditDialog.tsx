@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { useToast } from "@/components/ui/use-toast"
 
 interface QueryEditDialogProps {
   editingQuery: { id: number; text: string } | null
@@ -22,6 +23,7 @@ export function QueryEditDialog({
   isSaving
 }: QueryEditDialogProps) {
   const [queryText, setQueryText] = useState("")
+  const { toast } = useToast()
 
   useEffect(() => {
     if (editingQuery) {
@@ -31,7 +33,11 @@ export function QueryEditDialog({
 
   const handleSave = async () => {
     if (!editingQuery || !queryText.trim()) {
-      alert('쿼리 텍스트를 입력해주세요.')
+      toast({
+        title: "입력 필요",
+        description: "쿼리 텍스트를 입력해주세요.",
+        variant: "destructive"
+      })
       return
     }
 

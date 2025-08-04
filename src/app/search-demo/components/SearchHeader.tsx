@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { searchApi } from "@/lib/api";
 import { Link } from "react-router-dom";
+import { logger } from "@/lib/logger";
 
 interface SearchHeaderProps {
   query: string;
@@ -51,7 +52,7 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords: _rela
         setSelectedIndex(-1); // 새로운 자동완성 시 선택 초기화
         setOriginalQuery(query); // 원본 쿼리 저장
       } catch (error) {
-        console.error('자동완성 오류:', error);
+        logger.error('자동완성 오류', error as Error);
         setSuggestions([]);
       }
     }, 200); // 200ms 디바운싱

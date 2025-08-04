@@ -17,6 +17,7 @@ import { PaginationControls } from "./PaginationControls"
 import { QueryTableRow } from "./QueryTableRow"
 import { QueryEditDialog } from "./QueryEditDialog"
 import type { EvaluationQuery } from "@/services"
+import { useToast } from "@/components/ui/use-toast"
 
 interface QueryTableProps {
   queries: EvaluationQuery[]
@@ -52,6 +53,7 @@ export function QueryTable({
   isLoading
 }: QueryTableProps) {
   const [editingQuery, setEditingQuery] = useState<{ id: number, text: string } | null>(null)
+  const { toast } = useToast()
   
   // 뮤테이션
   const generateQueriesAsyncMutation = useGenerateQueriesAsync()
@@ -81,7 +83,11 @@ export function QueryTable({
 
   const handleUpdateQuery = async (queryId: number, newText: string) => {
     await updateQueryMutation.mutateAsync({ queryId, data: { value: newText.trim() } })
-    alert('쿼리 수정완료')
+    toast({
+      title: "수정 완료",
+      description: "쿼리가 성공적으로 수정되었습니다.",
+      variant: "success"
+    })
   }
 
   const handleDeleteQuery = async (queryId: number) => {
@@ -91,7 +97,11 @@ export function QueryTable({
       if (selectedQueryIds.includes(queryId)) {
         onSelectQuery(queryId, '', false)
       }
-      alert('쿼리 삭제완료')
+      toast({
+        title: "삭제 완료",
+        description: "쿼리가 성공적으로 삭제되었습니다.",
+        variant: "success"
+      })
     }
   }
 
@@ -99,7 +109,11 @@ export function QueryTable({
     const count = selectedQueryIds.length
     await deleteQueryMutation.mutateAsync(selectedQueryIds)
     onClearSelection()
-    alert(`${count}개 쿼리 삭제완료`)
+    toast({
+      title: "삭제 완료",
+      description: `${count}개 쿼리가 성공적으로 삭제되었습니다.`,
+      variant: "success"
+    })
   }
 
   // 전체 선택 관련 로직 (현재 페이지 기준)

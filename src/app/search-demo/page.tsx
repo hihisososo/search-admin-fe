@@ -1,6 +1,7 @@
 import * as React from "react";
 import { dashboardApi, enhancedSearchApi, type Product, type AggregationBucket } from "@/lib/api";
 import { type KeywordItem } from "@/types/dashboard";
+import { logger } from "@/lib/logger";
 import { SearchHeader } from "./components/SearchHeader";
 import { PopularKeywords } from "./components/PopularKeywords";
 import { ProductFilters } from "./components/ProductFilters";
@@ -315,7 +316,7 @@ export default function SearchDemo() {
       const randomProduct = products[randomIndex];
       
       if (randomProduct) {
-        console.log(`[자동 클릭] 상품: ${randomProduct.name} (ID: ${randomProduct.id})`);
+        logger.debug('[자동 클릭]', { product: randomProduct.name, id: randomProduct.id });
         
         // 클릭 이벤트 시뮬레이션 - 실제 클릭 효과를 위해 DOM 요소 찾기
         const productElement = document.querySelector(`[data-product-id="${randomProduct.id}"]`);
