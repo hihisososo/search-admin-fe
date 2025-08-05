@@ -142,7 +142,6 @@ export default function SearchLogs() {
             maxResponseTime={maxResponseTime}
             minResultCount={minResultCount}
             maxResultCount={maxResultCount}
-            filterOptions={filterOptions}
             onKeywordChange={setKeyword}
             onIndexNameChange={() => {}}
             onIsErrorChange={setIsError}

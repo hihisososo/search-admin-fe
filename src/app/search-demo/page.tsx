@@ -223,11 +223,11 @@ export default function SearchDemo() {
         // 새로운 API 응답 구조에 맞게 직접 매핑
         setPopularKeywords(popularResponse.keywords.map((k: KeywordItem) => ({
           keyword: k.keyword,
-          searchCount: k.searchCount,
+          searchCount: k.searchCount || 0,
           rank: k.rank,
-          previousRank: k.previousRank,
-          rankChange: k.rankChange,
-          changeStatus: k.changeStatus
+          previousRank: k.previousRank ?? null,
+          rankChange: k.rankChange ?? null,
+          changeStatus: k.changeStatus || "SAME"
         })));
 
       } catch (error) {
