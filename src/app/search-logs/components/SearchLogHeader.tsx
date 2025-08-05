@@ -5,7 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar"
 import { Search, RotateCcw, CalendarIcon } from "lucide-react"
 import { ko } from "date-fns/locale"
-import type { SearchLogFilterOptions } from "@/types/dashboard"
+// import type { SearchLogFilterOptions } from "@/types/dashboard"
 
 interface SearchLogHeaderProps {
   keyword: string
@@ -18,7 +18,6 @@ interface SearchLogHeaderProps {
   maxResponseTime: number | undefined
   minResultCount: number | undefined
   maxResultCount: number | undefined
-  filterOptions: SearchLogFilterOptions | null
   onKeywordChange: (value: string) => void
   onIndexNameChange: (value: string) => void
   onIsErrorChange: (value: boolean | undefined) => void
@@ -44,7 +43,6 @@ export function SearchLogHeader({
   maxResponseTime,
   minResultCount,
   maxResultCount,
-  filterOptions: _filterOptions,
   onKeywordChange,
   onIndexNameChange: _onIndexNameChange,
   onIsErrorChange,
