@@ -21,21 +21,6 @@ export interface SearchLogPageResponse extends PageResponse<SearchLogItem> {
   hasPrevious: boolean
 }
 
-// 검색 로그 필터 옵션
-export interface SearchLogFilterOptions {
-  indexNames: string[]
-  recentKeywords: string[]
-  topClientIps: string[]
-  dateRange: {
-    minDate: string
-    maxDate: string
-  }
-  responseTimeStats: {
-    min: number
-    max: number
-    avg: number
-  }
-}
 
 // 검색 로그 파라미터
 export interface SearchLogParams extends SearchParams, DateRangeParams {

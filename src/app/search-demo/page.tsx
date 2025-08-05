@@ -6,7 +6,6 @@ import { SearchHeader } from "./components/SearchHeader";
 import { PopularKeywords } from "./components/PopularKeywords";
 import { ProductFilters } from "./components/ProductFilters";
 import { ProductList } from "./components/ProductList";
-import { AutoEventController } from "./components/AutoEventController";
 
 export default function SearchDemo() {
   // 검색/필터 상태
@@ -19,7 +18,7 @@ export default function SearchDemo() {
   const pageSize = 10;
   const [sort, setSort] = React.useState("score");
   const [categorySub, setCategorySub] = React.useState<string[]>([]);
-  const [applyTypoCorrection, setApplyTypoCorrection] = React.useState(true); // 🆕 오타교정 옵션
+  // const [applyTypoCorrection, setApplyTypoCorrection] = React.useState(true); // 오타교정 - 백엔드 미지원
   const [products, setProducts] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [_brandAgg, setBrandAgg] = React.useState<AggregationBucket[]>([]);
@@ -38,12 +37,6 @@ export default function SearchDemo() {
   }>>([]);
   const [_relatedKeywords, _setRelatedKeywords] = React.useState<string[]>([]);
   const [_hasSearched, setHasSearched] = React.useState(false); // 검색 실행 여부 추적
-
-  // 자동 이벤트 상태
-  const [isAutoSearchEnabled, setIsAutoSearchEnabled] = React.useState(false);
-  const [isAutoClickEnabled, setIsAutoClickEnabled] = React.useState(false);
-  const [searchInterval, setSearchInterval] = React.useState(10000); // 10초
-  const [clickInterval, setClickInterval] = React.useState(5000); // 5초
 
   // 최소 로딩 시간을 보장하는 헬퍼 함수
   const ensureMinimumLoadingTime = React.useCallback(async <T,>(apiCall: Promise<T>, minTime: number = 500): Promise<T> => {
@@ -87,7 +80,7 @@ export default function SearchDemo() {
         query: searchQuery,
         page: 1,
         size: pageSize,
-        applyTypoCorrection: applyTypoCorrection // 🆕 오타교정 옵션 추가
+        // applyTypoCorrection 파라미터는 백엔드에서 지원하지 않음
       };
 
       const response = await ensureMinimumLoadingTime(
@@ -161,7 +154,7 @@ export default function SearchDemo() {
         size: pageSize,
         sortField: sortField,
         sortOrder: sortOrder,
-        applyTypoCorrection: applyTypoCorrection, // 🆕 오타교정 옵션 추가
+        // applyTypoCorrection 파라미터는 백엔드에서 지원하지 않음
         ...(brand.length > 0 && { brand }),
         ...(category.length > 0 && { category }),
         ...(price.from && { priceFrom: Number(price.from) }),
@@ -250,14 +243,14 @@ export default function SearchDemo() {
     if (searchQuery) {
       performInitialSearch();
     }
-  }, [searchQuery, applyTypoCorrection, performInitialSearch]);
+  }, [searchQuery, performInitialSearch]);
 
   // 필터 변경 시 (필터 검색)
   React.useEffect(() => {
     if (searchQuery) { // 검색어가 있을 때만 필터 적용
       performFilterSearch();
     }
-  }, [brand, category, categorySub, page, sort, applyTypoCorrection, performFilterSearch]);
+  }, [brand, category, categorySub, page, sort, performFilterSearch]);
 
   // 핸들러
   const handleSearch = React.useCallback((val: string) => {
@@ -288,79 +281,20 @@ export default function SearchDemo() {
     }
   };
 
-  // 자동 검색 로직
-  React.useEffect(() => {
-    if (!isAutoSearchEnabled || popularKeywords.length === 0) return;
-
-    const interval = setInterval(() => {
-      // 인기 검색어 중 랜덤으로 선택
-      const randomIndex = Math.floor(Math.random() * Math.min(popularKeywords.length, 5));
-      const randomKeyword = popularKeywords[randomIndex]?.keyword;
-      
-      if (randomKeyword) {
-        // Auto search keyword: ${randomKeyword}
-        handleSearch(randomKeyword);
-      }
-    }, searchInterval);
-
-    return () => clearInterval(interval);
-  }, [isAutoSearchEnabled, searchInterval, popularKeywords, handleSearch]);
-
-  // 자동 클릭 로직
-  React.useEffect(() => {
-    if (!isAutoClickEnabled || products.length === 0) return;
-
-    const interval = setInterval(() => {
-      // 현재 표시된 상품 중 랜덤으로 선택
-      const randomIndex = Math.floor(Math.random() * products.length);
-      const randomProduct = products[randomIndex];
-      
-      if (randomProduct) {
-        logger.debug('[자동 클릭]', { product: randomProduct.name, id: randomProduct.id });
-        
-        // 클릭 이벤트 시뮬레이션 - 실제 클릭 효과를 위해 DOM 요소 찾기
-        const productElement = document.querySelector(`[data-product-id="${randomProduct.id}"]`);
-        if (productElement) {
-          const clickEvent = new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window
-          });
-          productElement.dispatchEvent(clickEvent);
-        }
-      }
-    }, clickInterval);
-
-    return () => clearInterval(interval);
-  }, [isAutoClickEnabled, clickInterval, products]);
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center py-0 font-sans">
+      <div className="w-full max-w-[80%] mx-auto">
       <SearchHeader
         query={query}
         setQuery={setQuery}
         onSearch={handleSearch}
         relatedKeywords={[]}
-        applyTypoCorrection={applyTypoCorrection}
-        setApplyTypoCorrection={setApplyTypoCorrection}
+        // 오타교정 props 제거 - 백엔드 미지원
       />
 
-      {/* 자동 이벤트 컨트롤러 */}
-      <div className="w-full max-w-7xl px-4 mt-4">
-        <AutoEventController
-          isAutoSearchEnabled={isAutoSearchEnabled}
-          setIsAutoSearchEnabled={setIsAutoSearchEnabled}
-          isAutoClickEnabled={isAutoClickEnabled}
-          setIsAutoClickEnabled={setIsAutoClickEnabled}
-          searchInterval={searchInterval}
-          setSearchInterval={setSearchInterval}
-          clickInterval={clickInterval}
-          setClickInterval={setClickInterval}
-        />
-      </div>
 
       {/* 중앙: 필터/인기검색어/상품리스트 */}
-      <div className="w-full max-w-7xl grid grid-cols-10 gap-4 mt-2">
+      <div className="w-full grid grid-cols-10 gap-4 mt-2">
         {/* 필터 (좌측 3칸) */}
         <div className="col-span-8 mb-2">
           <ProductFilters
@@ -401,6 +335,7 @@ export default function SearchDemo() {
             searchQuery={searchQuery}
           />
         </div>
+      </div>
       </div>
     </div>
   );

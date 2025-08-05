@@ -5,7 +5,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { searchLogApi } from "@/lib/api"
 import type { 
   SearchLogItem, 
-  SearchLogFilterOptions,
   SearchLogParams,
   SearchLogSortField, 
   SearchLogSortDirection 
@@ -37,18 +36,6 @@ export default function SearchLogs() {
   const [sortField, setSortField] = useState<SearchLogSortField>('timestamp')
   const [sortDirection, setSortDirection] = useState<SearchLogSortDirection>('desc')
   
-  // 필터 옵션
-  const [filterOptions, setFilterOptions] = useState<SearchLogFilterOptions | null>(null)
-
-  // 필터 옵션 조회
-  const fetchFilterOptions = async () => {
-    try {
-      const options = await searchLogApi.getFilterOptions()
-      setFilterOptions(options)
-    } catch (err) {
-      console.error('필터 옵션 조회 에러:', err)
-    }
-  }
 
   // 검색 로그 목록 조회
   const fetchItems = async () => {
@@ -130,10 +117,6 @@ export default function SearchLogs() {
     setPage(1) // 페이지 크기 변경시 첫 페이지로 이동
   }
 
-  // 초기 로드
-  useEffect(() => {
-    fetchFilterOptions()
-  }, [])
 
   // 페이지, 정렬, 페이지 크기 변경 시에만 목록 재조회
   useEffect(() => {

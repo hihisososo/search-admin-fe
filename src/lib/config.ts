@@ -11,7 +11,7 @@ class ConfigManager {
 
   constructor() {
     this.config = {
-      apiBaseUrl: import.meta.env.VITE_API_BASE_URL || '',
+      apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
       environment: import.meta.env.MODE === 'production' ? 'production' : 'development',
       enableDebugMode: import.meta.env.MODE === 'development'
     }

@@ -4,7 +4,6 @@ import type {
   PopularKeywordsResponse,
   TrendingKeywordsResponse,
   TrendsResponse,
-  IndexDistributionResponse,
   DashboardApiParams
 } from './types'
 
@@ -31,10 +30,6 @@ class DashboardService {
     return apiClient.get<TrendsResponse>(`${this.baseEndpoint}/stats/trends`, params)
   }
 
-  // 인덱스별 분포 조회
-  async getIndexDistribution(params: Omit<DashboardApiParams, 'indexName' | 'limit' | 'interval'> = {}): Promise<IndexDistributionResponse> {
-    return apiClient.get<IndexDistributionResponse>(`${this.baseEndpoint}/stats/index-distribution`, params)
-  }
 }
 
 export const dashboardService = new DashboardService() 

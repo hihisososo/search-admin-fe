@@ -24,6 +24,10 @@ export { searchLogService } from './search-logs/api'
 export * from './evaluation/types'
 export { evaluationService } from './evaluation/api'
 
+// 클릭 로그 서비스
+export * from './click-logs/types'
+export { clickLogService } from './click-logs/api'
+
 // 하위 호환성을 위한 기존 API 별칭들
 export { dashboardService as dashboardApi } from './dashboard/api'
 export { 
@@ -34,4 +38,5 @@ export {
   realtimeSyncService as realtimeSyncApi
 } from './dictionary/api'
 export { searchLogService as searchLogApi } from './search-logs/api'
-export { evaluationService as evaluationApi } from './evaluation/api' 
+export { evaluationService as evaluationApi } from './evaluation/api'
+export { clickLogService as clickLogApi } from './click-logs/api' 

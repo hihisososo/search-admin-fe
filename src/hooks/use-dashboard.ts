@@ -39,29 +39,18 @@ export function useTrends(params: DashboardApiParams = {}) {
   })
 }
 
-// 인덱스 분포 조회
-export function useIndexDistribution(params: Omit<DashboardApiParams, 'indexName' | 'limit' | 'interval'> = {}) {
-  return useQuery({
-    queryKey: queryKeys.dashboard.indexDistribution(params),
-    queryFn: () => dashboardService.getIndexDistribution(params),
-    enabled: true,
-  })
-}
-
 // 모든 대시보드 데이터를 한번에 조회하는 훅
 export function useDashboardData(params: DashboardApiParams = {}) {
   const statsQuery = useDashboardStats(params)
   const popularKeywordsQuery = usePopularKeywords({ ...params, limit: 10 })
   const trendingKeywordsQuery = useTrendingKeywords({ ...params, limit: 5 })
   const trendsQuery = useTrends({ ...params, interval: 'day' })
-  const indexDistributionQuery = useIndexDistribution(params)
 
   return {
     stats: statsQuery,
     popularKeywords: popularKeywordsQuery,
     trendingKeywords: trendingKeywordsQuery,
     trends: trendsQuery,
-    indexDistribution: indexDistributionQuery,
     
     // 전체 로딩 상태
     isLoading: [
@@ -69,7 +58,6 @@ export function useDashboardData(params: DashboardApiParams = {}) {
       popularKeywordsQuery.isLoading,
       trendingKeywordsQuery.isLoading,
       trendsQuery.isLoading,
-      indexDistributionQuery.isLoading,
     ].some(Boolean),
     
     // 전체 에러 상태
@@ -78,7 +66,6 @@ export function useDashboardData(params: DashboardApiParams = {}) {
       popularKeywordsQuery.error,
       trendingKeywordsQuery.error,
       trendsQuery.error,
-      indexDistributionQuery.error,
     ].find(Boolean),
     
     // 모든 데이터 로드 완료 여부
@@ -87,7 +74,6 @@ export function useDashboardData(params: DashboardApiParams = {}) {
       popularKeywordsQuery.isSuccess,
       trendingKeywordsQuery.isSuccess,
       trendsQuery.isSuccess,
-      indexDistributionQuery.isSuccess,
     ].every(Boolean),
   }
 } 

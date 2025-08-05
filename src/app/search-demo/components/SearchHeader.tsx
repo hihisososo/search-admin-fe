@@ -11,8 +11,9 @@ interface SearchHeaderProps {
   setQuery: (query: string) => void;
   onSearch: (query: string) => void;
   relatedKeywords: string[];
-  applyTypoCorrection?: boolean; // 🆕 오타교정 옵션
-  setApplyTypoCorrection?: (apply: boolean) => void; // 🆕 오타교정 설정 함수
+  // 오타교정 기능은 백엔드에서 미지원
+  // applyTypoCorrection?: boolean;
+  // setApplyTypoCorrection?: (apply: boolean) => void;
 }
 
 function highlight(text: string, keyword: string) {
@@ -34,7 +35,7 @@ function highlight(text: string, keyword: string) {
   );
 }
 
-export function SearchHeader({ query, setQuery, onSearch, relatedKeywords: _relatedKeywords, applyTypoCorrection: _applyTypoCorrection = true, setApplyTypoCorrection }: SearchHeaderProps) {
+export function SearchHeader({ query, setQuery, onSearch, relatedKeywords: _relatedKeywords }: SearchHeaderProps) {
   const [suggestions, setSuggestions] = React.useState<string[]>([]);
   const [showSuggest, setShowSuggest] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(-1);
@@ -126,7 +127,7 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords: _rela
   return (
     <>
       {/* 상단: 관리도구 링크 */}
-      <div className="w-full max-w-7xl mx-auto">
+      <div className="w-full">
         <div className="flex items-center px-2 py-2 justify-end">
           <Link to="/dashboard" className="text-xs text-gray-400 hover:underline font-medium">관리도구</Link>
         </div>
@@ -134,7 +135,7 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords: _rela
       </div>
       
       {/* 검색창 영역 */}
-      <div className="w-full max-w-7xl flex flex-col mb-2">
+      <div className="w-full flex flex-col mb-2">
         <div className="relative flex items-center h-[64px]">
           <div className="flex items-center min-w-[160px] h-[64px] bg-transparent justify-start">
             {/* 로고 */}
@@ -196,13 +197,7 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords: _rela
           </div>
         </div>
 
-        {/* 🆕 검색 옵션 */}
-        {setApplyTypoCorrection && (
-          <div className="w-full flex justify-center mt-2 mb-1">
-            <div className="flex items-center gap-1 text-xs">
-            </div>
-          </div>
-        )}
+        {/* 오타교정 옵션 제거 - 백엔드 미지원 */}
         
         {/* 연관검색어 */}
         {/* <div className="w-full px-6 py-2 flex items-center gap-2 text-xs bg-transparent justify-center">

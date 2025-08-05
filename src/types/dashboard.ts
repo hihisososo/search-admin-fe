@@ -9,8 +9,6 @@ export type {
   TrendingKeywordsResponse,
   TrendDataPoint,
   TrendsResponse,
-  IndexDistributionItem,
-  IndexDistributionResponse,
   DashboardApiParams
 } from '@/services/dashboard/types'
 
@@ -48,7 +46,6 @@ export const ENVIRONMENT_LABELS = {
 export type {
   SearchLogItem,
   SearchLogPageResponse,
-  SearchLogFilterOptions,
   SearchLogParams,
   SearchLogSortField,
   SearchLogSortDirection

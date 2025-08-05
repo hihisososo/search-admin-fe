@@ -10,7 +10,6 @@ import type {
   PopularKeywordsResponse, 
   TrendingKeywordsResponse, 
   TrendsResponse, 
-  IndexDistributionResponse,
   DashboardApiParams 
 } from '@/types/dashboard'
 
@@ -75,6 +74,9 @@ export interface PopularKeyword {
   keyword: string
   searchCount: number
   rank: number
+  previousRank: number
+  rankChange: number
+  changeStatus: "UP" | "DOWN" | "NEW" | "SAME"
 }
 
 export interface TrendingKeyword {
@@ -271,11 +273,6 @@ export const dashboardApi = {
     return apiFetch<TrendsResponse>(`/v1/stats/trends${queryString}`)
   },
 
-  // 인덱스별 분포 조회
-  async getIndexDistribution(params: Omit<DashboardApiParams, 'indexName' | 'limit' | 'interval'> = {}): Promise<IndexDistributionResponse> {
-    const queryString = buildQueryString(params)
-    return apiFetch<IndexDistributionResponse>(`/v1/stats/index-distribution${queryString}`)
-  }
 }
 
 // 검색 API 함수들
@@ -286,7 +283,7 @@ export const searchApi = {
     return apiFetch<AutocompleteResponse>(`/v1/search/autocomplete${queryString}`)
   },
 
-  // 상품 검색 - GET 방식으로 변경
+  // 상품 검색 - GET 방식
   async searchProducts(searchRequest: SearchRequest): Promise<SearchResponse> {
     const params = new URLSearchParams()
     
@@ -325,16 +322,16 @@ export const searchApi = {
     return apiFetch<SearchResponse>(`/v1/search?${queryString}`)
   },
 
-  // 인기 검색어 조회
-  async getPopularKeywords(params: { fromDate?: string; toDate?: string; limit?: number } = {}): Promise<PopularKeywordsApiResponse> {
+  // 인기 검색어 조회 (검색 로그 API로 변경)
+  async getPopularKeywords(params: { from?: string; to?: string; limit?: number } = {}): Promise<PopularKeywordsApiResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<PopularKeywordsApiResponse>(`/v1/keywords/popular${queryString}`)
+    return apiFetch<PopularKeywordsApiResponse>(`/v1/search-logs/popular-keywords${queryString}`)
   },
 
-  // 급등 검색어 조회
-  async getTrendingKeywords(params: { currentFromDate?: string; currentToDate?: string; limit?: number } = {}): Promise<TrendingKeywordsApiResponse> {
+  // 급등 검색어 조회 (검색 로그 API로 변경)
+  async getTrendingKeywords(params: { currentFrom?: string; currentTo?: string; previousFrom?: string; previousTo?: string; limit?: number } = {}): Promise<TrendingKeywordsApiResponse> {
     const queryString = buildQueryString(params)
-    return apiFetch<TrendingKeywordsApiResponse>(`/v1/keywords/trending${queryString}`)
+    return apiFetch<TrendingKeywordsApiResponse>(`/v1/search-logs/trending-keywords${queryString}`)
   },
 
   // 실시간 인기 검색어 조회
@@ -452,12 +449,12 @@ export const synonymDictionaryApi = {
     environment?: string
   } = {}): Promise<DictionaryPageResponse<SynonymDictionaryItem>> {
     const queryString = buildQueryString(params)
-    return apiFetch<DictionaryPageResponse<SynonymDictionaryItem>>(`/v1/dictionaries/synonym${queryString}`)
+    return apiFetch<DictionaryPageResponse<SynonymDictionaryItem>>(`/v1/dictionaries/synonyms${queryString}`)
   },
 
   // 생성
   async create(data: { keyword: string; description?: string }): Promise<SynonymDictionaryItem> {
-    return apiFetch<SynonymDictionaryItem>('/v1/dictionaries/synonym', {
+    return apiFetch<SynonymDictionaryItem>('/v1/dictionaries/synonyms', {
       method: 'POST',
       body: JSON.stringify(data)
     })
@@ -465,12 +462,12 @@ export const synonymDictionaryApi = {
 
   // 상세 조회
   async getById(id: number): Promise<SynonymDictionaryItem> {
-    return apiFetch<SynonymDictionaryItem>(`/v1/dictionaries/synonym/${id}`)
+    return apiFetch<SynonymDictionaryItem>(`/v1/dictionaries/synonyms/${id}`)
   },
 
   // 수정
   async update(id: number, data: { keyword: string; description?: string }): Promise<SynonymDictionaryItem> {
-    return apiFetch<SynonymDictionaryItem>(`/v1/dictionaries/synonym/${id}`, {
+    return apiFetch<SynonymDictionaryItem>(`/v1/dictionaries/synonyms/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data)
     })
@@ -478,7 +475,7 @@ export const synonymDictionaryApi = {
 
   // 삭제
   async delete(id: number): Promise<void> {
-    return apiFetch<void>(`/v1/dictionaries/synonym/${id}`, {
+    return apiFetch<void>(`/v1/dictionaries/synonyms/${id}`, {
       method: 'DELETE'
     })
   }
@@ -496,12 +493,12 @@ export const typoCorrectionDictionaryApi = {
     environment?: string
   } = {}): Promise<DictionaryPageResponse<TypoCorrectionDictionaryItem>> {
     const queryString = buildQueryString(params)
-    return apiFetch<DictionaryPageResponse<TypoCorrectionDictionaryItem>>(`/v1/dictionaries/typo${queryString}`)
+    return apiFetch<DictionaryPageResponse<TypoCorrectionDictionaryItem>>(`/v1/dictionaries/typo-corrections${queryString}`)
   },
 
   // 생성
   async create(data: { keyword: string; correctedWord: string; description?: string }): Promise<TypoCorrectionDictionaryItem> {
-    return apiFetch<TypoCorrectionDictionaryItem>('/v1/dictionaries/typo', {
+    return apiFetch<TypoCorrectionDictionaryItem>('/v1/dictionaries/typo-corrections', {
       method: 'POST',
       body: JSON.stringify(data)
     })
@@ -509,12 +506,12 @@ export const typoCorrectionDictionaryApi = {
 
   // 상세 조회
   async getById(id: number): Promise<TypoCorrectionDictionaryItem> {
-    return apiFetch<TypoCorrectionDictionaryItem>(`/v1/dictionaries/typo/${id}`)
+    return apiFetch<TypoCorrectionDictionaryItem>(`/v1/dictionaries/typo-corrections/${id}`)
   },
 
   // 수정
   async update(id: number, data: { keyword: string; correctedWord: string; description?: string }): Promise<TypoCorrectionDictionaryItem> {
-    return apiFetch<TypoCorrectionDictionaryItem>(`/v1/dictionaries/typo/${id}`, {
+    return apiFetch<TypoCorrectionDictionaryItem>(`/v1/dictionaries/typo-corrections/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data)
     })
@@ -522,7 +519,7 @@ export const typoCorrectionDictionaryApi = {
 
   // 삭제
   async delete(id: number): Promise<void> {
-    return apiFetch<void>(`/v1/dictionaries/typo/${id}`, {
+    return apiFetch<void>(`/v1/dictionaries/typo-corrections/${id}`, {
       method: 'DELETE'
     })
   },
@@ -530,14 +527,14 @@ export const typoCorrectionDictionaryApi = {
   // 🆕 실시간 동기화
   async realtimeSync(environment: string): Promise<RealtimeSyncResponse> {
     const params = new URLSearchParams({ environment })
-    return apiFetch<RealtimeSyncResponse>(`/v1/dictionaries/typo/realtime-sync?${params}`, {
+    return apiFetch<RealtimeSyncResponse>(`/v1/dictionaries/typo-corrections/realtime-sync?${params}`, {
       method: 'POST'
     })
   },
 
   // 🆕 동기화 상태 조회
   async getSyncStatus(): Promise<SyncStatusResponse> {
-    return apiFetch<SyncStatusResponse>('/v1/dictionaries/typo/sync-status')
+    return apiFetch<SyncStatusResponse>('/v1/dictionaries/typo-corrections/sync-status')
   }
 }
 
@@ -553,12 +550,12 @@ export const stopwordDictionaryApi = {
     environment?: string
   } = {}): Promise<DictionaryPageResponse<StopwordDictionaryItem>> {
     const queryString = buildQueryString(params)
-    return apiFetch<DictionaryPageResponse<StopwordDictionaryItem>>(`/v1/dictionaries/stopword${queryString}`)
+    return apiFetch<DictionaryPageResponse<StopwordDictionaryItem>>(`/v1/dictionaries/stopwords${queryString}`)
   },
 
   // 생성
   async create(data: { keyword: string; description?: string }): Promise<StopwordDictionaryItem> {
-    return apiFetch<StopwordDictionaryItem>('/v1/dictionaries/stopword', {
+    return apiFetch<StopwordDictionaryItem>('/v1/dictionaries/stopwords', {
       method: 'POST',
       body: JSON.stringify(data)
     })
@@ -566,12 +563,12 @@ export const stopwordDictionaryApi = {
 
   // 상세 조회
   async getById(id: number): Promise<StopwordDictionaryItem> {
-    return apiFetch<StopwordDictionaryItem>(`/v1/dictionaries/stopword/${id}`)
+    return apiFetch<StopwordDictionaryItem>(`/v1/dictionaries/stopwords/${id}`)
   },
 
   // 수정
   async update(id: number, data: { keyword: string; description?: string }): Promise<StopwordDictionaryItem> {
-    return apiFetch<StopwordDictionaryItem>(`/v1/dictionaries/stopword/${id}`, {
+    return apiFetch<StopwordDictionaryItem>(`/v1/dictionaries/stopwords/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data)
     })
@@ -579,7 +576,7 @@ export const stopwordDictionaryApi = {
 
   // 삭제
   async delete(id: number): Promise<void> {
-    return apiFetch<void>(`/v1/dictionaries/stopword/${id}`, {
+    return apiFetch<void>(`/v1/dictionaries/stopwords/${id}`, {
       method: 'DELETE'
     })
   }
@@ -665,7 +662,7 @@ export const enhancedSearchApi = {
     query: string
     page: number
     size: number
-    applyTypoCorrection?: boolean
+    // applyTypoCorrection?: boolean - 백엔드에서 미지원
     sortField?: string
     sortOrder?: string
     brand?: string[]
@@ -684,7 +681,7 @@ export const enhancedSearchApi = {
     size: number
     environmentType: string
     explain?: boolean
-    applyTypoCorrection?: boolean
+    // applyTypoCorrection?: boolean - 백엔드에서 미지원
     sortField?: string
     sortOrder?: string
     brand?: string[]
@@ -714,8 +711,4 @@ export const searchLogApi = {
     return apiFetch<import('@/types/dashboard').SearchLogPageResponse>(`/v1/search-logs${queryString}`)
   },
 
-  // 필터 옵션 조회
-  async getFilterOptions(): Promise<import('@/types/dashboard').SearchLogFilterOptions> {
-    return apiFetch<import('@/types/dashboard').SearchLogFilterOptions>('/v1/search-logs/filter-options')
-  }
 } 

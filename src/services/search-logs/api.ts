@@ -1,7 +1,6 @@
 import { apiClient } from '../common/api-client'
 import type {
   SearchLogPageResponse,
-  SearchLogFilterOptions,
   SearchLogParams
 } from './types'
 
@@ -13,10 +12,6 @@ class SearchLogService {
     return apiClient.get<SearchLogPageResponse>(this.baseEndpoint, params)
   }
 
-  // 필터 옵션 조회
-  async getFilterOptions(): Promise<SearchLogFilterOptions> {
-    return apiClient.get<SearchLogFilterOptions>(`${this.baseEndpoint}/filter-options`)
-  }
 }
 
 export const searchLogService = new SearchLogService() 
