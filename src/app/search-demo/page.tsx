@@ -1,7 +1,7 @@
 import * as React from "react";
 import { dashboardApi, enhancedSearchApi, type Product, type AggregationBucket } from "@/lib/api";
 import { type KeywordItem } from "@/types/dashboard";
-import { logger } from "@/lib/logger";
+// import { logger } from "@/lib/logger";
 import { SearchHeader } from "./components/SearchHeader";
 import { PopularKeywords } from "./components/PopularKeywords";
 import { ProductFilters } from "./components/ProductFilters";
