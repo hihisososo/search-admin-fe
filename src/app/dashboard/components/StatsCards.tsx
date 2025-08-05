@@ -92,7 +92,7 @@ StatCard.displayName = 'StatCard'
 
 export default memo(function StatsCards({ stats, loading }: StatsCardsProps) {
   return (
-    <div className="grid grid-cols-4 gap-2">
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
       {loading
         ? Array.from({ length: 8 }).map((_, index) => (
             <StatCardSkeleton key={index} />

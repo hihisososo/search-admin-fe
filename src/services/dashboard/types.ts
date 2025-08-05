@@ -1,42 +1,103 @@
 import type { DateRangeParams } from '../common/types'
 
-// 대시보드 통계 (API 명세서 기준)
+// 대시보드 통계 - 백엔드 API 실제 응답
 export interface DashboardStats {
-  totalSearches: number
-  averageResponseTime: number
-  errorRate: number
-  uniqueUsers: number
-  searchVolumeByTime: Array<{
-    time: string
+  totalSearchCount: number
+  totalDocumentCount: number
+  searchFailureRate: number
+  errorCount: number
+  averageResponseTimeMs: number
+  successRate: number
+  clickCount: number
+  clickThroughRate: number
+  period: string
+}
+
+// 백엔드 API 명세서 기준 타입 (향후 사용 예정)
+export interface FullDashboardStats {
+  period: {
+    from: string
+    to: string
+    timezone: string
+    days: number
+  }
+  searchMetrics: {
+    totalSearches: number
+    uniqueSearches: number
+    avgSearchesPerDay: number
+    peakHour: string
+    peakDay: string
+  }
+  performanceMetrics: {
+    avgResponseTime: number
+    medianResponseTime: number
+    p95ResponseTime: number
+    p99ResponseTime: number
+    maxResponseTime: number
+    timeoutRate: number
+  }
+  qualityMetrics: {
+    errorRate: number
+    zeroResultRate: number
+    clickThroughRate: number
+    bounceRate: number
+    avgResultCount: number
+    avgClickPosition: number
+  }
+  userBehavior: {
+    avgSessionDuration: string
+    avgSearchesPerSession: number
+    refinementRate: number
+    uniqueUsers: number
+    newUserRate: number
+  }
+  topSearchedKeywords: Array<{
+    keyword: string
     count: number
+    percentage: number
+    avgCtr: number
+    avgResultCount: number
   }>
+  errorBreakdown: Record<string, number>
+  deviceBreakdown: Record<string, number>
 }
 
 // 인기 키워드 아이템 (대시보드용)
 export interface PopularKeywordItem {
   keyword: string
   count: number
+  clickCount: number
+  clickThroughRate: number
+  percentage: number
   rank: number
+  previousRank: number | null
+  rankChange: number | null
+  changeStatus: 'UP' | 'DOWN' | 'NEW' | 'SAME'
 }
 
 // 급등 키워드 아이템 (대시보드용)
 export interface TrendingKeywordItem {
   keyword: string
   count: number
-  growthRate: number
+  clickCount: number
+  clickThroughRate: number
+  percentage: number
   rank: number
+  previousRank: number | null
+  rankChange: number | null
+  changeStatus: 'UP' | 'DOWN' | 'NEW' | 'SAME'
 }
 
 // 인기 키워드 응답
 export interface PopularKeywordsResponse {
   keywords: PopularKeywordItem[]
-  totalCount: number
+  period: string
 }
 
 // 급등 키워드 응답
 export interface TrendingKeywordsResponse {
   keywords: TrendingKeywordItem[]
-  totalCount: number
+  period: string
 }
 
 // 트렌드 데이터 포인트
@@ -44,17 +105,17 @@ export interface TrendDataPoint {
   timestamp: string
   searchCount: number
   clickCount: number
-  errorCount: number
+  clickThroughRate: number
+  averageResponseTime: number
+  label: string
 }
 
 // 트렌드 응답
 export interface TrendsResponse {
-  trends: TrendDataPoint[]
-  summary: {
-    totalSearches: number
-    totalClicks: number
-    averageCTR: number
-  }
+  searchVolumeData: TrendDataPoint[]
+  responseTimeData: TrendDataPoint[]
+  period: string
+  interval: string
 }
 
 // 대시보드 API 파라미터

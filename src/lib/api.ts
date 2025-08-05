@@ -322,17 +322,6 @@ export const searchApi = {
     return apiFetch<SearchResponse>(`/v1/search?${queryString}`)
   },
 
-  // 인기 검색어 조회 (검색 로그 API로 변경)
-  async getPopularKeywords(params: { from?: string; to?: string; limit?: number } = {}): Promise<PopularKeywordsApiResponse> {
-    const queryString = buildQueryString(params)
-    return apiFetch<PopularKeywordsApiResponse>(`/v1/search-logs/popular-keywords${queryString}`)
-  },
-
-  // 급등 검색어 조회 (검색 로그 API로 변경)
-  async getTrendingKeywords(params: { currentFrom?: string; currentTo?: string; previousFrom?: string; previousTo?: string; limit?: number } = {}): Promise<TrendingKeywordsApiResponse> {
-    const queryString = buildQueryString(params)
-    return apiFetch<TrendingKeywordsApiResponse>(`/v1/search-logs/trending-keywords${queryString}`)
-  },
 
   // 실시간 인기 검색어 조회
   async getRealtimeKeywords(params: { limit?: number } = {}): Promise<RealtimeKeywordsResponse> {
@@ -341,37 +330,7 @@ export const searchApi = {
   }
 } 
 
-// 배포 관리 API 함수들
-export const deploymentApi = {
-  // 환경 정보 조회
-  async getEnvironments(): Promise<import('@/types/deploy').EnvironmentsResponse> {
-    return apiFetch<import('@/types/deploy').EnvironmentsResponse>('/v1/deployment/environments')
-  },
-
-  // 색인 실행 (개발환경만)
-  async executeIndexing(request: import('@/types/deploy').IndexingRequest = {}): Promise<import('@/types/deploy').OperationResponse> {
-    return apiFetch<import('@/types/deploy').OperationResponse>('/v1/deployment/indexing', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(request)
-    })
-  },
-
-  // 배포 실행
-  async executeDeploy(request: import('@/types/deploy').DeploymentRequest = {}): Promise<import('@/types/deploy').OperationResponse> {
-    return apiFetch<import('@/types/deploy').OperationResponse>('/v1/deployment/deploy', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(request)
-    })
-  },
-
-  // 배포 이력 조회
-  async getDeploymentHistory(params: import('@/types/deploy').DeploymentHistoryParams = {}): Promise<import('@/types/deploy').DeploymentHistoryResponse> {
-    const queryString = buildQueryString(params)
-    return apiFetch<import('@/types/deploy').DeploymentHistoryResponse>(`/v1/deployment/history${queryString}`)
-  }
-} 
+ 
 
 // 🆕 사전 관련 타입 정의
 export interface DictionaryEnvironmentType {
@@ -626,34 +585,7 @@ export const userDictionaryApi = {
   }
 }
 
-// 🆕 실시간 반영 API 함수들
-export const realtimeSyncApi = {
-  // 동의어 사전 실시간 반영
-  async syncSynonym(environment: string): Promise<RealtimeSyncResponse> {
-    const params = new URLSearchParams({ environment })
-    return apiFetch<RealtimeSyncResponse>(`/v1/dictionaries/realtime-sync/synonym?${params}`, {
-      method: 'POST'
-    })
-  },
-
-  // 오타교정 사전 실시간 반영
-  async syncTypoCorrection(environment: string): Promise<RealtimeSyncResponse> {
-    return typoCorrectionDictionaryApi.realtimeSync(environment)
-  },
-
-  // 모든 사전 실시간 반영
-  async syncAll(environment: string): Promise<RealtimeSyncResponse> {
-    const params = new URLSearchParams({ environment })
-    return apiFetch<RealtimeSyncResponse>(`/v1/dictionaries/realtime-sync/all?${params}`, {
-      method: 'POST'
-    })
-  },
-
-  // 동기화 상태 조회
-  async getStatus(): Promise<SyncStatusResponse> {
-    return apiFetch<SyncStatusResponse>('/v1/dictionaries/realtime-sync/status')
-  }
-}
+// 실시간 반영 API는 각 사전 서비스에서 제공되므로 삭제
 
 // 🆕 검색 API 업데이트 (오타교정 옵션 추가)
 export const enhancedSearchApi = {
@@ -704,11 +636,4 @@ export const enhancedSearchApi = {
 } 
 
 // 🆕 검색 로그 API 함수들
-export const searchLogApi = {
-  // 검색 로그 목록 조회
-  async getList(params: import('@/types/dashboard').SearchLogParams = {}): Promise<import('@/types/dashboard').SearchLogPageResponse> {
-    const queryString = buildQueryString(params)
-    return apiFetch<import('@/types/dashboard').SearchLogPageResponse>(`/v1/search-logs${queryString}`)
-  },
-
-} 
+ 

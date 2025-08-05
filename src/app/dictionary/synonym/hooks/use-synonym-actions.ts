@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
-import { apiFetch, realtimeSyncApi } from '@/lib/api'
+import { apiFetch } from '@/lib/api'
+import { synonymDictionaryService } from '@/services'
 import { useToast } from '@/components/ui/use-toast'
 import type { DictionaryItem, DictionaryEnvironmentType } from '@/types/dashboard'
 
@@ -48,12 +49,12 @@ export function useSynonymActions(onRefetch: () => Promise<void>): UseSynonymAct
   }, [])
 
   const handleApplyChanges = useCallback(async (environment: DictionaryEnvironmentType) => {
-    const response = await realtimeSyncApi.syncSynonym(environment)
+    const response = await synonymDictionaryService.realtimeSync(environment)
     toast({
       title: "실시간 반영 완료",
       description: response.message || '동의어 사전이 실시간으로 반영되었습니다.'
     })
-  }, [])
+  }, [toast])
 
   const handleSaveNew = useCallback(async () => {
     if (!validateKeyword(newKeyword)) {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Environment, DeployHistory } from '@/types/deploy'
-import { deploymentApi } from '@/lib/api'
+import { deploymentService } from '@/services'
 import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/logger'
 import EnvironmentOverview from './components/EnvironmentOverview'
@@ -17,14 +17,14 @@ export default function DeployManagement() {
   // 개발 환경이 색인 중인지 확인하는 헬퍼 함수
   const checkIfIndexing = (envs: Environment[]) => {
     const devEnv = envs.find(env => env.environmentType === 'DEV')
-    // indexStatus가 'INDEXING'이면 색인 중
-    return devEnv?.indexStatus === 'INDEXING' || devEnv?.isIndexing || false
+    // indexStatus가 'IN_PROGRESS'이면 색인 중
+    return devEnv?.indexStatus === 'IN_PROGRESS' || devEnv?.isIndexing || false
   }
 
   // 환경 정보 조회
   const fetchEnvironments = useCallback(async () => {
     try {
-      const response = await deploymentApi.getEnvironments()
+      const response = await deploymentService.getEnvironments()
       setEnvironments(response.environments)
       
       // 백엔드 상태로 로컬 색인 상태 동기화
@@ -41,7 +41,7 @@ export default function DeployManagement() {
   // 배포 이력 조회
   const fetchDeploymentHistory = useCallback(async () => {
     try {
-      const response = await deploymentApi.getDeploymentHistory({
+      const response = await deploymentService.getDeploymentHistory({
         page: 0,
         size: 20,
         sort: 'createdAt,desc'
@@ -77,7 +77,7 @@ export default function DeployManagement() {
     
     setIsIndexing(true)
     try {
-      const response = await deploymentApi.executeIndexing({ description })
+      const response = await deploymentService.executeIndexing({ description })
       if (response.success) {
         logger.info('색인 시작', { message: response.message })
         // 즉시 환경 상태 새로고침 후 모니터링 시작
@@ -107,7 +107,7 @@ export default function DeployManagement() {
   const handleDeploy = async (description?: string) => {
     setIsDeploying(true)
     try {
-      const response = await deploymentApi.executeDeploy({ description })
+      const response = await deploymentService.executeDeploy({ description })
       if (response.success) {
         logger.info('배포 완료', { message: response.message })
         // 환경 정보 및 이력 새로고침
@@ -129,17 +129,17 @@ export default function DeployManagement() {
   const startIndexingMonitoring = useCallback(() => {
     const checkStatus = async () => {
       try {
-        const response = await deploymentApi.getEnvironments()
+        const response = await deploymentService.getEnvironments()
         const devEnv = response.environments.find(env => env.environmentType === 'DEV')
         
         // 즉시 상태 업데이트
         setEnvironments(response.environments)
         
         // 백엔드 상태 기준으로 판단
-        const backendIndexing = !!(devEnv?.indexStatus === 'INDEXING' || devEnv?.isIndexing)
+        const backendIndexing = !!(devEnv?.indexStatus === 'IN_PROGRESS' || devEnv?.isIndexing)
         setIsIndexing(backendIndexing)
         
-        if (devEnv && !backendIndexing && devEnv.indexStatus === 'ACTIVE') {
+        if (devEnv && !backendIndexing && devEnv.indexStatus === 'COMPLETED') {
           // 색인 완료
           await fetchDeploymentHistory()
           logger.info('색인 완료!')
