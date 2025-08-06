@@ -132,6 +132,27 @@ export default function EnvironmentOverview({
               </div>
             </div>
 
+            {/* 색인 진행률 표시 */}
+            {env.environmentType === 'DEV' && isEnvironmentIndexing(env) && env.indexingProgress !== null && env.indexingProgress !== undefined && (
+              <div className="space-y-2 pt-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600">색인 진행중</span>
+                  <span className="font-semibold text-blue-600">{env.indexingProgress}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${env.indexingProgress}%` }}
+                  />
+                </div>
+                {env.indexedDocumentCount !== null && env.totalDocumentCount !== null && (
+                  <div className="text-xs text-gray-500 text-center">
+                    {formatNumber(env.indexedDocumentCount)} / {formatNumber(env.totalDocumentCount)} 문서
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* 개발 환경에만 버튼들 표시 */}
             {env.environmentType === 'DEV' && (
               <div className="flex gap-2 pt-2">
@@ -145,7 +166,7 @@ export default function EnvironmentOverview({
                   {isEnvironmentIndexing(env) ? (
                     <>
                       <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                      색인중
+                      색인중 ({env.indexingProgress}%)
                     </>
                   ) : (
                     <>
@@ -157,8 +178,9 @@ export default function EnvironmentOverview({
                 <Button
                   onClick={() => onDeploy()}
                   disabled={isDeploying || !canDeploy()}
+                  variant="outline"
                   size="sm"
-                  className="flex-1 text-xs h-8 bg-green-600 text-white hover:bg-green-700 border-0 disabled:bg-gray-400"
+                  className="flex-1 text-xs h-8 border-green-300 text-green-700 hover:bg-green-50 disabled:opacity-50"
                 >
                   {isDeploying ? (
                     <>
