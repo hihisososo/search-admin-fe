@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -19,6 +20,20 @@ export default function EnvironmentOverview({
   isIndexing: _isIndexing,
   isDeploying 
 }: EnvironmentOverviewProps) {
+  // 디버깅용: 환경 정보가 업데이트 될 때마다 로그
+  useEffect(() => {
+    const devEnv = environments.find(env => env.environmentType === 'DEV')
+    if (devEnv && (devEnv.isIndexing || devEnv.indexStatus === 'IN_PROGRESS')) {
+      console.log('DEV 환경 색인 상태:', {
+        isIndexing: devEnv.isIndexing,
+        indexStatus: devEnv.indexStatus,
+        progress: devEnv.indexingProgress,
+        indexed: devEnv.indexedDocumentCount,
+        total: devEnv.totalDocumentCount
+      })
+    }
+  }, [environments])
+
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('ko-KR').format(num)
   }

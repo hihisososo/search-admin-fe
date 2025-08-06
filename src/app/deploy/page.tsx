@@ -159,6 +159,15 @@ export default function DeployManagement() {
         // 즉시 상태 업데이트
         setEnvironments(response.environments)
         
+        // 진행률 로그 (디버깅용)
+        if (devEnv?.indexingProgress !== null && devEnv?.indexingProgress !== undefined) {
+          logger.debug('색인 진행률', { 
+            progress: devEnv.indexingProgress,
+            indexed: devEnv.indexedDocumentCount,
+            total: devEnv.totalDocumentCount
+          })
+        }
+        
         // 백엔드 상태 기준으로 판단
         const backendIndexing = !!(devEnv?.indexStatus === 'IN_PROGRESS' || devEnv?.isIndexing)
         setIsIndexing(backendIndexing)
@@ -201,12 +210,12 @@ export default function DeployManagement() {
       }
     }, 1000) // 1초마다 체크
 
-    // 60초 후 자동 중단
+    // 5분 후 자동 중단
     setTimeout(() => {
       clearInterval(interval)
       setIsIndexing(false)
       logger.warn('색인 모니터링 시간 초과로 중단됨')
-    }, 60000)
+    }, 300000)
   }, [fetchDeploymentHistory])
 
   if (isLoading) {
