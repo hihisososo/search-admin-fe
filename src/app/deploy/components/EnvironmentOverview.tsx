@@ -36,6 +36,7 @@ export default function EnvironmentOverview({
   const getStatusColor = (status: Environment['indexStatus']) => {
     switch (status) {
       case 'COMPLETED':
+      case 'ACTIVE':
         return 'bg-green-50 text-green-700 border-green-200'
       case 'IN_PROGRESS':
         return 'bg-blue-50 text-blue-600 border-blue-200'
@@ -57,8 +58,9 @@ export default function EnvironmentOverview({
 
   const canDeploy = () => {
     const devEnv = getDevelopmentEnvironment()
+    
     return devEnv && 
-           devEnv.indexStatus === 'COMPLETED' && 
+           (devEnv.indexStatus === 'COMPLETED' || devEnv.indexStatus === 'ACTIVE') && 
            !isEnvironmentIndexing(devEnv) && 
            !isDeploying
   }

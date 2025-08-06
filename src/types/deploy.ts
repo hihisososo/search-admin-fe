@@ -7,7 +7,7 @@ export interface Environment {
   indexName: string
   autocompleteIndexName: string
   documentCount: number
-  indexStatus: 'COMPLETED' | 'IN_PROGRESS' | 'FAILED'
+  indexStatus: 'COMPLETED' | 'IN_PROGRESS' | 'FAILED' | 'ACTIVE'
   indexStatusDescription: string
   indexDate: string
   version: string
