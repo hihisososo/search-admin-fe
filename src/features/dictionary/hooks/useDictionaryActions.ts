@@ -17,6 +17,7 @@ interface EditingState<T extends BaseDictionaryItem> {
   newItem: Partial<T>
   editingItem: Partial<T>
   highlightedId: number | null
+  selectedIds: Set<number>
 }
 
 export function useDictionaryActions<T extends BaseDictionaryItem>({
@@ -30,7 +31,8 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
     addingItem: false,
     newItem: {},
     editingItem: {},
-    highlightedId: null
+    highlightedId: null,
+    selectedIds: new Set()
   })
 
   const validateItem = useCallback((item: Partial<T>): string | null => {
@@ -184,6 +186,41 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
     }
   }, [config, refetch, toast])
 
+  const handleDeleteSelected = useCallback(async () => {
+    const selectedCount = editingState.selectedIds.size
+    if (selectedCount === 0) return
+    
+    if (!confirm(`선택한 ${selectedCount}개 항목을 삭제하시겠습니까?`)) {
+      return
+    }
+
+    try {
+      const deletePromises = Array.from(editingState.selectedIds).map(id => 
+        apiClient.delete(`/v1/dictionaries${config.apiPath}/${id}`)
+      )
+      
+      await Promise.all(deletePromises)
+      
+      setEditingState(prev => ({ 
+        ...prev, 
+        selectedIds: new Set() 
+      }))
+      
+      toast({
+        title: '삭제 완료',
+        description: `${selectedCount}개 항목이 삭제되었습니다.`
+      })
+      
+      refetch()
+    } catch (error) {
+      toast({
+        title: '삭제 실패',
+        description: error instanceof Error ? error.message : '선택한 항목 삭제에 실패했습니다.',
+        variant: 'destructive'
+      })
+    }
+  }, [editingState.selectedIds, config, refetch, toast])
+
   const handleApplyChanges = useCallback(async (env: DictionaryEnvironmentType) => {
     if (!config.features.realtimeSync) {
       return
@@ -239,6 +276,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
     handleCancelEdit,
     handleSaveEdit,
     handleDelete,
+    handleDeleteSelected,
     handleApplyChanges: config.features.realtimeSync ? handleApplyChanges : undefined,
     handleSort,
     handleSearch,

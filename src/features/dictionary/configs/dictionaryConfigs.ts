@@ -2,7 +2,7 @@ import type { DictionaryConfigs } from '../types/dictionary.types'
 
 export const dictionaryConfigs: DictionaryConfigs = {
   user: {
-    name: '사용자 사전',
+    name: '사용자',
     apiPath: '/users',
     theme: {
       color: 'purple',
@@ -27,7 +27,7 @@ export const dictionaryConfigs: DictionaryConfigs = {
   },
   
   stopword: {
-    name: '불용어 사전',
+    name: '불용어',
     apiPath: '/stopwords',
     theme: {
       color: 'orange',
@@ -52,7 +52,7 @@ export const dictionaryConfigs: DictionaryConfigs = {
   },
   
   synonym: {
-    name: '동의어 사전',
+    name: '동의어',
     apiPath: '/synonyms',
     theme: {
       color: 'blue',
@@ -83,8 +83,8 @@ export const dictionaryConfigs: DictionaryConfigs = {
   },
   
   typo: {
-    name: '오타교정 사전',
-    apiPath: '/typo-corrections',
+    name: '오타교정',
+    apiPath: '/typos',
     theme: {
       color: 'green',
       iconName: 'CheckCircle'

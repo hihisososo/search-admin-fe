@@ -22,15 +22,6 @@ interface DictionaryFieldRendererProps<T extends BaseDictionaryItem> {
   isNewItem: boolean
 }
 
-const getThemeBadgeClass = (color: string) => {
-  const colors = {
-    purple: 'text-purple-600 bg-purple-50',
-    orange: 'text-orange-600 bg-orange-50', 
-    blue: 'text-blue-600 bg-blue-50',
-    green: 'text-green-600 bg-green-50'
-  }
-  return colors[color as keyof typeof colors] || colors.purple
-}
 
 export function DictionaryFieldRenderer<T extends BaseDictionaryItem>({
   type,
@@ -40,7 +31,6 @@ export function DictionaryFieldRenderer<T extends BaseDictionaryItem>({
   editingValues,
   onEditingChange
 }: DictionaryFieldRendererProps<T>) {
-  const badgeClass = getThemeBadgeClass(config.theme.color)
   
   if (type === 'synonym') {
     const synonymItem = item as unknown as SynonymDictionaryItem
@@ -72,7 +62,7 @@ export function DictionaryFieldRenderer<T extends BaseDictionaryItem>({
     return (
       <>
         <TableCell className="py-2">
-          <span className={`font-medium ${badgeClass} px-2 py-0.5 rounded text-xs`}>
+          <span className="font-medium text-xs">
             {synonymItem.keyword}
           </span>
         </TableCell>
@@ -119,7 +109,7 @@ export function DictionaryFieldRenderer<T extends BaseDictionaryItem>({
     return (
       <>
         <TableCell className="py-2">
-          <span className={`font-medium ${badgeClass} px-2 py-0.5 rounded text-xs`}>
+          <span className="font-medium text-xs">
             {typoItem.keyword}
           </span>
         </TableCell>

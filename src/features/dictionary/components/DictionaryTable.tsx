@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, Check, X } from "lucide-react"
 import { DictionaryFieldRenderer } from './DictionaryFieldRenderer'
 import type { 
@@ -36,12 +37,14 @@ interface DictionaryTableProps<T extends BaseDictionaryItem> {
     newItem: Partial<T>
     editingItem: Partial<T>
     highlightedId: number | null
+    selectedIds: Set<number>
   }
   setEditingState: React.Dispatch<React.SetStateAction<{
     addingItem: boolean
     newItem: Partial<T>
     editingItem: Partial<T>
     highlightedId: number | null
+    selectedIds: Set<number>
   }>>
 }
 
@@ -59,32 +62,6 @@ const getSortIcon = (field: DictionarySortField, sortField: DictionarySortField,
   return sortDirection === 'asc' ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />
 }
 
-const getThemeClasses = (color: string) => {
-  const themes = {
-    purple: {
-      badge: 'text-purple-600 bg-purple-50',
-      addRow: 'bg-blue-50 hover:bg-blue-50',
-      button: 'bg-green-600 hover:bg-green-700'
-    },
-    orange: {
-      badge: 'text-orange-600 bg-orange-50',
-      addRow: 'bg-blue-50 hover:bg-blue-50',
-      button: 'bg-green-600 hover:bg-green-700'
-    },
-    blue: {
-      badge: 'text-blue-600 bg-blue-50',
-      addRow: 'bg-blue-50 hover:bg-blue-50',
-      button: 'bg-green-600 hover:bg-green-700'
-    },
-    green: {
-      badge: 'text-green-600 bg-green-50',
-      addRow: 'bg-blue-50 hover:bg-blue-50',
-      button: 'bg-green-600 hover:bg-green-700'
-    }
-  }
-  return themes[color as keyof typeof themes] || themes.purple
-}
-
 export function DictionaryTable<T extends BaseDictionaryItem>({
   type,
   config,
@@ -99,7 +76,6 @@ export function DictionaryTable<T extends BaseDictionaryItem>({
   editingState,
   setEditingState
 }: DictionaryTableProps<T>) {
-  const theme = getThemeClasses(config.theme.color)
   
   if (loading) {
     return <div className="text-center py-4">로딩 중...</div>
@@ -151,6 +127,26 @@ export function DictionaryTable<T extends BaseDictionaryItem>({
       <Table>
         <TableHeader>
           <TableRow className="bg-gray-50 hover:bg-gray-50">
+            {canEdit && (
+              <TableHead className="w-10 py-2">
+                <Checkbox
+                  checked={editingState.selectedIds.size === items.length && items.length > 0}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setEditingState(prev => ({
+                        ...prev,
+                        selectedIds: new Set(items.map(item => item.id))
+                      }))
+                    } else {
+                      setEditingState(prev => ({
+                        ...prev,
+                        selectedIds: new Set()
+                      }))
+                    }
+                  }}
+                />
+              </TableHead>
+            )}
             {getFieldHeaders()}
             <TableHead
               className="cursor-pointer hover:bg-gray-100 py-2 text-xs font-semibold text-gray-700 w-24"
@@ -166,7 +162,10 @@ export function DictionaryTable<T extends BaseDictionaryItem>({
         </TableHeader>
         <TableBody>
           {editingState.addingItem && canEdit && (
-            <TableRow className={theme.addRow}>
+            <TableRow className="bg-gray-50 hover:bg-gray-50">
+              <TableCell className="py-2">
+                -
+              </TableCell>
               <DictionaryFieldRenderer
                 type={type}
                 config={config}
@@ -189,7 +188,7 @@ export function DictionaryTable<T extends BaseDictionaryItem>({
                   <Button
                     size="sm"
                     onClick={actions.handleSaveNew}
-                    className={`h-6 w-6 p-0 ${theme.button}`}
+                    className="h-6 w-6 p-0 bg-green-600 hover:bg-green-700"
                   >
                     <Check className="h-3 w-3" />
                   </Button>
@@ -211,8 +210,26 @@ export function DictionaryTable<T extends BaseDictionaryItem>({
             return (
               <TableRow
                 key={item.id}
-                className={`hover:bg-gray-50 ${editingState.highlightedId === item.id ? "bg-amber-50" : ""}`}
+                className={`hover:bg-gray-50 ${editingState.highlightedId === item.id ? "bg-amber-50" : ""} ${editingState.selectedIds.has(item.id) ? "bg-blue-50" : ""}`}
               >
+                {canEdit && (
+                  <TableCell className="py-2">
+                    <Checkbox
+                      checked={editingState.selectedIds.has(item.id)}
+                      onCheckedChange={(checked) => {
+                        setEditingState(prev => {
+                          const newSelectedIds = new Set(prev.selectedIds)
+                          if (checked) {
+                            newSelectedIds.add(item.id)
+                          } else {
+                            newSelectedIds.delete(item.id)
+                          }
+                          return { ...prev, selectedIds: newSelectedIds }
+                        })
+                      }}
+                    />
+                  </TableCell>
+                )}
                 <DictionaryFieldRenderer
                   type={type}
                   config={config}
@@ -237,7 +254,7 @@ export function DictionaryTable<T extends BaseDictionaryItem>({
                         <Button
                           size="sm"
                           onClick={() => actions.handleSaveEdit(item)}
-                          className={`h-6 w-6 p-0 ${theme.button}`}
+                          className="h-6 w-6 p-0 bg-green-600 hover:bg-green-700"
                         >
                           <Check className="h-3 w-3" />
                         </Button>
