@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Plus, RefreshCw, Trash2, User, Ban, GitBranch, CheckCircle } from "lucide-react"
+import { Search, Plus, RefreshCw, Trash2 } from "lucide-react"
 import type { DictionaryConfig, BaseDictionaryItem } from '../types/dictionary.types'
 import type { DictionaryEnvironmentType } from '@/types/dashboard'
 
@@ -18,17 +18,6 @@ interface DictionaryHeaderProps<T extends BaseDictionaryItem> {
   onAdd: () => void
   onDeleteSelected?: () => void
   onApplyChanges?: (env: DictionaryEnvironmentType) => void
-}
-
-const getIcon = (iconName: string) => {
-  const icons = {
-    User: User,
-    Ban: Ban,
-    GitBranch: GitBranch,
-    CheckCircle: CheckCircle
-  }
-  const Icon = icons[iconName as keyof typeof icons] || User
-  return <Icon className="h-5 w-5" />
 }
 
 export function DictionaryHeader<T extends BaseDictionaryItem>({
