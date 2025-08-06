@@ -168,7 +168,8 @@ export default function EnvironmentOverview({
                     style={{ width: `${env.indexingProgress}%` }}
                   />
                 </div>
-                {env.indexedDocumentCount !== null && env.totalDocumentCount !== null && (
+                {env.indexedDocumentCount !== null && env.indexedDocumentCount !== undefined && 
+                 env.totalDocumentCount !== null && env.totalDocumentCount !== undefined && (
                   <div className="text-xs text-gray-500 text-center">
                     {formatNumber(env.indexedDocumentCount)} / {formatNumber(env.totalDocumentCount)} 문서
                   </div>

@@ -188,30 +188,35 @@ export default function DeployManagement() {
           wasIndexing = true
         }
         
-        if (devEnv && wasIndexing && !backendIndexing && (devEnv.indexStatus === 'COMPLETED' || devEnv.indexStatus === 'ACTIVE')) {
-          // 색인 완료
-          await fetchDeploymentHistory()
-          logger.info('색인 완료 감지!', {
-            status: devEnv.indexStatus,
-            documentCount: devEnv.documentCount
-          })
-          toast({
-            title: "색인 완료",
-            description: `색인이 성공적으로 완료되었습니다. (${formatNumber(devEnv.documentCount)}개 문서)`,
-            variant: "default"
-          })
-          return true
-        }
-        
-        if (devEnv && wasIndexing && !backendIndexing && devEnv.indexStatus === 'FAILED') {
-          // 색인 실패
-          logger.error('색인 실패!')
-          toast({
-            title: "색인 실패",
-            description: "색인이 실패했습니다. 다시 시도해주세요.",
-            variant: "destructive"
-          })
-          return true
+        if (devEnv && wasIndexing && !backendIndexing) {
+          // 색인 완료 체크
+          const indexStatus = devEnv.indexStatus as 'COMPLETED' | 'IN_PROGRESS' | 'FAILED' | 'ACTIVE'
+          if (indexStatus === 'COMPLETED' || indexStatus === 'ACTIVE') {
+            // 색인 완료
+            await fetchDeploymentHistory()
+            logger.info('색인 완료 감지!', {
+              status: devEnv.indexStatus,
+              documentCount: devEnv.documentCount
+            })
+            toast({
+              title: "색인 완료",
+              description: `색인이 성공적으로 완료되었습니다. (${formatNumber(devEnv.documentCount)}개 문서)`,
+              variant: "default"
+            })
+            return true
+          }
+          
+          // 색인 실패 체크
+          if (indexStatus === 'FAILED') {
+            // 색인 실패
+            logger.error('색인 실패!')
+            toast({
+              title: "색인 실패",
+              description: "색인이 실패했습니다. 다시 시도해주세요.",
+              variant: "destructive"
+            })
+            return true
+          }
         }
         
         return false
