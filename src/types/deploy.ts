@@ -5,7 +5,7 @@ export interface Environment {
   environmentType: 'DEV' | 'PROD'
   environmentDescription: string
   indexName: string
-  autocompleteIndexName: string
+  autocompleteIndexName: string | null
   documentCount: number
   indexStatus: 'COMPLETED' | 'IN_PROGRESS' | 'FAILED' | 'ACTIVE'
   indexStatusDescription: string

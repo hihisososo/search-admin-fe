@@ -104,7 +104,7 @@ export default function EnvironmentOverview({
             </div>
           </CardHeader>
           <CardContent className="space-y-3 pt-0">
-            <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="space-y-3">
               <div className="flex items-start gap-2">
                 <Database className="h-3 w-3 text-gray-400 mt-0.5" />
                 <div className="min-w-0 flex-1">
@@ -112,6 +112,14 @@ export default function EnvironmentOverview({
                   <div className="text-xs text-gray-500 truncate font-mono">
                     {env.indexName}
                   </div>
+                  {env.autocompleteIndexName && (
+                    <div className="mt-1">
+                      <div className="text-xs text-gray-600 font-medium">자동완성 색인명</div>
+                      <div className="text-xs text-gray-500 truncate font-mono">
+                        {env.autocompleteIndexName}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex items-start gap-2">
