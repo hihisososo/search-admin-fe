@@ -69,7 +69,7 @@ class SynonymDictionaryService extends BaseDictionaryService<
   CreateDictionaryRequest,
   UpdateDictionaryRequest
 > {
-  protected readonly endpoint = '/v1/dictionaries/synonyms'
+  protected readonly endpoint = '/api/v1/dictionaries/synonym'
 
   // 실시간 동기화
   async realtimeSync(environment: Environment): Promise<RealtimeSyncResponse> {
@@ -88,7 +88,7 @@ class TypoCorrectionDictionaryService extends BaseDictionaryService<
   CreateTypoCorrectionRequest,
   UpdateTypoCorrectionRequest
 > {
-  protected readonly endpoint = '/v1/dictionaries/typo-corrections'
+  protected readonly endpoint = '/api/v1/dictionaries/typo'
 
   // 실시간 동기화
   async realtimeSync(environment: Environment): Promise<RealtimeSyncResponse> {
@@ -107,7 +107,7 @@ class StopwordDictionaryService extends BaseDictionaryService<
   CreateDictionaryRequest,
   UpdateDictionaryRequest
 > {
-  protected readonly endpoint = '/v1/dictionaries/stopwords'
+  protected readonly endpoint = '/api/v1/dictionaries/stopword'
 }
 
 // 사용자 사전 서비스
@@ -116,12 +116,12 @@ class UserDictionaryService extends BaseDictionaryService<
   CreateDictionaryRequest,
   UpdateDictionaryRequest
 > {
-  protected readonly endpoint = '/v1/dictionaries/users'
+  protected readonly endpoint = '/api/v1/dictionaries/user'
 }
 
 // 사전 배포 서비스
 class DictionaryDeployService {
-  private readonly endpoint = '/v1/dictionaries/deploy'
+  private readonly endpoint = '/api/v1/dictionaries/deploy'
 
   async deployToDev(): Promise<{ message: string; deployedAt: string }> {
     return apiClient.post(`${this.endpoint}/dev`)
