@@ -86,7 +86,7 @@ export default function DeployManagement() {
         logger.info('색인 시작', { message: response.message })
         toast({
           title: "색인 시작",
-          description: "색인이 시작되었습니다. 진행 상황을 모니터링합니다.",
+          description: "색인이 시작되었습니다.",
           variant: "default"
         })
         // 즉시 환경 상태 새로고침 후 모니터링 시작

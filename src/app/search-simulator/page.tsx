@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { apiClient } from "@/services/common/api-client"
-import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
@@ -322,20 +321,18 @@ export default function SearchSimulator() {
     const envState = environments[currentEnvId]
 
     return (
-        <div className="bg-gray-50 min-h-screen p-3">
-            <div className="max-w-6xl mx-auto">
+        <div className="p-6">
+            <div className="space-y-4">
                 {/* 검색창 */}
-                <Card className="shadow-sm border-gray-200 mb-3">
-                    <CardContent className="pt-1 px-3 pb-3">
-                        <div className="space-y-2">
-                            {/* 환경 선택 */}
-                            <div className="flex justify-start">
-                                <EnvironmentSelector
-                                    value={selectedEnv}
-                                    onChange={setSelectedEnv}
-                                />
-                            </div>
-                            <div className="flex gap-2">
+                <div className="space-y-3">
+                    {/* 환경 선택 */}
+                    <div className="flex justify-start">
+                        <EnvironmentSelector
+                            value={selectedEnv}
+                            onChange={setSelectedEnv}
+                        />
+                    </div>
+                    <div className="flex gap-2">
                                 <Input
                                     value={envState.query}
                                     onChange={(e) => updateEnvironmentState(selectedEnv, { query: e.target.value })}
@@ -345,60 +342,56 @@ export default function SearchSimulator() {
                                             handleSearch(selectedEnv, envState.query)
                                         }
                                     }}
-                                    className="flex-1 h-8 text-xs"
+                                    className="flex-1 max-w-md h-9"
                                 />
                                 <Button
                                     onClick={() => handleSearch(currentEnvId, envState.query)}
                                     disabled={envState.loading}
-                                    className={`px-3 h-8 ${selectedEnv === DictionaryEnvironmentType.PROD ? 'bg-gray-800' : 'bg-blue-600'} hover:opacity-90`}
-                                    size="sm"
+                                    className={`px-4 h-9 ${selectedEnv === DictionaryEnvironmentType.PROD ? 'bg-gray-800' : 'bg-blue-600'} hover:opacity-90`}
                                 >
                                     {envState.loading ? (
                                         <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
                                     ) : (
-                                        <Search className="h-3 w-3" />
+                                        <Search className="h-4 w-4" />
                                     )}
                                 </Button>
                             </div>
                             
-                            {/* 검색 옵션들 */}
-                            <div className="flex items-center gap-4">
-                                <label className="flex items-center gap-1 text-xs">
+                    {/* 검색 옵션들 */}
+                    <div className="flex items-center gap-4">
+                        <label className="flex items-center gap-2 text-sm">
                                     <input
                                         type="checkbox"
                                         checked={envState.showExplain}
                                         onChange={(e) => updateEnvironmentState(selectedEnv, { showExplain: e.target.checked })}
-                                        className="rounded w-3 h-3"
+                                        className="rounded w-4 h-4"
                                     />
                                     <span>Explain 포함</span>
                                 </label>
                                 
-                                {/* 🆕 오타교정 옵션 */}
-                                <label className="flex items-center gap-1 text-xs">
+                        {/* 오타교정 옵션 */}
+                        <label className="flex items-center gap-2 text-sm">
                                     <input
                                         type="checkbox"
                                         checked={envState.applyTypoCorrection}
                                         onChange={(e) => updateEnvironmentState(currentEnvId, { applyTypoCorrection: e.target.checked })}
-                                        className="rounded w-3 h-3"
+                                        className="rounded w-4 h-4"
                                     />
                                     <span>오타 자동교정</span>
                                 </label>
                             </div>
 
-                            {/* 에러 메시지 */}
-                            {envState.error && (
-                                <div className="text-red-600 text-xs p-2 bg-red-50 rounded border border-red-200">
-                                    {envState.error}
-                                </div>
-                            )}
+                    {/* 에러 메시지 */}
+                    {envState.error && (
+                        <div className="text-red-600 text-sm p-3 bg-red-50 rounded border border-red-200">
+                            {envState.error}
                         </div>
-                    </CardContent>
-                </Card>
+                    )}
+                </div>
 
                 {/* 필터 */}
-                {envState.hasSearched && (
-                    <div className="mb-2">
-                        <ProductFilters
+                <div>
+                    <ProductFilters
                             category={envState.category}
                             setCategory={(category) => {
                                 if (typeof category === 'function') {
@@ -437,8 +430,7 @@ export default function SearchSimulator() {
                             onResetFilters={() => resetFilters(currentEnvId)}
                             onPriceSearch={() => handlePriceSearch(currentEnvId)}
                         />
-                    </div>
-                )}
+                </div>
 
                 {/* 상품 목록 */}
                 {envState.hasSearched && (
@@ -461,7 +453,7 @@ export default function SearchSimulator() {
                         showExplain={envState.showExplain}
                     />
                 )}
-            </div>
         </div>
+    </div>
     )
 } 

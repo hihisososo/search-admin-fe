@@ -1,5 +1,4 @@
 import { useMemo, useCallback, useState } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { DateRange } from 'react-day-picker'
 import { useDashboardData } from '@/hooks/use-dashboard'
 import { useDashboardTransformers } from './hooks/use-dashboard-transformers'
@@ -67,28 +66,15 @@ export default function DashboardPage() {
         
         <StatsCards stats={stats} loading={isLoading} />
         
-        <Tabs defaultValue="analytics" className="space-y-3">
-          <TabsList className="grid w-full grid-cols-2 lg:w-fit">
-            <TabsTrigger value="analytics" className="text-sm">
-              분석
-            </TabsTrigger>
-            <TabsTrigger value="keywords" className="text-sm">
-              키워드
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="analytics">
-            <AnalyticsCharts
-              responseTimeData={responseTimeData}
-              searchVolumeData={searchVolumeData}
-              loading={isLoading}
-            />
-          </TabsContent>
-
-          <TabsContent value="keywords">
-            <KeywordsTable keywords={topKeywords} loading={isLoading} />
-          </TabsContent>
-        </Tabs>
+        <div className="space-y-3">
+          <AnalyticsCharts
+            responseTimeData={responseTimeData}
+            searchVolumeData={searchVolumeData}
+            loading={isLoading}
+          />
+          
+          <KeywordsTable keywords={topKeywords} loading={isLoading} />
+        </div>
     </div>
   )
 }

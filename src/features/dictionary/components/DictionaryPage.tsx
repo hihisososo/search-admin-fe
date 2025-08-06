@@ -35,9 +35,11 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
         canEdit={canEdit}
         environment={environment}
         search={search}
+        selectedCount={state.editingState.selectedIds.size}
         onEnvironmentChange={setEnvironment}
         onSearchChange={setSearch}
         onAdd={actions.handleAdd}
+        onDeleteSelected={actions.handleDeleteSelected}
         onApplyChanges={config.features.realtimeSync ? actions.handleApplyChanges : undefined}
       />
       

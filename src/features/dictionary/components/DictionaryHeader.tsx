@@ -2,9 +2,8 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
-import { Search, Plus, RefreshCw, User, Ban, GitBranch, CheckCircle } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Search, Plus, RefreshCw, Trash2, User, Ban, GitBranch, CheckCircle } from "lucide-react"
 import type { DictionaryConfig, BaseDictionaryItem } from '../types/dictionary.types'
 import type { DictionaryEnvironmentType } from '@/types/dashboard'
 
@@ -13,9 +12,11 @@ interface DictionaryHeaderProps<T extends BaseDictionaryItem> {
   canEdit: boolean
   environment: DictionaryEnvironmentType
   search: string
+  selectedCount: number
   onEnvironmentChange: (env: DictionaryEnvironmentType) => void
   onSearchChange: (search: string) => void
   onAdd: () => void
+  onDeleteSelected?: () => void
   onApplyChanges?: (env: DictionaryEnvironmentType) => void
 }
 
@@ -35,20 +36,58 @@ export function DictionaryHeader<T extends BaseDictionaryItem>({
   canEdit,
   environment,
   search,
+  selectedCount,
   onEnvironmentChange,
   onSearchChange,
   onAdd,
+  onDeleteSelected,
   onApplyChanges
 }: DictionaryHeaderProps<T>) {
   return (
     <div className="space-y-4 mb-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {getIcon(config.theme.iconName)}
-          <h1 className="text-2xl font-bold">{config.name}</h1>
+          <span className="text-sm font-medium text-gray-700">환경선택</span>
+          <Select value={environment} onValueChange={(value) => onEnvironmentChange(value as DictionaryEnvironmentType)}>
+            <SelectTrigger className="w-[150px] h-9 text-sm border-gray-300 hover:border-gray-400 focus:border-blue-500 transition-colors">
+              <SelectValue placeholder="환경 선택" />
+            </SelectTrigger>
+            <SelectContent className="shadow-lg border-gray-200">
+              <SelectItem value="CURRENT" className="text-sm hover:bg-gray-50">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-2 h-2 rounded-full bg-blue-500 shadow-sm" />
+                  <span className="font-medium">현재 (편집용)</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="DEV" className="text-sm hover:bg-gray-50">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-2 h-2 rounded-full bg-green-500 shadow-sm" />
+                  <span className="font-medium">개발</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="PROD" className="text-sm hover:bg-gray-50">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-2 h-2 rounded-full bg-gray-800 shadow-sm" />
+                  <span className="font-medium">운영</span>
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         
         <div className="flex items-center gap-2">
+          {canEdit && selectedCount > 0 && (
+            <Button
+              onClick={onDeleteSelected}
+              size="sm"
+              variant="outline"
+              className="border-red-300 text-red-600 hover:bg-red-50"
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              선택 삭제 ({selectedCount})
+            </Button>
+          )}
+          
           {canEdit && (
             <Button
               onClick={onAdd}
@@ -75,31 +114,6 @@ export function DictionaryHeader<T extends BaseDictionaryItem>({
       </div>
       
       <div className="flex items-center gap-4">
-        <RadioGroup
-          value={environment}
-          onValueChange={(value) => onEnvironmentChange(value as DictionaryEnvironmentType)}
-          className="flex gap-4"
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="CURRENT" id="current" />
-            <Label htmlFor="current" className="text-sm cursor-pointer">
-              현재 (편집용)
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="DEV" id="development" />
-            <Label htmlFor="development" className="text-sm cursor-pointer">
-              개발
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="PROD" id="production" />
-            <Label htmlFor="production" className="text-sm cursor-pointer">
-              운영
-            </Label>
-          </div>
-        </RadioGroup>
-        
         <div className="flex-1 max-w-md">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />

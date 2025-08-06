@@ -76,6 +76,7 @@ export interface DictionaryActions<T extends BaseDictionaryItem> {
   handleCancelEdit: (item: T) => void
   handleSaveEdit: (item: T) => Promise<void>
   handleDelete: (id: number) => Promise<void>
+  handleDeleteSelected: () => Promise<void>
   handleApplyChanges?: (environment: DictionaryEnvironmentType) => Promise<void>
   handleSort: (field: DictionarySortField) => void
   handleSearch: (value: string) => void
