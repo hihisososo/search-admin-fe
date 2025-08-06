@@ -111,9 +111,9 @@ export function useTypoActions(onRefetch: () => Promise<void>): UseTypoActionsRe
     
     return items.map(i => 
       i.id === item.id 
-        ? { ...response, isEditing: false }
+        ? response
         : i
-    )
+    ) as TypoCorrectionDictionaryItem[]
   }, [editingKeyword, editingCorrectedWord, validateTypoCorrection])
 
   const handleCancelEdit = useCallback((item: TypoCorrectionDictionaryItem, items: TypoCorrectionDictionaryItem[]): TypoCorrectionDictionaryItem[] => {

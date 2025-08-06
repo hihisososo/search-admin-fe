@@ -28,7 +28,7 @@ class DeploymentService {
 
   // 배포 이력 조회
   async getDeploymentHistory(params: DeploymentHistoryParams = {}): Promise<DeploymentHistoryResponse> {
-    return apiClient.get<DeploymentHistoryResponse>(`${this.baseEndpoint}/history`, params)
+    return apiClient.get<DeploymentHistoryResponse>(`${this.baseEndpoint}/history`, params as Record<string, string | number | boolean | string[] | undefined>)
   }
 }
 

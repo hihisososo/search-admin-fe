@@ -113,6 +113,7 @@ export default function DeploymentHistory({ history = [] }: DeploymentHistoryPro
           return 0
       }
 
+      if (aValue === null || bValue === null) return 0
       if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
       if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
       return 0

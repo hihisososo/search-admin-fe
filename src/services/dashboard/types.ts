@@ -132,7 +132,9 @@ export interface StatItem {
 }
 
 // 이전 버전과의 호환성을 위한 타입 (deprecated)
-export interface KeywordItem extends PopularKeywordItem {
+export interface KeywordItem {
+  keyword: string
+  count: number
   searchCount?: number
   previousRank?: number | null
   rankChange?: number | null
@@ -140,4 +142,5 @@ export interface KeywordItem extends PopularKeywordItem {
   percentage?: number
   clickCount?: number
   clickThroughRate?: number
+  rank?: number
 }

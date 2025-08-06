@@ -48,13 +48,13 @@ export function useDashboardTransformers() {
     }
 
     // 응답시간 데이터
-    const responseTimeData = trendsData.responseTimeData.map((item) => ({
+    const responseTimeData = trendsData.responseTimeData.map((item: any) => ({
       date: item.timestamp,
       responseTime: item.averageResponseTime,
     }))
 
     // 검색량 데이터
-    const searchVolumeData = trendsData.searchVolumeData.map((item) => ({
+    const searchVolumeData = trendsData.searchVolumeData.map((item: any) => ({
       date: item.timestamp,
       searches: item.searchCount,
       successfulSearches: Math.round(item.searchCount * (1 - 0.02)), // 성공률 98% 가정

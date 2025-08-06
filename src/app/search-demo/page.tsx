@@ -224,7 +224,7 @@ export default function SearchDemo() {
         setPopularKeywords(popularResponse.keywords.map((k: KeywordItem) => ({
           keyword: k.keyword,
           searchCount: k.searchCount || 0,
-          rank: k.rank,
+          rank: k.rank || 0,
           previousRank: k.previousRank ?? null,
           rankChange: k.rankChange ?? null,
           changeStatus: k.changeStatus || "SAME"
