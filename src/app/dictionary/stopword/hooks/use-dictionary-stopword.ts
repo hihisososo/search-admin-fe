@@ -1,5 +1,5 @@
 import { useDictionaryData } from '@/hooks/dictionary'
-import { stopwordDictionaryApi } from '@/lib/api'
+import { stopwordDictionaryService } from '@/services'
 import type { 
   DictionaryItem, 
   DictionarySortField, 
@@ -18,7 +18,7 @@ interface UseDictionaryStopwordParams {
 export function useDictionaryStopword(params: UseDictionaryStopwordParams) {
   return useDictionaryData<DictionaryItem>(params, {
     queryKey: 'stopword-dictionary',
-    fetchFn: stopwordDictionaryApi.getList,
+    fetchFn: stopwordDictionaryService.getList.bind(stopwordDictionaryService),
     pageSize: 20
   })
 }

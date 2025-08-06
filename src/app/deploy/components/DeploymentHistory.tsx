@@ -26,7 +26,7 @@ interface DeploymentHistoryProps {
 type SortField = 'deploymentTime' | 'status' | 'version' | 'documentCount' | 'deploymentType'
 type SortDirection = 'asc' | 'desc'
 
-export default function DeploymentHistory({ history }: DeploymentHistoryProps) {
+export default function DeploymentHistory({ history = [] }: DeploymentHistoryProps) {
   const [sortField, setSortField] = useState<SortField>('deploymentTime')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
   const [currentPage, setCurrentPage] = useState(1)
@@ -90,8 +90,8 @@ export default function DeploymentHistory({ history }: DeploymentHistoryProps) {
       
       switch (sortField) {
         case 'deploymentTime':
-          aValue = new Date(a.deploymentTime).getTime()
-          bValue = new Date(b.deploymentTime).getTime()
+          aValue = a.deploymentTime ? new Date(a.deploymentTime).getTime() : new Date(a.createdAt).getTime()
+          bValue = b.deploymentTime ? new Date(b.deploymentTime).getTime() : new Date(b.createdAt).getTime()
           break
         case 'status':
           aValue = a.status
@@ -113,6 +113,7 @@ export default function DeploymentHistory({ history }: DeploymentHistoryProps) {
           return 0
       }
 
+      if (aValue === null || bValue === null) return 0
       if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
       if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
       return 0
@@ -241,12 +242,12 @@ export default function DeploymentHistory({ history }: DeploymentHistoryProps) {
                       </code>
                     </TableCell>
                     <TableCell className="text-xs text-gray-600 py-2">
-                      {formatNumber(deploy.documentCount)}
+                      {deploy.documentCount ? formatNumber(deploy.documentCount) : '-'}
                     </TableCell>
                     <TableCell className="py-2">
                       <div className="flex items-center gap-1.5">
                         <Calendar className="h-3 w-3 text-gray-400" />
-                        <span className="text-xs text-gray-600">{formatDate(deploy.deploymentTime)}</span>
+                        <span className="text-xs text-gray-600">{formatDate(deploy.deploymentTime || deploy.createdAt)}</span>
                       </div>
                     </TableCell>
                     <TableCell className="py-2">

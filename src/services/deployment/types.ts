@@ -1,5 +1,3 @@
-// API 명세에 맞는 새로운 타입 정의
-
 // 환경 정보
 export interface Environment {
   environmentType: 'DEV' | 'PROD'
@@ -75,4 +73,4 @@ export interface DeploymentHistoryParams {
                  // 예시: 'createdAt,desc' 또는 'id,asc'
   status?: 'SUCCESS' | 'FAILED' | 'IN_PROGRESS'  // Query param은 SUCCESS 사용
   deploymentType?: 'INDEXING' | 'DEPLOYMENT'
-} 
+}

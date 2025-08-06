@@ -35,11 +35,9 @@ export default function EnvironmentOverview({
 
   const getStatusColor = (status: Environment['indexStatus']) => {
     switch (status) {
-      case 'ACTIVE':
+      case 'COMPLETED':
         return 'bg-green-50 text-green-700 border-green-200'
-      case 'INACTIVE':
-        return 'bg-gray-50 text-gray-500 border-gray-200'
-      case 'INDEXING':
+      case 'IN_PROGRESS':
         return 'bg-blue-50 text-blue-600 border-blue-200'
       case 'FAILED':
         return 'bg-red-50 text-red-600 border-red-200'
@@ -54,13 +52,13 @@ export default function EnvironmentOverview({
 
   // 색인 중인지 확인하는 명확한 함수
   const isEnvironmentIndexing = (env: Environment) => {
-    return env.indexStatus === 'INDEXING' || env.isIndexing
+    return env.indexStatus === 'IN_PROGRESS' || env.isIndexing
   }
 
   const canDeploy = () => {
     const devEnv = getDevelopmentEnvironment()
     return devEnv && 
-           devEnv.indexStatus === 'ACTIVE' && 
+           devEnv.indexStatus === 'COMPLETED' && 
            !isEnvironmentIndexing(devEnv) && 
            !isDeploying
   }

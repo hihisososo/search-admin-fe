@@ -14,7 +14,7 @@ export default function SearchDemo() {
   const [brand, setBrand] = React.useState<string[]>([]);
   const [category, setCategory] = React.useState<string[]>([]);
   const [price, setPrice] = React.useState<{ from: string; to: string }>({ from: "", to: "" });
-  const [page, setPage] = React.useState(1);
+  const [page, setPage] = React.useState(0);
   const pageSize = 10;
   const [sort, setSort] = React.useState("score");
   const [categorySub, setCategorySub] = React.useState<string[]>([]);
@@ -78,7 +78,7 @@ export default function SearchDemo() {
     try {
       const searchRequest = {
         query: searchQuery,
-        page: 1,
+        page: 0,
         size: pageSize,
         // applyTypoCorrection 파라미터는 백엔드에서 지원하지 않음
       };
@@ -100,7 +100,7 @@ export default function SearchDemo() {
       setProducts(transformedProducts);
       setTotalResults(response.hits.total);
       setTotalPages(response.meta.totalPages);
-      setPage(1);
+      setPage(0);
 
       // 최초 검색 시 aggregation 저장 (그룹 필터용)
       if (response.aggregations?.brand_name) {
@@ -224,7 +224,7 @@ export default function SearchDemo() {
         setPopularKeywords(popularResponse.keywords.map((k: KeywordItem) => ({
           keyword: k.keyword,
           searchCount: k.searchCount || 0,
-          rank: k.rank,
+          rank: k.rank || 0,
           previousRank: k.previousRank ?? null,
           rankChange: k.rankChange ?? null,
           changeStatus: k.changeStatus || "SAME"
@@ -264,18 +264,18 @@ export default function SearchDemo() {
     setCategory([]);
     setCategorySub([]);
     setPrice({ from: "", to: "" });
-    setPage(1);
+    setPage(0);
   };
 
   // 정렬 변경 핸들러
   const handleSortChange = (newSort: string) => {
     setSort(newSort);
-    setPage(1);
+    setPage(0);
   };
 
   // 가격 검색 핸들러 - 가격 버튼을 눌렀을 때만 검색 실행
   const handlePriceSearch = () => {
-    setPage(1);
+    setPage(0);
     if (searchQuery) {
       performFilterSearch();
     }

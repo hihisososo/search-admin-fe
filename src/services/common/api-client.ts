@@ -94,16 +94,17 @@ export class ApiClient {
     }
   }
 
-  async get<T>(endpoint: string, params?: Record<string, string | number | boolean | string[] | undefined>): Promise<T> {
+  async get<T>(endpoint: string, params?: Record<string, string | number | boolean | string[] | undefined>, options?: RequestInit): Promise<T> {
     const queryString = params ? this.buildQueryString(params) : ''
     const url = queryString ? `${endpoint}?${queryString}` : endpoint
-    return this.request<T>(url, { method: 'GET' })
+    return this.request<T>(url, { method: 'GET', ...options })
   }
 
-  async post<T>(endpoint: string, data?: unknown): Promise<T> {
+  async post<T>(endpoint: string, data?: unknown, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'POST',
-      body: data instanceof FormData ? data : JSON.stringify(data)
+      body: data instanceof FormData ? data : JSON.stringify(data),
+      ...options
     })
   }
 
@@ -114,8 +115,11 @@ export class ApiClient {
     })
   }
 
-  async delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: 'DELETE' })
+  async delete<T>(endpoint: string, data?: unknown): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: 'DELETE',
+      body: data ? JSON.stringify(data) : undefined
+    })
   }
 
   private buildQueryString(params: Record<string, string | number | boolean | string[] | undefined>): string {

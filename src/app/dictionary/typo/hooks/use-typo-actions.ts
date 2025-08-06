@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
-import { realtimeSyncApi, typoCorrectionDictionaryApi } from '@/lib/api'
+import { typoCorrectionDictionaryApi } from '@/lib/api'
+import { typoCorrectionDictionaryService } from '@/services'
 import { useToast } from '@/components/ui/use-toast'
 import type { DictionaryEnvironmentType } from '@/types/dashboard'
 import type { TypoCorrectionDictionaryItem } from '@/services/dictionary/types'
@@ -50,12 +51,12 @@ export function useTypoActions(onRefetch: () => Promise<void>): UseTypoActionsRe
   }, [])
 
   const handleApplyChanges = useCallback(async (environment: DictionaryEnvironmentType) => {
-    const response = await realtimeSyncApi.syncTypoCorrection(environment)
+    const response = await typoCorrectionDictionaryService.realtimeSync(environment)
     toast({
       title: "실시간 반영 완료",
       description: response.message || '오타교정 사전이 실시간으로 반영되었습니다.'
     })
-  }, [])
+  }, [toast])
 
   const handleSaveNew = useCallback(async () => {
     if (!validateTypoCorrection(newKeyword, newCorrectedWord)) {
@@ -110,9 +111,9 @@ export function useTypoActions(onRefetch: () => Promise<void>): UseTypoActionsRe
     
     return items.map(i => 
       i.id === item.id 
-        ? { ...response, isEditing: false }
+        ? response
         : i
-    )
+    ) as TypoCorrectionDictionaryItem[]
   }, [editingKeyword, editingCorrectedWord, validateTypoCorrection])
 
   const handleCancelEdit = useCallback((item: TypoCorrectionDictionaryItem, items: TypoCorrectionDictionaryItem[]): TypoCorrectionDictionaryItem[] => {

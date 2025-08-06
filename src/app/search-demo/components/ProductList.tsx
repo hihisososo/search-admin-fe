@@ -212,7 +212,7 @@ export function ProductList({
         <div className="space-y-3">
           <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
           <div className="text-center text-sm text-gray-500">
-            {page} / {totalPages} 페이지 (총 {totalResults.toLocaleString()}개 상품)
+            {page + 1} / {totalPages} 페이지 (총 {totalResults.toLocaleString()}개 상품)
           </div>
         </div>
       )}

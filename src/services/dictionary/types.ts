@@ -7,23 +7,54 @@ export interface DictionaryItem {
   description?: string
   createdAt: string
   updatedAt: string
+  createdBy: string
+  updatedBy: string
+  environment: Environment
+  isActive: boolean
+  usageCount: number
+  lastUsedAt: string | null
   isNew?: boolean
   isEditing?: boolean
 }
 
 // 오타교정 사전 아이템
 export interface TypoCorrectionDictionaryItem extends DictionaryItem {
-  correctedWord: string
+  typoWord: string
+  correctWord: string
+  typoType: 'SPELLING' | 'KEYBOARD' | 'PHONETIC' | 'SPACING'
+  autoDetected: boolean
+  confidence: number
+  correctionCount: number
+  lastCorrectedAt: string | null
+  editDistance: number
+  detectionMethod: string
+  // 호환성을 위해 correctedWord 유지
+  correctedWord?: string
 }
 
 // 동의어 사전 아이템
-export type SynonymDictionaryItem = DictionaryItem
+export interface SynonymDictionaryItem extends DictionaryItem {
+  synonymType: 'BIDIRECTIONAL' | 'UNIDIRECTIONAL'
+  synonymCount: number
+  expandedTerms: string[]
+}
 
 // 불용어 사전 아이템  
 export type StopwordDictionaryItem = DictionaryItem
 
 // 사용자 사전 아이템
-export type UserDictionaryItem = DictionaryItem
+export interface UserDictionaryItem extends DictionaryItem {
+  pos: string
+  category: string
+  priority: number
+  synonyms: string[]
+  relatedWords: string[]
+  tokenInfo: {
+    originalTokens: string[]
+    userDefinedToken: string
+    tokenLength: number
+  }
+}
 
 // 사전 페이지 응답
 export type DictionaryPageResponse<T> = PageResponse<T>
@@ -43,8 +74,18 @@ export interface CreateDictionaryRequest {
 }
 
 // 오타교정 사전 생성 요청
-export interface CreateTypoCorrectionRequest extends CreateDictionaryRequest {
-  correctedWord: string
+export interface CreateTypoCorrectionRequest {
+  keyword: string // "오타 => 정답" 형식
+  description?: string
+  typoType?: 'SPELLING' | 'KEYBOARD' | 'PHONETIC' | 'SPACING'
+  confidence?: number
+  isActive?: boolean
+  applyRules?: {
+    caseSensitive?: boolean
+    applyToCompounds?: boolean
+    minWordLength?: number
+  }
+  testQueries?: string[]
 }
 
 // 사전 업데이트 요청
@@ -54,24 +95,73 @@ export interface UpdateDictionaryRequest {
 }
 
 // 오타교정 사전 업데이트 요청
-export interface UpdateTypoCorrectionRequest extends UpdateDictionaryRequest {
-  correctedWord: string
+export interface UpdateTypoCorrectionRequest {
+  keyword: string // "오타 => 정답" 형식
+  description?: string
+  typoType?: 'SPELLING' | 'KEYBOARD' | 'PHONETIC' | 'SPACING'
+  confidence?: number
+  isActive?: boolean
+  applyRules?: {
+    caseSensitive?: boolean
+    applyToCompounds?: boolean
+    minWordLength?: number
+  }
 }
 
 // 실시간 동기화 응답
 export interface RealtimeSyncResponse {
-  success: boolean
+  status: 'SUCCESS' | 'FAILED'
   message: string
-  environment: string
-  timestamp: number
+  timestamp: string
+  syncDetails: {
+    environment: Environment
+    syncedCount: number
+    addedCount: number
+    updatedCount: number
+    deletedCount: number
+    failedCount: number
+    duration: string
+  }
+  validation?: {
+    totalChecked: number
+    validCount: number
+    invalidCount: number
+    warnings: string[]
+  }
 }
 
 // 동기화 상태 응답
 export interface SyncStatusResponse {
-  success: boolean
-  typoCorrectionStatus: string
-  lastSyncTime: number
-  timestamp: number
+  environments: {
+    [key: string]: {
+      status: string
+      lastSyncTime: string
+      lastSyncBy: string
+      totalSynonyms?: number
+      totalCorrections?: number
+      pendingChanges: number
+      nextScheduledSync: string | null
+    }
+  }
+  syncHistory?: Array<{
+    syncId: string
+    environment: string
+    syncTime: string
+    syncBy: string
+    syncType: string
+    result: string
+    changes: {
+      added: number
+      updated: number
+      deleted: number
+    }
+  }>
+  systemStatus?: {
+    autoSyncEnabled: boolean
+    syncInterval: string
+    lastHealthCheck: string
+    healthStatus: string
+  }
 }
 
 // 정렬 필드 타입

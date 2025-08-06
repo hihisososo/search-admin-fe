@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { apiClient } from '@/lib/api'
-import { realtimeSyncApi } from '@/lib/api'
+import { synonymDictionaryService, typoCorrectionDictionaryService } from '@/services'
 import { useToast } from '@/components/ui/use-toast'
 import { getDictionaryConfig } from '../configs/dictionaryConfigs'
 import type { DictionaryType, BaseDictionaryItem, DictionaryActions } from '../types/dictionary.types'
@@ -195,9 +195,9 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
 
     try {
       if (type === 'synonym') {
-        await realtimeSyncApi.syncSynonym(env)
+        await synonymDictionaryService.realtimeSync(env)
       } else if (type === 'typo') {
-        await realtimeSyncApi.syncTypoCorrection(env)
+        await typoCorrectionDictionaryService.realtimeSync(env)
       }
       
       toast({

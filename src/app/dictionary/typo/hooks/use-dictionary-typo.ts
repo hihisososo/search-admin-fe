@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { typoCorrectionDictionaryApi } from '@/lib/api'
+import { typoCorrectionDictionaryService } from '@/services'
 import type { DictionarySortField, DictionarySortDirection, DictionaryEnvironmentType } from '@/types/dashboard'
 import type { TypoCorrectionDictionaryItem } from '@/services/dictionary/types'
 
@@ -44,7 +44,7 @@ export function useDictionaryTypo({
         ...(search && { search })
       }
       
-      const response = await typoCorrectionDictionaryApi.getList(params)
+      const response = await typoCorrectionDictionaryService.getList(params)
       
       setData(response.content || [])
       setTotal(response.totalElements || 0)

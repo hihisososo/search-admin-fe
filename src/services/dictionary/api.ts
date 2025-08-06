@@ -38,6 +38,29 @@ abstract class BaseDictionaryService<T, CreateReq, UpdateReq> {
   async delete(id: number): Promise<void> {
     return apiClient.delete<void>(`${this.endpoint}/${id}`)
   }
+
+  async bulkDelete(ids: number[]): Promise<void> {
+    return apiClient.delete<void>(`${this.endpoint}/bulk`, { ids })
+  }
+
+  async download(): Promise<Blob> {
+    const response = await fetch(`${this.endpoint}/download`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+      }
+    })
+    if (!response.ok) {
+      throw new Error(`Download failed: ${response.statusText}`)
+    }
+    return response.blob()
+  }
+
+  async upload(file: File): Promise<{ message: string; totalCount: number; successCount: number; failCount: number }> {
+    const formData = new FormData()
+    formData.append('file', file)
+    return apiClient.post(`${this.endpoint}/upload`, formData)
+  }
 }
 
 // 동의어 사전 서비스
@@ -46,7 +69,17 @@ class SynonymDictionaryService extends BaseDictionaryService<
   CreateDictionaryRequest,
   UpdateDictionaryRequest
 > {
-  protected readonly endpoint = '/v1/dictionaries/synonyms'
+  protected readonly endpoint = '/api/v1/dictionaries/synonym'
+
+  // 실시간 동기화
+  async realtimeSync(environment: Environment): Promise<RealtimeSyncResponse> {
+    return apiClient.post<RealtimeSyncResponse>(`${this.endpoint}/realtime-sync`, { environment })
+  }
+
+  // 동기화 상태 조회
+  async getSyncStatus(): Promise<SyncStatusResponse> {
+    return apiClient.get<SyncStatusResponse>(`${this.endpoint}/sync-status`)
+  }
 }
 
 // 오타교정 사전 서비스
@@ -55,7 +88,7 @@ class TypoCorrectionDictionaryService extends BaseDictionaryService<
   CreateTypoCorrectionRequest,
   UpdateTypoCorrectionRequest
 > {
-  protected readonly endpoint = '/v1/dictionaries/typo-corrections'
+  protected readonly endpoint = '/api/v1/dictionaries/typo'
 
   // 실시간 동기화
   async realtimeSync(environment: Environment): Promise<RealtimeSyncResponse> {
@@ -74,7 +107,7 @@ class StopwordDictionaryService extends BaseDictionaryService<
   CreateDictionaryRequest,
   UpdateDictionaryRequest
 > {
-  protected readonly endpoint = '/v1/dictionaries/stopwords'
+  protected readonly endpoint = '/api/v1/dictionaries/stopword'
 }
 
 // 사용자 사전 서비스
@@ -83,31 +116,19 @@ class UserDictionaryService extends BaseDictionaryService<
   CreateDictionaryRequest,
   UpdateDictionaryRequest
 > {
-  protected readonly endpoint = '/v1/dictionaries/user'
+  protected readonly endpoint = '/api/v1/dictionaries/user'
 }
 
-// 실시간 동기화 서비스
-class RealtimeSyncService {
-  private readonly baseEndpoint = '/v1/dictionaries/realtime-sync'
+// 사전 배포 서비스
+class DictionaryDeployService {
+  private readonly endpoint = '/api/v1/dictionaries/deploy'
 
-  // 동의어 사전 실시간 반영
-  async syncSynonym(environment: Environment): Promise<RealtimeSyncResponse> {
-    return apiClient.post<RealtimeSyncResponse>(`${this.baseEndpoint}/synonym`, { environment })
+  async deployToDev(): Promise<{ message: string; deployedAt: string }> {
+    return apiClient.post(`${this.endpoint}/dev`)
   }
 
-  // 오타교정 사전 실시간 반영
-  async syncTypoCorrection(environment: Environment): Promise<RealtimeSyncResponse> {
-    return apiClient.post<RealtimeSyncResponse>(`${this.baseEndpoint}/typo`, { environment })
-  }
-
-  // 모든 사전 실시간 반영
-  async syncAll(environment: Environment): Promise<RealtimeSyncResponse> {
-    return apiClient.post<RealtimeSyncResponse>(`${this.baseEndpoint}/all`, { environment })
-  }
-
-  // 동기화 상태 조회
-  async getStatus(): Promise<SyncStatusResponse> {
-    return apiClient.get<SyncStatusResponse>(`${this.baseEndpoint}/status`)
+  async deployToProd(): Promise<{ message: string; deployedAt: string }> {
+    return apiClient.post(`${this.endpoint}/prod`)
   }
 }
 
@@ -116,4 +137,4 @@ export const synonymDictionaryService = new SynonymDictionaryService()
 export const typoCorrectionDictionaryService = new TypoCorrectionDictionaryService()
 export const stopwordDictionaryService = new StopwordDictionaryService()
 export const userDictionaryService = new UserDictionaryService()
-export const realtimeSyncService = new RealtimeSyncService() 
+export const dictionaryDeployService = new DictionaryDeployService() 
