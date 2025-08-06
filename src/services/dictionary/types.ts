@@ -108,6 +108,28 @@ export interface UpdateTypoCorrectionRequest {
   }
 }
 
+// 형태소 분석 요청
+export interface AnalyzeTextRequest {
+  text: string
+}
+
+// 형태소 토큰
+export interface MorphemeToken {
+  token: string
+  type: string
+  position: number
+  startOffset: number
+  endOffset: number
+  positionLengthTags: string[]
+}
+
+// 형태소 분석 응답
+export interface AnalyzeTextResponse {
+  environment: Environment
+  originalText: string
+  tokens: MorphemeToken[]
+}
+
 // 실시간 동기화 응답
 export interface RealtimeSyncResponse {
   status: 'SUCCESS' | 'FAILED'

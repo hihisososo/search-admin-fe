@@ -12,7 +12,8 @@ import type {
   UpdateDictionaryRequest,
   UpdateTypoCorrectionRequest,
   RealtimeSyncResponse,
-  SyncStatusResponse
+  SyncStatusResponse,
+  AnalyzeTextResponse
 } from './types'
 
 // 기본 사전 서비스 클래스
@@ -117,6 +118,11 @@ class UserDictionaryService extends BaseDictionaryService<
   UpdateDictionaryRequest
 > {
   protected readonly endpoint = '/api/v1/dictionaries/user'
+
+  // 형태소 분석
+  async analyzeText(text: string, environment: Environment = 'DEV'): Promise<AnalyzeTextResponse> {
+    return apiClient.post<AnalyzeTextResponse>(`${this.endpoint}/analyze?environment=${environment}`, { text })
+  }
 }
 
 // 사전 배포 서비스

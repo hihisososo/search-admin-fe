@@ -3,6 +3,7 @@
 import { TableCell } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { MorphemeAnalyzer } from './MorphemeAnalyzer'
 import type { 
   DictionaryType,
   BaseDictionaryItem, 
@@ -144,6 +145,13 @@ export function DictionaryFieldRenderer<T extends BaseDictionaryItem>({
           />
           {!config.validation.keyword?.(editingValues.keyword || '') && editingValues.keyword !== undefined && (
             <div className="text-red-600 text-xs">{config.messages.validationError.keyword}</div>
+          )}
+          {type === 'user' && editingValues.keyword && (
+            <MorphemeAnalyzer 
+              text={editingValues.keyword} 
+              environment="DEV"
+              className="mt-2"
+            />
           )}
         </div>
       </TableCell>
