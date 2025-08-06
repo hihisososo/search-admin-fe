@@ -151,6 +151,8 @@ export default function DeployManagement() {
 
   // 색인 진행 상황 모니터링 - 백엔드 상태 우선
   const startIndexingMonitoring = useCallback(() => {
+    let wasIndexing = false // 실제로 색인이 진행 중이었는지 추적
+    
     const checkStatus = async () => {
       try {
         const response = await deploymentService.getEnvironments()
@@ -164,7 +166,9 @@ export default function DeployManagement() {
           logger.debug('색인 진행률', { 
             progress: devEnv.indexingProgress,
             indexed: devEnv.indexedDocumentCount,
-            total: devEnv.totalDocumentCount
+            total: devEnv.totalDocumentCount,
+            status: devEnv.indexStatus,
+            isIndexing: devEnv.isIndexing
           })
         }
         
@@ -172,10 +176,25 @@ export default function DeployManagement() {
         const backendIndexing = !!(devEnv?.indexStatus === 'IN_PROGRESS' || devEnv?.isIndexing)
         setIsIndexing(backendIndexing)
         
-        if (devEnv && !backendIndexing && (devEnv.indexStatus === 'COMPLETED' || devEnv.indexStatus === 'ACTIVE')) {
+        logger.debug('색인 상태 체크', {
+          wasIndexing,
+          backendIndexing,
+          indexStatus: devEnv?.indexStatus,
+          isIndexing: devEnv?.isIndexing
+        })
+        
+        // 색인이 진행 중이었다가 완료된 경우만 처리
+        if (backendIndexing) {
+          wasIndexing = true
+        }
+        
+        if (devEnv && wasIndexing && !backendIndexing && (devEnv.indexStatus === 'COMPLETED' || devEnv.indexStatus === 'ACTIVE')) {
           // 색인 완료
           await fetchDeploymentHistory()
-          logger.info('색인 완료!')
+          logger.info('색인 완료 감지!', {
+            status: devEnv.indexStatus,
+            documentCount: devEnv.documentCount
+          })
           toast({
             title: "색인 완료",
             description: `색인이 성공적으로 완료되었습니다. (${formatNumber(devEnv.documentCount)}개 문서)`,
@@ -184,7 +203,7 @@ export default function DeployManagement() {
           return true
         }
         
-        if (devEnv && !backendIndexing && devEnv.indexStatus === 'FAILED') {
+        if (devEnv && wasIndexing && !backendIndexing && devEnv.indexStatus === 'FAILED') {
           // 색인 실패
           logger.error('색인 실패!')
           toast({
