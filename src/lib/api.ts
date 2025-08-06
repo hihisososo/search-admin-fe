@@ -452,12 +452,12 @@ export const typoCorrectionDictionaryApi = {
     environment?: string
   } = {}): Promise<DictionaryPageResponse<TypoCorrectionDictionaryItem>> {
     const queryString = buildQueryString(params)
-    return apiFetch<DictionaryPageResponse<TypoCorrectionDictionaryItem>>(`/v1/dictionaries/typo-corrections${queryString}`)
+    return apiFetch<DictionaryPageResponse<TypoCorrectionDictionaryItem>>(`/api/v1/dictionaries/typos${queryString}`)
   },
 
   // 생성
   async create(data: { keyword: string; correctedWord: string; description?: string }): Promise<TypoCorrectionDictionaryItem> {
-    return apiFetch<TypoCorrectionDictionaryItem>('/v1/dictionaries/typo-corrections', {
+    return apiFetch<TypoCorrectionDictionaryItem>('/api/v1/dictionaries/typos', {
       method: 'POST',
       body: JSON.stringify(data)
     })
@@ -465,12 +465,12 @@ export const typoCorrectionDictionaryApi = {
 
   // 상세 조회
   async getById(id: number): Promise<TypoCorrectionDictionaryItem> {
-    return apiFetch<TypoCorrectionDictionaryItem>(`/v1/dictionaries/typo-corrections/${id}`)
+    return apiFetch<TypoCorrectionDictionaryItem>(`/api/v1/dictionaries/typos/${id}`)
   },
 
   // 수정
   async update(id: number, data: { keyword: string; correctedWord: string; description?: string }): Promise<TypoCorrectionDictionaryItem> {
-    return apiFetch<TypoCorrectionDictionaryItem>(`/v1/dictionaries/typo-corrections/${id}`, {
+    return apiFetch<TypoCorrectionDictionaryItem>(`/api/v1/dictionaries/typos/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data)
     })
@@ -478,7 +478,7 @@ export const typoCorrectionDictionaryApi = {
 
   // 삭제
   async delete(id: number): Promise<void> {
-    return apiFetch<void>(`/v1/dictionaries/typo-corrections/${id}`, {
+    return apiFetch<void>(`/api/v1/dictionaries/typos/${id}`, {
       method: 'DELETE'
     })
   },
@@ -486,14 +486,14 @@ export const typoCorrectionDictionaryApi = {
   // 🆕 실시간 동기화
   async realtimeSync(environment: string): Promise<RealtimeSyncResponse> {
     const params = new URLSearchParams({ environment })
-    return apiFetch<RealtimeSyncResponse>(`/v1/dictionaries/typo-corrections/realtime-sync?${params}`, {
+    return apiFetch<RealtimeSyncResponse>(`/api/v1/dictionaries/typos/realtime-sync?${params}`, {
       method: 'POST'
     })
   },
 
   // 🆕 동기화 상태 조회
   async getSyncStatus(): Promise<SyncStatusResponse> {
-    return apiFetch<SyncStatusResponse>('/v1/dictionaries/typo-corrections/sync-status')
+    return apiFetch<SyncStatusResponse>('/api/v1/dictionaries/typos/sync-status')
   }
 }
 

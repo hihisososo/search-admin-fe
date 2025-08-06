@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -19,6 +20,20 @@ export default function EnvironmentOverview({
   isIndexing: _isIndexing,
   isDeploying 
 }: EnvironmentOverviewProps) {
+  // 디버깅용: 환경 정보가 업데이트 될 때마다 로그
+  useEffect(() => {
+    const devEnv = environments.find(env => env.environmentType === 'DEV')
+    if (devEnv && (devEnv.isIndexing || devEnv.indexStatus === 'IN_PROGRESS')) {
+      console.log('DEV 환경 색인 상태:', {
+        isIndexing: devEnv.isIndexing,
+        indexStatus: devEnv.indexStatus,
+        progress: devEnv.indexingProgress,
+        indexed: devEnv.indexedDocumentCount,
+        total: devEnv.totalDocumentCount
+      })
+    }
+  }, [environments])
+
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('ko-KR').format(num)
   }
@@ -36,6 +51,7 @@ export default function EnvironmentOverview({
   const getStatusColor = (status: Environment['indexStatus']) => {
     switch (status) {
       case 'COMPLETED':
+      case 'ACTIVE':
         return 'bg-green-50 text-green-700 border-green-200'
       case 'IN_PROGRESS':
         return 'bg-blue-50 text-blue-600 border-blue-200'
@@ -57,8 +73,9 @@ export default function EnvironmentOverview({
 
   const canDeploy = () => {
     const devEnv = getDevelopmentEnvironment()
+    
     return devEnv && 
-           devEnv.indexStatus === 'COMPLETED' && 
+           (devEnv.indexStatus === 'COMPLETED' || devEnv.indexStatus === 'ACTIVE') && 
            !isEnvironmentIndexing(devEnv) && 
            !isDeploying
   }
@@ -102,7 +119,7 @@ export default function EnvironmentOverview({
             </div>
           </CardHeader>
           <CardContent className="space-y-3 pt-0">
-            <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="space-y-3">
               <div className="flex items-start gap-2">
                 <Database className="h-3 w-3 text-gray-400 mt-0.5" />
                 <div className="min-w-0 flex-1">
@@ -110,6 +127,14 @@ export default function EnvironmentOverview({
                   <div className="text-xs text-gray-500 truncate font-mono">
                     {env.indexName}
                   </div>
+                  {env.autocompleteIndexName && (
+                    <div className="mt-1">
+                      <div className="text-xs text-gray-600 font-medium">자동완성 색인명</div>
+                      <div className="text-xs text-gray-500 truncate font-mono">
+                        {env.autocompleteIndexName}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex items-start gap-2">
@@ -130,6 +155,28 @@ export default function EnvironmentOverview({
               </div>
             </div>
 
+            {/* 색인 진행률 표시 */}
+            {env.environmentType === 'DEV' && isEnvironmentIndexing(env) && env.indexingProgress !== null && env.indexingProgress !== undefined && (
+              <div className="space-y-2 pt-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600">색인 진행중</span>
+                  <span className="font-semibold text-blue-600">{env.indexingProgress}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${env.indexingProgress}%` }}
+                  />
+                </div>
+                {env.indexedDocumentCount !== null && env.indexedDocumentCount !== undefined && 
+                 env.totalDocumentCount !== null && env.totalDocumentCount !== undefined && (
+                  <div className="text-xs text-gray-500 text-center">
+                    {formatNumber(env.indexedDocumentCount)} / {formatNumber(env.totalDocumentCount)} 문서
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* 개발 환경에만 버튼들 표시 */}
             {env.environmentType === 'DEV' && (
               <div className="flex gap-2 pt-2">
@@ -143,7 +190,7 @@ export default function EnvironmentOverview({
                   {isEnvironmentIndexing(env) ? (
                     <>
                       <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                      색인중
+                      색인중 ({env.indexingProgress}%)
                     </>
                   ) : (
                     <>
@@ -155,8 +202,9 @@ export default function EnvironmentOverview({
                 <Button
                   onClick={() => onDeploy()}
                   disabled={isDeploying || !canDeploy()}
+                  variant="outline"
                   size="sm"
-                  className="flex-1 text-xs h-8 bg-green-600 text-white hover:bg-green-700 border-0 disabled:bg-gray-400"
+                  className="flex-1 text-xs h-8 border-green-300 text-green-700 hover:bg-green-50 disabled:opacity-50"
                 >
                   {isDeploying ? (
                     <>

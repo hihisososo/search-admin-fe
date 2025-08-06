@@ -6,6 +6,10 @@ import { logger } from '@/lib/logger'
 import EnvironmentOverview from './components/EnvironmentOverview'
 import DeploymentHistory from './components/DeploymentHistory'
 
+const formatNumber = (num: number) => {
+  return new Intl.NumberFormat('ko-KR').format(num)
+}
+
 export default function DeployManagement() {
   const [environments, setEnvironments] = useState<Environment[]>([])
   const [deployHistory, setDeployHistory] = useState<DeployHistory[]>([])
@@ -80,6 +84,11 @@ export default function DeployManagement() {
       const response = await deploymentService.executeIndexing({ description })
       if (response.success) {
         logger.info('색인 시작', { message: response.message })
+        toast({
+          title: "색인 시작",
+          description: "색인이 시작되었습니다. 진행 상황을 모니터링합니다.",
+          variant: "default"
+        })
         // 즉시 환경 상태 새로고침 후 모니터링 시작
         await fetchEnvironments()
         startIndexingMonitoring()
@@ -110,6 +119,11 @@ export default function DeployManagement() {
       const response = await deploymentService.executeDeploy({ description })
       if (response.success) {
         logger.info('배포 완료', { message: response.message })
+        toast({
+          title: "배포 완료",
+          description: `운영 환경으로 배포가 완료되었습니다. (버전: ${response.version})`,
+          variant: "default"
+        })
         // 환경 정보 및 이력 새로고침
         await Promise.all([
           fetchEnvironments(),
@@ -117,9 +131,19 @@ export default function DeployManagement() {
         ])
       } else {
         logger.error('배포 실패', new Error(response.message))
+        toast({
+          title: "배포 실패",
+          description: response.message,
+          variant: "destructive"
+        })
       }
     } catch (error) {
       logger.error('배포 요청 실패', error as Error)
+      toast({
+        title: "배포 요청 실패",
+        description: "네트워크 오류가 발생했습니다. 다시 시도해주세요.",
+        variant: "destructive"
+      })
     } finally {
       setIsDeploying(false)
     }
@@ -127,6 +151,8 @@ export default function DeployManagement() {
 
   // 색인 진행 상황 모니터링 - 백엔드 상태 우선
   const startIndexingMonitoring = useCallback(() => {
+    let wasIndexing = false // 실제로 색인이 진행 중이었는지 추적
+    
     const checkStatus = async () => {
       try {
         const response = await deploymentService.getEnvironments()
@@ -135,26 +161,62 @@ export default function DeployManagement() {
         // 즉시 상태 업데이트
         setEnvironments(response.environments)
         
+        // 진행률 로그 (디버깅용)
+        if (devEnv?.indexingProgress !== null && devEnv?.indexingProgress !== undefined) {
+          logger.debug('색인 진행률', { 
+            progress: devEnv.indexingProgress,
+            indexed: devEnv.indexedDocumentCount,
+            total: devEnv.totalDocumentCount,
+            status: devEnv.indexStatus,
+            isIndexing: devEnv.isIndexing
+          })
+        }
+        
         // 백엔드 상태 기준으로 판단
         const backendIndexing = !!(devEnv?.indexStatus === 'IN_PROGRESS' || devEnv?.isIndexing)
         setIsIndexing(backendIndexing)
         
-        if (devEnv && !backendIndexing && devEnv.indexStatus === 'COMPLETED') {
-          // 색인 완료
-          await fetchDeploymentHistory()
-          logger.info('색인 완료!')
-          return true
+        logger.debug('색인 상태 체크', {
+          wasIndexing,
+          backendIndexing,
+          indexStatus: devEnv?.indexStatus,
+          isIndexing: devEnv?.isIndexing
+        })
+        
+        // 색인이 진행 중이었다가 완료된 경우만 처리
+        if (backendIndexing) {
+          wasIndexing = true
         }
         
-        if (devEnv && !backendIndexing && devEnv.indexStatus === 'FAILED') {
-          // 색인 실패
-          logger.error('색인 실패!')
-          toast({
-            title: "색인 실패",
-            description: "색인이 실패했습니다. 다시 시도해주세요.",
-            variant: "destructive"
-          })
-          return true
+        if (devEnv && wasIndexing && !backendIndexing) {
+          // 색인 완료 체크
+          const indexStatus = devEnv.indexStatus as 'COMPLETED' | 'IN_PROGRESS' | 'FAILED' | 'ACTIVE'
+          if (indexStatus === 'COMPLETED' || indexStatus === 'ACTIVE') {
+            // 색인 완료
+            await fetchDeploymentHistory()
+            logger.info('색인 완료 감지!', {
+              status: devEnv.indexStatus,
+              documentCount: devEnv.documentCount
+            })
+            toast({
+              title: "색인 완료",
+              description: `색인이 성공적으로 완료되었습니다. (${formatNumber(devEnv.documentCount)}개 문서)`,
+              variant: "default"
+            })
+            return true
+          }
+          
+          // 색인 실패 체크
+          if (indexStatus === 'FAILED') {
+            // 색인 실패
+            logger.error('색인 실패!')
+            toast({
+              title: "색인 실패",
+              description: "색인이 실패했습니다. 다시 시도해주세요.",
+              variant: "destructive"
+            })
+            return true
+          }
         }
         
         return false
@@ -172,12 +234,12 @@ export default function DeployManagement() {
       }
     }, 1000) // 1초마다 체크
 
-    // 60초 후 자동 중단
+    // 5분 후 자동 중단
     setTimeout(() => {
       clearInterval(interval)
       setIsIndexing(false)
       logger.warn('색인 모니터링 시간 초과로 중단됨')
-    }, 60000)
+    }, 300000)
   }, [fetchDeploymentHistory])
 
   if (isLoading) {

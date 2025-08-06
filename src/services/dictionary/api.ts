@@ -89,7 +89,7 @@ class TypoCorrectionDictionaryService extends BaseDictionaryService<
   CreateTypoCorrectionRequest,
   UpdateTypoCorrectionRequest
 > {
-  protected readonly endpoint = '/api/v1/dictionaries/typo'
+  protected readonly endpoint = '/api/v1/dictionaries/typos'
 
   // 실시간 동기화
   async realtimeSync(environment: Environment): Promise<RealtimeSyncResponse> {
