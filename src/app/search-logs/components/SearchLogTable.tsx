@@ -98,6 +98,7 @@ export function SearchLogTable({
             </TableHead>
             <TableHead className="w-[100px] py-2 text-xs font-semibold text-gray-700 text-center">클라이언트 IP</TableHead>
             <TableHead className="w-[50px] py-2 text-xs font-semibold text-gray-700 text-center">상태</TableHead>
+            <TableHead className="w-[120px] py-2 text-xs font-semibold text-gray-700 text-center">세션 ID</TableHead>
             <TableHead className="min-w-[150px] py-2 text-xs font-semibold text-gray-700">User-Agent</TableHead>
           </TableRow>
         </TableHeader>
@@ -138,6 +139,11 @@ export function SearchLogTable({
                       </Badge>
                     </>
                   )}
+                </div>
+              </TableCell>
+              <TableCell className="text-xs text-gray-600 py-1 text-center">
+                <div className="max-w-[120px] truncate" title={item.searchSessionId || '-'}>
+                  {item.searchSessionId ? item.searchSessionId.split('-').slice(0, 3).join('-') : '-'}
                 </div>
               </TableCell>
               <TableCell className="text-xs text-gray-500 py-1 max-w-[300px]">

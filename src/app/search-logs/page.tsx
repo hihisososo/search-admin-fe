@@ -11,6 +11,7 @@ import type {
 } from "@/types/dashboard"
 import { SearchLogHeader } from "./components/SearchLogHeader"
 import { SearchLogTable } from "./components/SearchLogTable"
+import { getSearchSessionId } from "@/lib/search-session"
 
 export default function SearchLogs() {
   const [items, setItems] = useState<SearchLogItem[]>([])
@@ -42,11 +43,13 @@ export default function SearchLogs() {
     setLoading(true)
     setError("")
     try {
+      const sessionId = getSearchSessionId()
       const params: SearchLogParams = {
         page: page - 1, // API는 0부터 시작
         size: pageSize,
         sort: sortField,
         order: sortDirection,
+        searchSessionId: sessionId,
         ...(keyword && { keyword }),
         ...(isError !== undefined && { isError }),
         ...(clientIp && { clientIp }),

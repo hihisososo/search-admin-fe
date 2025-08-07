@@ -19,14 +19,18 @@ export default function DashboardPage() {
     
     if (dateRange.from) {
       const fromDate = new Date(dateRange.from)
-      fromDate.setHours(0, 0, 0, 0)
-      params.from = fromDate.toISOString().replace('Z', '')
+      const year = fromDate.getFullYear()
+      const month = String(fromDate.getMonth() + 1).padStart(2, '0')
+      const day = String(fromDate.getDate()).padStart(2, '0')
+      params.from = `${year}-${month}-${day}T00:00:00`
     }
     
     if (dateRange.to) {
       const toDate = new Date(dateRange.to)
-      toDate.setHours(23, 59, 59, 999)
-      params.to = toDate.toISOString().replace('Z', '')
+      const year = toDate.getFullYear()
+      const month = String(toDate.getMonth() + 1).padStart(2, '0')
+      const day = String(toDate.getDate()).padStart(2, '0')
+      params.to = `${year}-${month}-${day}T23:59:59`
     }
     
     return params
