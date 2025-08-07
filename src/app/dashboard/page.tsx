@@ -14,10 +14,23 @@ export default function DashboardPage() {
     to: DASHBOARD_CONSTANTS.getDefaultDateRange().to,
   })
 
-  const apiParams = useMemo(() => ({
-    ...(dateRange.from && { from: dateRange.from.toISOString().replace('Z', '') }),
-    ...(dateRange.to && { to: dateRange.to.toISOString().replace('Z', '') }),
-  }), [dateRange])
+  const apiParams = useMemo(() => {
+    const params: any = {}
+    
+    if (dateRange.from) {
+      const fromDate = new Date(dateRange.from)
+      fromDate.setHours(0, 0, 0, 0)
+      params.from = fromDate.toISOString().replace('Z', '')
+    }
+    
+    if (dateRange.to) {
+      const toDate = new Date(dateRange.to)
+      toDate.setHours(23, 59, 59, 999)
+      params.to = toDate.toISOString().replace('Z', '')
+    }
+    
+    return params
+  }, [dateRange])
 
   const dashboardData = useDashboardData(apiParams)
   const transformers = useDashboardTransformers()
@@ -86,7 +99,7 @@ export default function DashboardPage() {
             <KeywordsTable 
               keywords={trendingKeywords} 
               loading={isLoading}
-              title="급등 검색어"
+              title="급등 검색어 TOP 10"
               type="trending"
             />
           </div>
