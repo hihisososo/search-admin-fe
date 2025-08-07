@@ -12,6 +12,7 @@ export interface SearchLogItem {
   userAgent: string
   isError: boolean
   errorMessage?: string
+  searchSessionId?: string
   searchParams?: {
     size: number
     page: number
@@ -43,6 +44,7 @@ export interface SearchLogParams extends SearchParams, DateRangeParams {
   maxResultCount?: number
   sort?: SearchLogSortField
   order?: SearchLogSortDirection
+  searchSessionId?: string
 }
 
 // 정렬 필드 및 방향
@@ -133,6 +135,7 @@ export interface CreateSearchLogRequest {
   resultCount: number
   isError: boolean
   errorMessage?: string
+  searchSessionId?: string
   searchParams: {
     size: number
     page: number
