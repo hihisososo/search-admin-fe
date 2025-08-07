@@ -7,9 +7,9 @@ import {
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
-  AreaChart,
-  Area,
   Tooltip,
+  LineChart,
+  Line,
 } from 'recharts'
 
 interface ResponseTimeData {
@@ -80,13 +80,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 const ResponseTimeChart = memo(({ data }: { data: ResponseTimeData[] }) => (
   <ChartContainer config={{ responseTime: CHART_CONFIG.responseTime }} className="h-full w-full">
     <ResponsiveContainer width="100%" height="100%">
-      <AreaChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
-        <defs>
-          <linearGradient id="responseTimeGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={CHART_CONFIG.responseTime.color} stopOpacity={0.3} />
-            <stop offset="95%" stopColor={CHART_CONFIG.responseTime.color} stopOpacity={0} />
-          </linearGradient>
-        </defs>
+      <LineChart data={data} margin={{ top: 10, right: 10, left: -5, bottom: 10 }}>
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
         <XAxis
           dataKey="date"
@@ -99,18 +93,18 @@ const ResponseTimeChart = memo(({ data }: { data: ResponseTimeData[] }) => (
           tickLine={false}
           axisLine={false}
           fontSize={11}
-          label={{ value: 'ms', position: 'insideLeft', style: { fontSize: 11 } }}
+          width={35}
         />
         <Tooltip content={<CustomTooltip />} />
-        <Area
+        <Line
           dataKey="responseTime"
           name="응답시간"
           type="monotone"
           stroke={CHART_CONFIG.responseTime.color}
           strokeWidth={2}
-          fill="url(#responseTimeGradient)"
+          dot={{ fill: CHART_CONFIG.responseTime.color, r: 3 }}
         />
-      </AreaChart>
+      </LineChart>
     </ResponsiveContainer>
   </ChartContainer>
 ))
@@ -126,17 +120,7 @@ const SearchVolumeChart = memo(({ data }: { data: SearchVolumeData[] }) => (
     className="h-full w-full"
   >
     <ResponsiveContainer width="100%" height="100%">
-      <AreaChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
-        <defs>
-          <linearGradient id="successGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={CHART_CONFIG.successfulSearches.color} stopOpacity={0.8} />
-            <stop offset="95%" stopColor={CHART_CONFIG.successfulSearches.color} stopOpacity={0.2} />
-          </linearGradient>
-          <linearGradient id="failGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={CHART_CONFIG.failedSearches.color} stopOpacity={0.8} />
-            <stop offset="95%" stopColor={CHART_CONFIG.failedSearches.color} stopOpacity={0.2} />
-          </linearGradient>
-        </defs>
+      <LineChart data={data} margin={{ top: 10, right: 10, left: -5, bottom: 10 }}>
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
         <XAxis
           dataKey="date"
@@ -149,26 +133,26 @@ const SearchVolumeChart = memo(({ data }: { data: SearchVolumeData[] }) => (
           tickLine={false} 
           axisLine={false} 
           fontSize={11}
-          label={{ value: '검색 횟수', position: 'insideLeft', style: { fontSize: 11 } }}
+          width={35}
         />
         <Tooltip content={<CustomTooltip />} />
-        <Area
+        <Line
           dataKey="successfulSearches"
           name="성공"
-          stackId="1"
+          type="monotone"
           stroke={CHART_CONFIG.successfulSearches.color}
-          fill="url(#successGradient)"
           strokeWidth={2}
+          dot={{ fill: CHART_CONFIG.successfulSearches.color, r: 3 }}
         />
-        <Area
+        <Line
           dataKey="failedSearches"
           name="실패"
-          stackId="1"
+          type="monotone"
           stroke={CHART_CONFIG.failedSearches.color}
-          fill="url(#failGradient)"
           strokeWidth={2}
+          dot={{ fill: CHART_CONFIG.failedSearches.color, r: 3 }}
         />
-      </AreaChart>
+      </LineChart>
     </ResponsiveContainer>
   </ChartContainer>
 ))
@@ -182,26 +166,7 @@ export default memo(function AnalyticsCharts({
 }: AnalyticsChartsProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-      <Card className="border-0 shadow-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold">검색 응답시간</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64">
-            {loading ? (
-              <ChartSkeleton />
-            ) : responseTimeData.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-muted-foreground">
-                데이터 없음
-              </div>
-            ) : (
-              <ResponseTimeChart data={responseTimeData} />
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="border-0 shadow-sm">
+      <Card className="border border-gray-200 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base font-semibold">검색량 추이</CardTitle>
         </CardHeader>
@@ -215,6 +180,25 @@ export default memo(function AnalyticsCharts({
               </div>
             ) : (
               <SearchVolumeChart data={searchVolumeData} />
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border border-gray-200 shadow-sm">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold">검색 응답시간</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-64">
+            {loading ? (
+              <ChartSkeleton />
+            ) : responseTimeData.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                데이터 없음
+              </div>
+            ) : (
+              <ResponseTimeChart data={responseTimeData} />
             )}
           </div>
         </CardContent>

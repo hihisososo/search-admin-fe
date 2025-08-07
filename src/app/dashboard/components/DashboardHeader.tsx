@@ -2,16 +2,16 @@ import { memo, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
-import { CalendarIcon, RefreshCw } from 'lucide-react'
+import { CalendarIcon } from 'lucide-react'
 import { ko } from 'date-fns/locale'
 import type { DateRange } from 'react-day-picker'
 
 interface DashboardHeaderProps {
   dateRange: DateRange
   setDateRange: (value: DateRange) => void
-  onRefresh: () => void
-  loading: boolean
-  lastUpdated: Date
+  onRefresh?: () => void
+  loading?: boolean
+  lastUpdated?: Date
 }
 
 const formatDateRange = (dateRange: DateRange): string => {
@@ -27,8 +27,6 @@ const formatDateRange = (dateRange: DateRange): string => {
 export default memo(function DashboardHeader({
   dateRange,
   setDateRange,
-  onRefresh,
-  loading,
 }: DashboardHeaderProps) {
   const handleDateRange = useCallback((value: DateRange | undefined) => {
     setDateRange(value || { from: undefined, to: undefined })
@@ -36,15 +34,16 @@ export default memo(function DashboardHeader({
 
   return (
     <div className="flex items-center gap-2">
+        <span className="text-sm font-medium text-gray-700">날짜 선택 :</span>
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              size="sm"
-              className="h-8 text-xs"
+              size="default"
+              className="h-9 px-4 shadow-sm hover:shadow-md transition-all duration-200"
             >
-              <CalendarIcon className="h-3 w-3 mr-1.5" />
-              {formatDateRange(dateRange)}
+              <CalendarIcon className="h-4 w-4 mr-2" />
+              <span className="font-medium text-sm">{formatDateRange(dateRange)}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="p-0 w-auto">
@@ -60,16 +59,6 @@ export default memo(function DashboardHeader({
             />
           </PopoverContent>
         </Popover>
-
-        <Button
-          onClick={onRefresh}
-          disabled={loading}
-          variant="outline"
-          size="sm"
-          className="h-8 px-2"
-        >
-          <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
-        </Button>
     </div>
   )
 })

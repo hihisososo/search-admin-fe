@@ -43,7 +43,7 @@ export function useTrends(params: DashboardApiParams = {}) {
 export function useDashboardData(params: DashboardApiParams = {}) {
   const statsQuery = useDashboardStats(params)
   const popularKeywordsQuery = usePopularKeywords({ ...params, limit: 10 })
-  const trendingKeywordsQuery = useTrendingKeywords({ ...params, limit: 5 })
+  const trendingKeywordsQuery = useTrendingKeywords({ ...params, limit: 10 })
   const trendsQuery = useTrends({ ...params, interval: 'day' })
 
   return {
@@ -52,12 +52,12 @@ export function useDashboardData(params: DashboardApiParams = {}) {
     trendingKeywords: trendingKeywordsQuery,
     trends: trendsQuery,
     
-    // 전체 로딩 상태
+    // 전체 로딩 상태 (초기 로딩 또는 refetch 중)
     isLoading: [
-      statsQuery.isLoading,
-      popularKeywordsQuery.isLoading,
-      trendingKeywordsQuery.isLoading,
-      trendsQuery.isLoading,
+      statsQuery.isLoading || statsQuery.isFetching,
+      popularKeywordsQuery.isLoading || popularKeywordsQuery.isFetching,
+      trendingKeywordsQuery.isLoading || trendingKeywordsQuery.isFetching,
+      trendsQuery.isLoading || trendsQuery.isFetching,
     ].some(Boolean),
     
     // 전체 에러 상태

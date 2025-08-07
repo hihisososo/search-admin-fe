@@ -38,7 +38,7 @@ export function useDashboardTransformers() {
       { label: '평균응답시간', value: `${Math.round(dashboardStats.averageResponseTimeMs || 0)}ms` },
       { label: '성공률', value: `${(dashboardStats.successRate || 0).toFixed(1)}%` },
       { label: '클릭수', value: (dashboardStats.clickCount || 0).toLocaleString() },
-      { label: 'CTR', value: `${((dashboardStats.clickThroughRate || 0) * 100).toFixed(1)}%` },
+      { label: 'CTR', value: `${(dashboardStats.clickThroughRate || 0).toFixed(1)}%` },
     ]
   }, [])
 
@@ -73,7 +73,7 @@ export function useDashboardTransformers() {
       return keywords.map((item) => ({
         keyword: item.keyword,
         searches: item.count,
-        ctr: `${(item.clickThroughRate * 100).toFixed(1)}%`,
+        ctr: `${(item.clickThroughRate).toFixed(1)}%`,
         trend: item.changeStatus === 'UP' ? 'up' : item.changeStatus === 'DOWN' ? 'down' : item.changeStatus === 'NEW' ? 'new' : 'stable',
         percentage: item.percentage,
         rank: item.rank,
@@ -91,7 +91,7 @@ export function useDashboardTransformers() {
       return keywords.map((item) => ({
         keyword: item.keyword,
         searches: item.count,
-        ctr: `${(item.clickThroughRate * 100).toFixed(1)}%`,
+        ctr: `${(item.clickThroughRate).toFixed(1)}%`,
         trend: item.changeStatus === 'UP' ? 'up' : item.changeStatus === 'DOWN' ? 'down' : item.changeStatus === 'NEW' ? 'new' : 'stable',
         percentage: item.percentage,
         rank: item.rank,

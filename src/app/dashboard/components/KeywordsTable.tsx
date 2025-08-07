@@ -85,7 +85,7 @@ export default memo(function KeywordsTable({
 }: KeywordsTableProps) {
   return (
     <Card>
-      <CardHeader className="pb-3 pt-4">
+      <CardHeader className="pb-2 pt-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold">{title}</CardTitle>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
