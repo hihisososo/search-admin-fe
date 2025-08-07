@@ -35,12 +35,15 @@ export default function DashboardPage() {
   , [dashboardData.trends.data, transformers])
 
 
-  const topKeywords = useMemo(() => {
-    const popularKeywords = dashboardData.popularKeywords.data?.keywords || []
-    const trendingKeywords = dashboardData.trendingKeywords.data?.keywords || []
-    
-    return transformers.mergeKeywords(popularKeywords, trendingKeywords)
-  }, [dashboardData.popularKeywords.data, dashboardData.trendingKeywords.data, transformers])
+  const popularKeywords = useMemo(() => {
+    const keywords = dashboardData.popularKeywords.data?.keywords || []
+    return transformers.convertPopularKeywordsToTableData(keywords)
+  }, [dashboardData.popularKeywords.data, transformers])
+
+  const trendingKeywords = useMemo(() => {
+    const keywords = dashboardData.trendingKeywords.data?.keywords || []
+    return transformers.convertTrendingKeywordsToTableData(keywords)
+  }, [dashboardData.trendingKeywords.data, transformers])
 
   const handleRefresh = useCallback(() => {
     Object.values(dashboardData).forEach(query => {
@@ -73,7 +76,20 @@ export default function DashboardPage() {
             loading={isLoading}
           />
           
-          <KeywordsTable keywords={topKeywords} loading={isLoading} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <KeywordsTable 
+              keywords={popularKeywords} 
+              loading={isLoading}
+              title="인기 검색어 TOP 10"
+              type="popular"
+            />
+            <KeywordsTable 
+              keywords={trendingKeywords} 
+              loading={isLoading}
+              title="급등 검색어"
+              type="trending"
+            />
+          </div>
         </div>
     </div>
   )

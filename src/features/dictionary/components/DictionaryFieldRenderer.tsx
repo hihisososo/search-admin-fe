@@ -115,7 +115,7 @@ export function DictionaryFieldRenderer<T extends BaseDictionaryItem>({
         </TableCell>
         <TableCell className="py-2">
           <span className="text-xs font-medium">
-            → {typoItem.correctedWord}
+            {typoItem.correctedWord}
           </span>
         </TableCell>
       </>
@@ -151,7 +151,7 @@ export function DictionaryFieldRenderer<T extends BaseDictionaryItem>({
   return (
     <TableCell className="py-2">
       <div className="break-words">
-        <span className={`font-medium ${badgeClass} px-2 py-0.5 rounded text-xs`}>
+        <span className="font-medium px-2 py-0.5 rounded text-xs">
           {item.keyword}
         </span>
       </div>

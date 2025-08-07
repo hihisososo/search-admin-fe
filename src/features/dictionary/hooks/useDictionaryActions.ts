@@ -22,6 +22,7 @@ interface EditingState<T extends BaseDictionaryItem> {
 
 export function useDictionaryActions<T extends BaseDictionaryItem>({
   type,
+  environment: _environment,
   refetch
 }: UseDictionaryActionsParams): DictionaryActions<T> & { editingState: EditingState<T>, setEditingState: React.Dispatch<React.SetStateAction<EditingState<T>>> } {
   const config = getDictionaryConfig(type)
@@ -223,6 +224,16 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
 
   const handleApplyChanges = useCallback(async (env: DictionaryEnvironmentType) => {
     if (!config.features.realtimeSync) {
+      return
+    }
+
+    // 현재 환경에서는 실시간 반영 불가
+    if (env === 'CURRENT') {
+      toast({
+        title: '실시간 반영 불가',
+        description: '현재 환경에서는 실시간 반영을 할 수 없습니다. 개발 또는 운영 환경을 선택해주세요.',
+        variant: 'destructive'
+      })
       return
     }
 

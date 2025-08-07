@@ -12,7 +12,9 @@ export interface TopKeyword {
   keyword: string
   searches: number
   ctr: string
-  trend: 'up' | 'down' | 'stable'
+  trend: 'up' | 'down' | 'stable' | 'new'
+  percentage?: number
+  rank?: number
 }
 
 export function useDashboardTransformers() {
@@ -20,7 +22,6 @@ export function useDashboardTransformers() {
     if (!dashboardStats) {
       return [
         { label: '검색량', value: '0' },
-        { label: '문서량', value: '0' },
         { label: '검색실패', value: '0%' },
         { label: '에러건수', value: '0' },
         { label: '평균응답시간', value: '0ms' },
@@ -32,11 +33,10 @@ export function useDashboardTransformers() {
     
     return [
       { label: '검색량', value: (dashboardStats.totalSearchCount || 0).toLocaleString() },
-      { label: '문서량', value: (dashboardStats.totalDocumentCount || 0).toLocaleString() },
-      { label: '검색실패', value: `${((dashboardStats.searchFailureRate || 0) * 100).toFixed(1)}%` },
+      { label: '검색실패', value: `${(dashboardStats.searchFailureRate || 0).toFixed(1)}%` },
       { label: '에러건수', value: (dashboardStats.errorCount || 0).toLocaleString() },
       { label: '평균응답시간', value: `${Math.round(dashboardStats.averageResponseTimeMs || 0)}ms` },
-      { label: '성공률', value: `${((dashboardStats.successRate || 0) * 100).toFixed(1)}%` },
+      { label: '성공률', value: `${(dashboardStats.successRate || 0).toFixed(1)}%` },
       { label: '클릭수', value: (dashboardStats.clickCount || 0).toLocaleString() },
       { label: 'CTR', value: `${((dashboardStats.clickThroughRate || 0) * 100).toFixed(1)}%` },
     ]
@@ -74,7 +74,9 @@ export function useDashboardTransformers() {
         keyword: item.keyword,
         searches: item.count,
         ctr: `${(item.clickThroughRate * 100).toFixed(1)}%`,
-        trend: item.changeStatus === 'UP' ? 'up' : item.changeStatus === 'DOWN' ? 'down' : 'stable',
+        trend: item.changeStatus === 'UP' ? 'up' : item.changeStatus === 'DOWN' ? 'down' : item.changeStatus === 'NEW' ? 'new' : 'stable',
+        percentage: item.percentage,
+        rank: item.rank,
       }))
     },
     []
@@ -90,7 +92,9 @@ export function useDashboardTransformers() {
         keyword: item.keyword,
         searches: item.count,
         ctr: `${(item.clickThroughRate * 100).toFixed(1)}%`,
-        trend: item.changeStatus === 'UP' ? 'up' : item.changeStatus === 'DOWN' ? 'down' : 'stable',
+        trend: item.changeStatus === 'UP' ? 'up' : item.changeStatus === 'DOWN' ? 'down' : item.changeStatus === 'NEW' ? 'new' : 'stable',
+        percentage: item.percentage,
+        rank: item.rank,
       }))
     },
     []
@@ -119,7 +123,8 @@ export function useDashboardTransformers() {
   return {
     convertStatsToStatItems,
     convertTrendsToChartData,
-    convertKeywordsToTableData: convertPopularKeywordsToTableData,
+    convertPopularKeywordsToTableData,
+    convertTrendingKeywordsToTableData,
     mergeKeywords,
   }
 }

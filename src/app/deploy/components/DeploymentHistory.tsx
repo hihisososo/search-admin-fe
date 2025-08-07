@@ -161,9 +161,9 @@ export default function DeploymentHistory({ history = [] }: DeploymentHistoryPro
         <div className="rounded border border-gray-200">
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-gray-50/50">
+              <TableRow className="bg-gray-50 hover:bg-gray-50">
                 <TableHead 
-                  className="cursor-pointer hover:bg-gray-50 select-none text-xs font-medium text-gray-600 h-9"
+                  className="cursor-pointer hover:bg-gray-100 select-none py-2 text-xs font-semibold text-gray-700"
                   onClick={() => handleSort('deploymentType')}
                 >
                   <div className="flex items-center gap-1">
@@ -172,7 +172,7 @@ export default function DeploymentHistory({ history = [] }: DeploymentHistoryPro
                   </div>
                 </TableHead>
                 <TableHead 
-                  className="cursor-pointer hover:bg-gray-50 select-none text-xs font-medium text-gray-600 h-9"
+                  className="cursor-pointer hover:bg-gray-100 select-none py-2 text-xs font-semibold text-gray-700"
                   onClick={() => handleSort('status')}
                 >
                   <div className="flex items-center gap-1">
@@ -181,7 +181,7 @@ export default function DeploymentHistory({ history = [] }: DeploymentHistoryPro
                   </div>
                 </TableHead>
                 <TableHead 
-                  className="cursor-pointer hover:bg-gray-50 select-none text-xs font-medium text-gray-600 h-9"
+                  className="cursor-pointer hover:bg-gray-100 select-none py-2 text-xs font-semibold text-gray-700"
                   onClick={() => handleSort('version')}
                 >
                   <div className="flex items-center gap-1">
@@ -190,7 +190,7 @@ export default function DeploymentHistory({ history = [] }: DeploymentHistoryPro
                   </div>
                 </TableHead>
                 <TableHead 
-                  className="cursor-pointer hover:bg-gray-50 select-none text-xs font-medium text-gray-600 h-9"
+                  className="cursor-pointer hover:bg-gray-100 select-none py-2 text-xs font-semibold text-gray-700"
                   onClick={() => handleSort('documentCount')}
                 >
                   <div className="flex items-center gap-1">
@@ -199,7 +199,7 @@ export default function DeploymentHistory({ history = [] }: DeploymentHistoryPro
                   </div>
                 </TableHead>
                 <TableHead 
-                  className="cursor-pointer hover:bg-gray-50 select-none text-xs font-medium text-gray-600 h-9"
+                  className="cursor-pointer hover:bg-gray-100 select-none py-2 text-xs font-semibold text-gray-700"
                   onClick={() => handleSort('deploymentTime')}
                 >
                   <div className="flex items-center gap-1">
@@ -207,7 +207,7 @@ export default function DeploymentHistory({ history = [] }: DeploymentHistoryPro
                     {getSortIcon('deploymentTime')}
                   </div>
                 </TableHead>
-                <TableHead className="text-xs font-medium text-gray-600 h-9">설명</TableHead>
+                <TableHead className="py-2 text-xs font-semibold text-gray-700">설명</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -219,7 +219,7 @@ export default function DeploymentHistory({ history = [] }: DeploymentHistoryPro
                 </TableRow>
               ) : (
                 paginatedData.map((deploy) => (
-                  <TableRow key={deploy.id} className="hover:bg-gray-50/30">
+                  <TableRow key={deploy.id} className="hover:bg-gray-50">
                     <TableCell className="py-2">
                       <div className="flex items-center gap-1.5">
                         {getTypeIcon(deploy.deploymentType)}

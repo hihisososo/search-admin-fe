@@ -1,6 +1,5 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { ChevronUp, ChevronDown, AlertCircle, CheckCircle } from "lucide-react"
 import type { SearchLogItem, SearchLogSortField, SearchLogSortDirection } from "@/types/dashboard"
 
@@ -71,55 +70,35 @@ export function SearchLogTable({
   return (
     <div className="border rounded-lg overflow-x-auto">
       <Table className="min-w-full">
-        <TableHeader className="bg-gray-50">
-          <TableRow className="h-8">
-            <TableHead className="w-[120px] py-1 text-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onSort('timestamp')}
-                className="h-4 p-1 font-medium hover:bg-gray-100 flex items-center justify-center gap-1 text-xs w-full"
-              >
+        <TableHeader>
+          <TableRow className="bg-gray-50 hover:bg-gray-50">
+            <TableHead className="w-[120px] py-2 text-xs font-semibold text-gray-700 text-center cursor-pointer hover:bg-gray-100" onClick={() => onSort('timestamp')}>
+              <div className="flex items-center justify-center gap-1">
                 검색시간
                 {renderSortIcon('timestamp')}
-              </Button>
+              </div>
             </TableHead>
-            <TableHead className="min-w-[150px] py-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onSort('searchKeyword')}
-                className="h-4 p-1 font-medium hover:bg-gray-100 flex items-center gap-1 text-xs"
-              >
+            <TableHead className="min-w-[150px] py-2 text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" onClick={() => onSort('searchKeyword')}>
+              <div className="flex items-center gap-1">
                 검색키워드
                 {renderSortIcon('searchKeyword')}
-              </Button>
+              </div>
             </TableHead>
-            <TableHead className="w-[70px] py-1 text-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onSort('responseTime')}
-                className="h-4 p-1 font-medium hover:bg-gray-100 flex items-center justify-center gap-1 text-xs w-full"
-              >
+            <TableHead className="w-[70px] py-2 text-xs font-semibold text-gray-700 text-center cursor-pointer hover:bg-gray-100" onClick={() => onSort('responseTime')}>
+              <div className="flex items-center justify-center gap-1">
                 응답시간
                 {renderSortIcon('responseTime')}
-              </Button>
+              </div>
             </TableHead>
-            <TableHead className="w-[60px] py-1 text-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onSort('resultCount')}
-                className="h-4 p-1 font-medium hover:bg-gray-100 flex items-center justify-center gap-1 text-xs w-full"
-              >
+            <TableHead className="w-[60px] py-2 text-xs font-semibold text-gray-700 text-center cursor-pointer hover:bg-gray-100" onClick={() => onSort('resultCount')}>
+              <div className="flex items-center justify-center gap-1">
                 결과수
                 {renderSortIcon('resultCount')}
-              </Button>
+              </div>
             </TableHead>
-            <TableHead className="w-[100px] py-1 text-xs text-center">클라이언트 IP</TableHead>
-            <TableHead className="w-[50px] py-1 text-xs text-center">상태</TableHead>
-            <TableHead className="min-w-[150px] py-1 text-xs">User-Agent</TableHead>
+            <TableHead className="w-[100px] py-2 text-xs font-semibold text-gray-700 text-center">클라이언트 IP</TableHead>
+            <TableHead className="w-[50px] py-2 text-xs font-semibold text-gray-700 text-center">상태</TableHead>
+            <TableHead className="min-w-[150px] py-2 text-xs font-semibold text-gray-700">User-Agent</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
