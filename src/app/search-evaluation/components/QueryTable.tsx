@@ -168,8 +168,8 @@ export function QueryTable({
       {/* 쿼리 테이블 */}
       <Table>
         <TableHeader>
-          <TableRow className="bg-gray-50">
-            <TableHead className="w-12">
+          <TableRow className="bg-gray-50 hover:bg-gray-50">
+            <TableHead className="w-12 py-2 text-xs font-semibold text-gray-700">
               <Checkbox
                 checked={isAllSelected}
                 onCheckedChange={(checked) => {
@@ -177,12 +177,12 @@ export function QueryTable({
                 }}
               />
             </TableHead>
-            <TableHead>쿼리</TableHead>
-            <TableHead className="text-center w-24">문서수</TableHead>
-            <TableHead className="text-center w-16">정답</TableHead>
-            <TableHead className="text-center w-16">오답</TableHead>
-            <TableHead className="text-center w-20">미지정</TableHead>
-            <TableHead className="text-center w-24">액션</TableHead>
+            <TableHead className="py-2 text-xs font-semibold text-gray-700">쿼리</TableHead>
+            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-24">문서수</TableHead>
+            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-16">정답</TableHead>
+            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-16">오답</TableHead>
+            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-20">미지정</TableHead>
+            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-24">액션</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

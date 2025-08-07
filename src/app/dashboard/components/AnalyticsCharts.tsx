@@ -53,7 +53,29 @@ const ChartSkeleton = memo(() => (
 
 ChartSkeleton.displayName = 'ChartSkeleton'
 
-const formatDateTick = (value: string) => value.slice(5)
+const formatDateTick = (value: string) => {
+  const date = new Date(value)
+  return `${date.getMonth() + 1}/${date.getDate()}`
+}
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const date = new Date(label)
+    const formattedDate = `${date.getMonth() + 1}/${date.getDate()}`
+    
+    return (
+      <div className="bg-white p-2 border border-gray-200 rounded shadow-sm text-xs">
+        <p className="font-medium text-gray-700 mb-1">{formattedDate}</p>
+        {payload.map((entry: any, index: number) => (
+          <p key={index} className="text-gray-600" style={{ color: entry.color }}>
+            {entry.name}: {entry.name.includes('시간') ? `${entry.value}ms` : entry.value.toLocaleString()}
+          </p>
+        ))}
+      </div>
+    )
+  }
+  return null
+}
 
 const ResponseTimeChart = memo(({ data }: { data: ResponseTimeData[] }) => (
   <ChartContainer config={{ responseTime: CHART_CONFIG.responseTime }} className="h-full w-full">
@@ -79,12 +101,10 @@ const ResponseTimeChart = memo(({ data }: { data: ResponseTimeData[] }) => (
           fontSize={11}
           label={{ value: 'ms', position: 'insideLeft', style: { fontSize: 11 } }}
         />
-        <Tooltip 
-          contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', border: '1px solid #e5e7eb', borderRadius: '6px' }}
-          formatter={(value: number) => [`${value}ms`, '응답시간']}
-        />
+        <Tooltip content={<CustomTooltip />} />
         <Area
           dataKey="responseTime"
+          name="응답시간"
           type="monotone"
           stroke={CHART_CONFIG.responseTime.color}
           strokeWidth={2}
@@ -131,15 +151,10 @@ const SearchVolumeChart = memo(({ data }: { data: SearchVolumeData[] }) => (
           fontSize={11}
           label={{ value: '검색 횟수', position: 'insideLeft', style: { fontSize: 11 } }}
         />
-        <Tooltip 
-          contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', border: '1px solid #e5e7eb', borderRadius: '6px' }}
-          formatter={(value: number, name: string) => [
-            value.toLocaleString(),
-            name === 'successfulSearches' ? '성공' : '실패'
-          ]}
-        />
+        <Tooltip content={<CustomTooltip />} />
         <Area
           dataKey="successfulSearches"
+          name="성공"
           stackId="1"
           stroke={CHART_CONFIG.successfulSearches.color}
           fill="url(#successGradient)"
@@ -147,6 +162,7 @@ const SearchVolumeChart = memo(({ data }: { data: SearchVolumeData[] }) => (
         />
         <Area
           dataKey="failedSearches"
+          name="실패"
           stackId="1"
           stroke={CHART_CONFIG.failedSearches.color}
           fill="url(#failGradient)"
@@ -165,8 +181,7 @@ export default memo(function AnalyticsCharts({
   loading,
 }: AnalyticsChartsProps) {
   return (
-    <div className="space-y-4">
-      {/* 검색 응답시간 */}
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
       <Card className="border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base font-semibold">검색 응답시간</CardTitle>
@@ -186,7 +201,6 @@ export default memo(function AnalyticsCharts({
         </CardContent>
       </Card>
 
-      {/* 검색량 추이 */}
       <Card className="border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base font-semibold">검색량 추이</CardTitle>

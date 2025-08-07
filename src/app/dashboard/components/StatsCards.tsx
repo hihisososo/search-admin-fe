@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Search, Clock, AlertTriangle, Database, Activity, MousePointerClick, BarChart3 } from 'lucide-react'
+import { Search, Clock, AlertTriangle, Activity, MousePointerClick, BarChart3 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { StatItem } from '@/types/dashboard'
 
@@ -19,10 +19,6 @@ const STAT_CONFIG: Record<string, StatConfig> = {
   검색량: {
     icon: Search,
     color: 'text-blue-600',
-  },
-  문서량: {
-    icon: Database,
-    color: 'text-green-600',
   },
   검색실패: {
     icon: AlertTriangle,
@@ -92,9 +88,9 @@ StatCard.displayName = 'StatCard'
 
 export default memo(function StatsCards({ stats, loading }: StatsCardsProps) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
       {loading
-        ? Array.from({ length: 8 }).map((_, index) => (
+        ? Array.from({ length: 7 }).map((_, index) => (
             <StatCardSkeleton key={index} />
           ))
         : stats.map((stat) => (

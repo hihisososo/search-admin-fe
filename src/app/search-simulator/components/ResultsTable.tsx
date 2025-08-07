@@ -33,20 +33,20 @@ export function ResultsTable({ hits }: ResultsTableProps) {
         <div className="border rounded-md overflow-auto h-full">
             <Table>
                 <TableHeader>
-                    <TableRow>
+                    <TableRow className="bg-gray-50 hover:bg-gray-50">
                         {/* 동적으로 1depth 키들을 헤더로 생성 */}
                         {Array.from(allKeys).map(key => (
-                            <TableHead key={key} className="min-w-[120px]">
+                            <TableHead key={key} className="min-w-[120px] py-2 text-xs font-semibold text-gray-700">
                                 {key}
                             </TableHead>
                         ))}
-                        <TableHead className="w-20">_score</TableHead>
+                        <TableHead className="w-20 py-2 text-xs font-semibold text-gray-700">_score</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {hits.map((hit: SearchResult, index: number) => {
                         return (
-                            <TableRow key={`${hit._id}-${index}`}>
+                            <TableRow key={`${hit._id}-${index}`} className="hover:bg-gray-50">
                                 {/* 각 키에 해당하는 값 표시 */}
                                 {Array.from(allKeys).map(key => {
                                     const value = hit._source?.[key]

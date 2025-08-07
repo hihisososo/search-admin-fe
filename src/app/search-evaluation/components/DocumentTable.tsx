@@ -225,11 +225,11 @@ export function DocumentTable({
           <div className="border rounded-lg overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-50">
-                  <TableHead className="w-16">순번</TableHead>
-                  <TableHead className="w-32">상품 ID</TableHead>
-                  <TableHead>상품명</TableHead>
-                  <TableHead className="w-32 text-center">평가 상태</TableHead>
+                <TableRow className="bg-gray-50 hover:bg-gray-50">
+                  <TableHead className="w-16 py-2 text-xs font-semibold text-gray-700">순번</TableHead>
+                  <TableHead className="w-32 py-2 text-xs font-semibold text-gray-700">상품 ID</TableHead>
+                  <TableHead className="py-2 text-xs font-semibold text-gray-700">상품명</TableHead>
+                  <TableHead className="w-32 py-2 text-xs font-semibold text-gray-700 text-center">평가 상태</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -333,11 +333,11 @@ export function DocumentTable({
       <div className="border rounded-lg overflow-hidden bg-white">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-50">
-              <TableHead className="w-16 text-center">순번</TableHead>
-              <TableHead className="w-32">상품 ID</TableHead>
-              <TableHead>상품명</TableHead>
-              <TableHead className="w-32 text-center">
+            <TableRow className="bg-gray-50 hover:bg-gray-50">
+              <TableHead className="w-16 py-2 text-xs font-semibold text-gray-700 text-center">순번</TableHead>
+              <TableHead className="w-32 py-2 text-xs font-semibold text-gray-700">상품 ID</TableHead>
+              <TableHead className="py-2 text-xs font-semibold text-gray-700">상품명</TableHead>
+              <TableHead className="w-32 py-2 text-xs font-semibold text-gray-700 text-center">
                 <div className="flex items-center justify-center gap-1">
                   <span>평가 상태</span>
                 </div>

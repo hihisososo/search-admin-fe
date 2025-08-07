@@ -32,7 +32,7 @@ export function QueryTableRow({
 
   return (
     <TableRow 
-      className={isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'}
+      className={`hover:bg-gray-50 ${isSelected ? 'bg-blue-50' : ''}`}
     >
       <TableCell>
         <Checkbox

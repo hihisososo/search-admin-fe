@@ -16,7 +16,8 @@ interface DictionaryPageProps {
 export function DictionaryPage({ type }: DictionaryPageProps) {
   const [environment, setEnvironment] = useState<DictionaryEnvironmentType>('CURRENT' as DictionaryEnvironmentType)
   const config = getDictionaryConfig(type)
-  const canEdit = environment === 'CURRENT'
+  // 유의어, 오타교정 사전은 실시간 반영이 있으므로 모든 환경에서 편집 가능
+  const canEdit = (type === 'synonym' || type === 'typo') ? true : environment === 'CURRENT'
   
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')

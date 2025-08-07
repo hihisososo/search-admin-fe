@@ -55,6 +55,8 @@ export default memo(function DashboardHeader({
               numberOfMonths={2}
               locale={ko}
               className="border-0"
+              disabled={(date) => date > new Date()}
+              toDate={new Date()}
             />
           </PopoverContent>
         </Popover>
