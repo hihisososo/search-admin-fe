@@ -47,10 +47,8 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
         config={config as any}
         canEdit={canEdit}
         environment={environment}
-        search={search}
         selectedCount={state.editingState.selectedIds.size}
         onEnvironmentChange={setEnvironment}
-        onSearchChange={setSearch}
         onAdd={actions.handleAdd}
         onDeleteSelected={actions.handleDeleteSelected}
         onApplyChanges={config.features.realtimeSync ? actions.handleApplyChanges : undefined}
@@ -70,15 +68,7 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
             }}
             className="h-9 flex-1"
           />
-          <Button
-            onClick={() => setSearch(searchInput)}
-            size="sm"
-            variant="outline"
-            className="h-9 px-3"
-            aria-label="검색"
-          >
-            <SearchIcon className="h-4 w-4" />
-          </Button>
+          {/* 버튼 제거: Enter 입력으로만 검색 */}
         </div>
         <div className="flex items-center gap-2">
           <Select value={pageSize.toString()} onValueChange={(value) => { setPageSize(Number(value)); setPage(1) }}>
