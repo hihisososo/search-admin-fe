@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -32,6 +33,7 @@ export function DictionaryHeader<T extends BaseDictionaryItem>({
   onDeleteSelected,
   onApplyChanges
 }: DictionaryHeaderProps<T>) {
+  const [searchInput, setSearchInput] = useState(search)
   return (
     <div className="space-y-4 mb-6">
       <div className="flex items-center justify-between">
@@ -104,14 +106,26 @@ export function DictionaryHeader<T extends BaseDictionaryItem>({
       
       <div className="flex items-center gap-4">
         <div className="flex-1 max-w-md">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <div className="flex items-center gap-2">
             <Input
               placeholder="검색어를 입력하세요"
-              value={search}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10 h-9"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  onSearchChange(searchInput)
+                }
+              }}
+              className="h-9"
             />
+            <Button
+              onClick={() => onSearchChange(searchInput)}
+              size="sm"
+              variant="outline"
+              className="h-9 px-3"
+            >
+              <Search className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </div>

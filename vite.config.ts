@@ -11,12 +11,5 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  server: {
-    proxy: {
-      '/v1': {
-        target: 'http://localhost:8080/api',
-        changeOrigin: true,
-      }
-    }
-  }
+  // 프록시 미사용: 모든 API는 절대 baseUrl 또는 fetch 클라이언트를 통해 호출
 })

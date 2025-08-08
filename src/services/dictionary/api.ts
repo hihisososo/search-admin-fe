@@ -45,10 +45,11 @@ abstract class BaseDictionaryService<T, CreateReq, UpdateReq> {
   }
 
   async download(): Promise<Blob> {
-    const response = await fetch(`${this.endpoint}/download`, {
+    const absoluteUrl = `${(apiClient as any).baseUrl || ''}${this.endpoint}/download`
+    const response = await fetch(absoluteUrl, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+        ...(localStorage.getItem('token') ? { 'Authorization': `Bearer ${localStorage.getItem('token')}` } : {})
       }
     })
     if (!response.ok) {
@@ -70,7 +71,7 @@ class SynonymDictionaryService extends BaseDictionaryService<
   CreateDictionaryRequest,
   UpdateDictionaryRequest
 > {
-  protected readonly endpoint = '/api/v1/dictionaries/synonym'
+  protected readonly endpoint = '/v1/dictionaries/synonym'
 
   // 실시간 동기화
   async realtimeSync(environment: Environment): Promise<RealtimeSyncResponse> {
@@ -89,7 +90,7 @@ class TypoCorrectionDictionaryService extends BaseDictionaryService<
   CreateTypoCorrectionRequest,
   UpdateTypoCorrectionRequest
 > {
-  protected readonly endpoint = '/api/v1/dictionaries/typos'
+  protected readonly endpoint = '/v1/dictionaries/typos'
 
   // 실시간 동기화
   async realtimeSync(environment: Environment): Promise<RealtimeSyncResponse> {
@@ -108,7 +109,7 @@ class StopwordDictionaryService extends BaseDictionaryService<
   CreateDictionaryRequest,
   UpdateDictionaryRequest
 > {
-  protected readonly endpoint = '/api/v1/dictionaries/stopword'
+  protected readonly endpoint = '/v1/dictionaries/stopword'
 }
 
 // 사용자 사전 서비스
@@ -117,7 +118,7 @@ class UserDictionaryService extends BaseDictionaryService<
   CreateDictionaryRequest,
   UpdateDictionaryRequest
 > {
-  protected readonly endpoint = '/api/v1/dictionaries/user'
+  protected readonly endpoint = '/v1/dictionaries/users'
 
   // 형태소 분석
   async analyzeText(text: string, environment: Environment = 'DEV'): Promise<AnalyzeTextResponse> {
@@ -127,7 +128,7 @@ class UserDictionaryService extends BaseDictionaryService<
 
 // 사전 배포 서비스
 class DictionaryDeployService {
-  private readonly endpoint = '/api/v1/dictionaries/deploy'
+  private readonly endpoint = '/v1/dictionaries/deploy'
 
   async deployToDev(): Promise<{ message: string; deployedAt: string }> {
     return apiClient.post(`${this.endpoint}/dev`)

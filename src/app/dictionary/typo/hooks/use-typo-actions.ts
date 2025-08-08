@@ -65,8 +65,7 @@ export function useTypoActions(onRefetch: () => Promise<void>): UseTypoActionsRe
     }
     
     const response = await typoCorrectionDictionaryApi.create({ 
-      keyword: newKeyword.trim(),
-      correctedWord: newCorrectedWord.trim()
+      keyword: `${newKeyword.trim()} => ${newCorrectedWord.trim()}`
     })
     
     setAddingItem(false)
@@ -87,7 +86,7 @@ export function useTypoActions(onRefetch: () => Promise<void>): UseTypoActionsRe
 
   const handleEdit = useCallback((item: TypoCorrectionDictionaryItem, items: TypoCorrectionDictionaryItem[]): TypoCorrectionDictionaryItem[] => {
     setEditingKeyword(item.keyword)
-    setEditingCorrectedWord(item.correctedWord || '')
+    setEditingCorrectedWord(item.correctedWord || (item as any).correctWord || '')
     return items.map(i => ({
       ...i,
       isEditing: i.id === item.id
@@ -101,8 +100,7 @@ export function useTypoActions(onRefetch: () => Promise<void>): UseTypoActionsRe
     }
     
     const response = await typoCorrectionDictionaryApi.update(item.id, { 
-      keyword: editingKeyword.trim(),
-      correctedWord: editingCorrectedWord.trim()
+      keyword: `${editingKeyword.trim()} => ${editingCorrectedWord.trim()}`
     })
     
     setError('')
