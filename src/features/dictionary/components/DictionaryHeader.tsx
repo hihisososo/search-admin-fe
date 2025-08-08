@@ -1,6 +1,4 @@
 'use client'
-
-import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, RefreshCw, Trash2 } from "lucide-react"
@@ -28,7 +26,6 @@ export function DictionaryHeader<T extends BaseDictionaryItem>({
   onDeleteSelected,
   onApplyChanges
 }: DictionaryHeaderProps<T>) {
-  const [searchInput] = useState("")
   return (
     <div className="space-y-4 mb-6">
       <div className="flex items-center justify-between">
