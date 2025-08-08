@@ -54,7 +54,6 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
         onAdd={actions.handleAdd}
         onDeleteSelected={actions.handleDeleteSelected}
         onApplyChanges={config.features.realtimeSync ? actions.handleApplyChanges : undefined}
-        showSearch={false}
       />
 
       {/* 검색 입력창 - 데이터 테이블 바로 위 배치 */}
@@ -121,12 +120,6 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
             pageSize={pageSize}
             onPageChange={(p) => setPage(p + 1)}
             onPageSizeChange={(ps) => { setPageSize(ps); setPage(1) }}
-            alwaysShow
-            leftContent={
-              <span>
-                전체 {state.total.toLocaleString()}건 (페이지 {Math.max(1, page)} / {Math.max(1, totalPages)})
-              </span>
-            }
           />
         </div>
       )}
@@ -139,12 +132,6 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
             pageSize={pageSize}
             onPageChange={(p) => setPage(p + 1)}
             onPageSizeChange={(ps) => { setPageSize(ps); setPage(1) }}
-            alwaysShow
-            leftContent={
-              <span>
-                전체 {state.total.toLocaleString()}건 (페이지 {Math.max(1, page)} / {Math.max(1, totalPages)})
-              </span>
-            }
           />
         </div>
       )}
