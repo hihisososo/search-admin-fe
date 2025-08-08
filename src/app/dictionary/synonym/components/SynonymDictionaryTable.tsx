@@ -100,7 +100,7 @@ export function SynonymDictionaryTable({
                             onClick={() => onSort('keyword')}
                         >
                             <div className="flex items-center gap-1">
-                                유의어 규칙
+                                동의어 규칙
                                 {getSortIcon('keyword', sortField, sortDirection)}
                             </div>
                         </TableHead>
@@ -122,13 +122,13 @@ export function SynonymDictionaryTable({
                             <TableCell className="py-2">
                                 <div className="space-y-2">
                                     <Input
-                                        placeholder="유의어 규칙을 입력하세요 (예: 휴대폰 => 핸드폰,모바일,스마트폰)"
+                                        placeholder="동의어 규칙을 입력하세요 (예: 휴대폰 => 핸드폰,모바일,스마트폰)"
                                         value={newKeyword}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => onNewKeywordChange(e.target.value)}
                                         className="h-7 text-xs"
                                     />
                                     {!validateKeyword(newKeyword) && (
-                                        <div className="text-red-600 text-xs">올바른 형식으로 입력해주세요. (기본어 {'=>'} 유의어1,유의어2)</div>
+                                        <div className="text-red-600 text-xs">올바른 형식으로 입력해주세요. (기본어 {'=>'} 동의어1,동의어2)</div>
                                     )}
                                 </div>
                             </TableCell>
@@ -167,13 +167,13 @@ export function SynonymDictionaryTable({
                                     <TableCell className="py-2">
                                         <div className="space-y-2">
                                             <Input
-                                                placeholder="유의어 규칙을 입력하세요"
+                                                placeholder="동의어 규칙을 입력하세요"
                                                 value={editingKeyword}
                                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => onEditingKeywordChange(e.target.value)}
                                                 className="h-7 text-xs"
                                             />
                                             {!validateKeyword(editingKeyword) && (
-                                                <div className="text-red-600 text-xs">올바른 형식으로 입력해주세요. (기본어 {'=>'} 유의어1,유의어2)</div>
+                                                <div className="text-red-600 text-xs">올바른 형식으로 입력해주세요. (기본어 {'=>'} 동의어1,동의어2)</div>
                                             )}
                                         </div>
                                     </TableCell>

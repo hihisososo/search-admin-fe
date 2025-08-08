@@ -1,13 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { DictionaryHeader } from './DictionaryHeader'
 import { DictionaryTable } from './DictionaryTable'
 import { useDictionary } from '../hooks/useDictionary'
 import { getDictionaryConfig } from '../configs/dictionaryConfigs'
 import type { DictionaryType } from '../types/dictionary.types'
 import type { DictionaryEnvironmentType } from '@/types/dashboard'
-import { Pagination } from '@/components/ui/pagination'
+import { PaginationControls } from '@/app/search-evaluation/components/PaginationControls'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { EVALUATION_CONFIG } from '@/constants/evaluation'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Search as SearchIcon } from 'lucide-react'
 
 interface DictionaryPageProps {
   type: DictionaryType
@@ -16,21 +21,28 @@ interface DictionaryPageProps {
 export function DictionaryPage({ type }: DictionaryPageProps) {
   const [environment, setEnvironment] = useState<DictionaryEnvironmentType>('CURRENT' as DictionaryEnvironmentType)
   const config = getDictionaryConfig(type)
-  // 유의어, 오타교정 사전은 실시간 반영이 있으므로 모든 환경에서 편집 가능
+  // 동의어, 오타교정 사전은 실시간 반영이 있으므로 모든 환경에서 편집 가능
   const canEdit = (type === 'synonym' || type === 'typo') ? true : environment === 'CURRENT'
   
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
   const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   
   const { state, actions } = useDictionary(type, {
     environment,
     page,
     search,
-    pageSize: 20
+    pageSize
   })
   
+  const totalPages = useMemo(() => {
+    if (state.total <= 0) return 0
+    return Math.ceil(state.total / pageSize)
+  }, [state.total, pageSize])
+  
   return (
-    <div className="p-6">
+    <div className="p-6 space-y-4">
       <DictionaryHeader
         config={config as any}
         canEdit={canEdit}
@@ -42,8 +54,49 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
         onAdd={actions.handleAdd}
         onDeleteSelected={actions.handleDeleteSelected}
         onApplyChanges={config.features.realtimeSync ? actions.handleApplyChanges : undefined}
+        showSearch={false}
       />
-      
+
+      {/* 검색 입력창 - 데이터 테이블 바로 위 배치 */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-1 w-full max-w-lg">
+          <Input
+            placeholder="검색어를 입력하세요"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                setSearch(searchInput)
+              }
+            }}
+            className="h-9 flex-1"
+          />
+          <Button
+            onClick={() => setSearch(searchInput)}
+            size="sm"
+            variant="outline"
+            className="h-9 px-3"
+            aria-label="검색"
+          >
+            <SearchIcon className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="flex items-center gap-2">
+          <Select value={pageSize.toString()} onValueChange={(value) => { setPageSize(Number(value)); setPage(1) }}>
+            <SelectTrigger className="w-24 h-9 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="text-xs">
+              {EVALUATION_CONFIG.AVAILABLE_PAGE_SIZES.map(size => (
+                <SelectItem key={size} value={size.toString()} className="text-xs py-1">
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       <DictionaryTable
         type={type}
         config={config as any}
@@ -59,14 +112,39 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
         setEditingState={actions.setEditingState}
       />
       
-      {state.total > 0 && (
-        <div className="mt-4">
-          <Pagination
-            currentPage={page}
-            totalPages={Math.ceil(state.total / state.pageSize)}
-            totalItems={state.total}
-            itemsPerPage={state.pageSize}
-            onPageChange={setPage}
+      {totalPages > 1 && (
+        <div className="mt-2">
+          <PaginationControls
+            currentPage={page - 1}
+            totalPages={totalPages}
+            totalCount={state.total}
+            pageSize={pageSize}
+            onPageChange={(p) => setPage(p + 1)}
+            onPageSizeChange={(ps) => { setPageSize(ps); setPage(1) }}
+            alwaysShow
+            leftContent={
+              <span>
+                전체 {state.total.toLocaleString()}건 (페이지 {Math.max(1, page)} / {Math.max(1, totalPages)})
+              </span>
+            }
+          />
+        </div>
+      )}
+      {totalPages <= 1 && (
+        <div className="mt-2">
+          <PaginationControls
+            currentPage={page - 1}
+            totalPages={Math.max(1, totalPages)}
+            totalCount={state.total}
+            pageSize={pageSize}
+            onPageChange={(p) => setPage(p + 1)}
+            onPageSizeChange={(ps) => { setPageSize(ps); setPage(1) }}
+            alwaysShow
+            leftContent={
+              <span>
+                전체 {state.total.toLocaleString()}건 (페이지 {Math.max(1, page)} / {Math.max(1, totalPages)})
+              </span>
+            }
           />
         </div>
       )}

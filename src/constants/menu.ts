@@ -35,7 +35,7 @@ export const MENU_ITEMS: MenuItem[] = [
       },
       {
         id: 'synonym-dictionary',
-        title: '유의어사전',
+        title: '동의어사전',
         path: '/dictionary/synonym'
       },
       {
