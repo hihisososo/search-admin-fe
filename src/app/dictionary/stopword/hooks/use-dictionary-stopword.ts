@@ -1,5 +1,4 @@
 import { useDictionaryData } from '@/features/dictionary/hooks/useDictionaryData'
-import { stopwordDictionaryService } from '@/services'
 import type { 
   DictionaryItem, 
   DictionarySortField, 
