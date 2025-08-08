@@ -49,7 +49,7 @@ export function useDictionaryUser({
       })
       
       const response = await apiFetch<DictionaryPageResponse<DictionaryItem>>(
-        `/api/v1/dictionaries/user?${params}`
+        `/v1/dictionaries/user?${params}`
       )
       
       setData(response)

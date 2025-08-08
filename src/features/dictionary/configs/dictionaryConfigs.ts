@@ -17,7 +17,7 @@ export const dictionaryConfigs: DictionaryConfigs = {
     },
     messages: {
       placeholder: {
-        keyword: '사용자 단어를 입력하세요 (예: 브랜드명, 제품명)'
+        keyword: '단어를 입력하세요 (예: "삼성" 또는 "삼성전자 삼성 전자")'
       },
       validationError: {
         keyword: '키워드를 입력해주세요.'
@@ -58,10 +58,9 @@ export const dictionaryConfigs: DictionaryConfigs = {
       color: 'blue',
       iconName: 'GitBranch'
     },
-    fields: ['keyword', 'synonyms'],
+    fields: ['keyword'],
     validation: {
-      keyword: (value) => value.trim() !== '',
-      synonyms: (value) => value && value.length > 0
+      keyword: (value) => value.trim() !== ''
     },
     features: {
       realtimeSync: true,
@@ -69,12 +68,10 @@ export const dictionaryConfigs: DictionaryConfigs = {
     },
     messages: {
       placeholder: {
-        keyword: '대표어를 입력하세요',
-        synonyms: '동의어를 입력하세요 (콤마로 구분)'
+        keyword: '동의어를 입력하세요 (예: "핸드폰, 휴대폰, 스마트폰" 또는 "lg => LG전자, 엘지")'
       },
       validationError: {
-        keyword: '대표어를 입력해주세요.',
-        synonyms: '동의어를 하나 이상 입력해주세요.'
+        keyword: '동의어를 입력해주세요.'
       },
       deleteConfirm: '동의어 그룹을 삭제하시겠습니까?',
       applyConfirm: '변경사항을 실시간으로 반영하시겠습니까?',

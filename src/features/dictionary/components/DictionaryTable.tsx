@@ -103,14 +103,6 @@ export function DictionaryTable<T extends BaseDictionaryItem>({
     )
     
     // Add other fields based on config
-    if (config.fields.includes('synonyms' as keyof T)) {
-      headers.push(
-        <TableHead key="synonyms" className="py-2 text-xs font-semibold text-gray-700">
-          동의어
-        </TableHead>
-      )
-    }
-    
     if (config.fields.includes('correctedWord' as keyof T)) {
       headers.push(
         <TableHead key="correctedWord" className="py-2 text-xs font-semibold text-gray-700">

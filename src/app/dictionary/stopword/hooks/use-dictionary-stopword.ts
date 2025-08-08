@@ -1,4 +1,4 @@
-import { useDictionaryData } from '@/hooks/dictionary'
+import { useDictionaryData } from '@/features/dictionary/hooks/useDictionaryData'
 import { stopwordDictionaryService } from '@/services'
 import type { 
   DictionaryItem, 
@@ -16,9 +16,13 @@ interface UseDictionaryStopwordParams {
 }
 
 export function useDictionaryStopword(params: UseDictionaryStopwordParams) {
-  return useDictionaryData<DictionaryItem>(params, {
-    queryKey: 'stopword-dictionary',
-    fetchFn: stopwordDictionaryService.getList.bind(stopwordDictionaryService),
-    pageSize: 20
+  return useDictionaryData<DictionaryItem>({
+    type: 'stopword',
+    page: params.page,
+    pageSize: 20,
+    search: params.search,
+    sortField: params.sortField,
+    sortDirection: params.sortDirection,
+    environment: params.environment
   })
 }

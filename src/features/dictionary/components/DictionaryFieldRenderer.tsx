@@ -2,8 +2,6 @@
 
 import { TableCell } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { MorphemeAnalyzer } from './MorphemeAnalyzer'
 import type { 
   DictionaryType,
   BaseDictionaryItem, 
@@ -38,44 +36,23 @@ export function DictionaryFieldRenderer<T extends BaseDictionaryItem>({
     
     if (isEditing) {
       return (
-        <>
-          <TableCell className="py-2">
-            <Input
-              placeholder={config.messages.placeholder.keyword}
-              value={editingSynonymItem.keyword || ''}
-              onChange={(e) => onEditingChange('keyword' as keyof T, e.target.value)}
-              className="h-7 text-xs"
-            />
-          </TableCell>
-          <TableCell className="py-2">
-            <Input
-              placeholder={config.messages.placeholder.synonyms}
-              value={editingSynonymItem.synonyms?.join(', ') || ''}
-              onChange={(e) => onEditingChange('synonyms' as keyof T, e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-              className="h-7 text-xs"
-            />
-          </TableCell>
-        </>
+        <TableCell className="py-2">
+          <Input
+            placeholder={config.messages.placeholder.keyword}
+            value={editingSynonymItem.keyword || ''}
+            onChange={(e) => onEditingChange('keyword' as keyof T, e.target.value)}
+            className="h-7 text-xs"
+          />
+        </TableCell>
       )
     }
     
     return (
-      <>
-        <TableCell className="py-2">
-          <span className="font-medium text-xs">
-            {synonymItem.keyword}
-          </span>
-        </TableCell>
-        <TableCell className="py-2">
-          <div className="flex flex-wrap gap-1">
-            {synonymItem.synonyms?.map((synonym, idx) => (
-              <Badge key={idx} variant="secondary" className="text-xs">
-                {synonym}
-              </Badge>
-            ))}
-          </div>
-        </TableCell>
-      </>
+      <TableCell className="py-2">
+        <span className="font-medium text-xs">
+          {synonymItem.keyword}
+        </span>
+      </TableCell>
     )
   }
   
@@ -135,13 +112,6 @@ export function DictionaryFieldRenderer<T extends BaseDictionaryItem>({
           />
           {!config.validation.keyword?.(editingValues.keyword || '') && editingValues.keyword !== undefined && (
             <div className="text-red-600 text-xs">{config.messages.validationError.keyword}</div>
-          )}
-          {type === 'user' && editingValues.keyword && (
-            <MorphemeAnalyzer 
-              text={editingValues.keyword} 
-              environment="DEV"
-              className="mt-2"
-            />
           )}
         </div>
       </TableCell>

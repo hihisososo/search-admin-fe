@@ -50,7 +50,7 @@ export function useDictionarySynonym({
       })
       
       const response = await apiFetch<DictionaryPageResponse<DictionaryItem>>(
-        `/api/v1/dictionaries/synonym?${params}`
+        `/v1/dictionaries/synonym?${params}`
       )
       
       setData(response.content || [])

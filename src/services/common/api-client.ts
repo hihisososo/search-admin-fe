@@ -28,6 +28,7 @@ export class ApiClient {
         // FormData인 경우 Content-Type을 설정하지 않음
         ...(!(options.body instanceof FormData) && { 'Content-Type': 'application/json' }),
         ...(options.headers || {}),
+        ...(this.getAuthorizationHeader()),
       },
     }
 
@@ -92,6 +93,12 @@ export class ApiClient {
       
       throw error
     }
+  }
+
+  private getAuthorizationHeader(): Record<string, string> | undefined {
+    const token = localStorage.getItem('token')
+    if (!token) return undefined
+    return { Authorization: `Bearer ${token}` }
   }
 
   async get<T>(endpoint: string, params?: Record<string, string | number | boolean | string[] | undefined>, options?: RequestInit): Promise<T> {

@@ -62,7 +62,7 @@ export function useSynonymActions(onRefetch: () => Promise<void>): UseSynonymAct
       return
     }
     
-    const response = await apiFetch<DictionaryItem>('/api/v1/dictionaries/synonym', {
+    const response = await apiFetch<DictionaryItem>('/v1/dictionaries/synonym', {
       method: 'POST',
       body: JSON.stringify({ keyword: newKeyword.trim() })
     })
@@ -95,7 +95,7 @@ export function useSynonymActions(onRefetch: () => Promise<void>): UseSynonymAct
       throw new Error('Invalid keyword format')
     }
     
-    const response = await apiFetch<DictionaryItem>(`/api/v1/dictionaries/synonym/${item.id}`, {
+    const response = await apiFetch<DictionaryItem>(`/v1/dictionaries/synonym/${item.id}`, {
       method: 'PUT',
       body: JSON.stringify({ keyword: editingKeyword.trim() })
     })
@@ -122,7 +122,7 @@ export function useSynonymActions(onRefetch: () => Promise<void>): UseSynonymAct
   const handleDelete = useCallback(async (id: number) => {
     if (!confirm('정말로 삭제하시겠습니까?')) return
     
-    await apiFetch(`/api/v1/dictionaries/synonym/${id}`, { method: 'DELETE' })
+    await apiFetch(`/v1/dictionaries/synonym/${id}`, { method: 'DELETE' })
     toast({
       title: "삭제 완료",
       description: "사전 항목이 성공적으로 삭제되었습니다."
