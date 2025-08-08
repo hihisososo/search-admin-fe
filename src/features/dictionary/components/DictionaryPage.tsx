@@ -11,8 +11,6 @@ import { PaginationControls } from '@/app/search-evaluation/components/Paginatio
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { EVALUATION_CONFIG } from '@/constants/evaluation'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Search as SearchIcon } from 'lucide-react'
 
 interface DictionaryPageProps {
   type: DictionaryType
