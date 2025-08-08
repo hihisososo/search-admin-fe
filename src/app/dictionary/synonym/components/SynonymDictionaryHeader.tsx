@@ -27,7 +27,7 @@ export function SynonymDictionaryHeader({
                     <div className="relative flex-1">
                         <Search className="absolute left-2 top-2 h-3.5 w-3.5 text-gray-400" />
                         <Input
-                            placeholder="유의어 검색..."
+                            placeholder="동의어 검색..."
                             value={search}
                             onChange={(e) => onSearchChange(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && onSearch()}

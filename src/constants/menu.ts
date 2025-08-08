@@ -35,7 +35,7 @@ export const MENU_ITEMS: MenuItem[] = [
       },
       {
         id: 'synonym-dictionary',
-        title: '유의어사전',
+        title: '동의어사전',
         path: '/dictionary/synonym'
       },
       {
@@ -114,3 +114,49 @@ export const getMenuByPath = (path: string) => {
 export const getMenuById = (id: string) => {
   return MENU_ITEMS.find(item => item.id === id)
 } 
+
+export interface BreadcrumbEntry {
+  title: string
+  path: string
+}
+
+// 현재 경로 기준 브레드크럼 목록 반환
+export const getBreadcrumbsByPath = (path: string): BreadcrumbEntry[] => {
+  // 메인 메뉴와 정확히 일치
+  const mainMenu = MENU_ITEMS.find(item => item.path === path)
+  if (mainMenu) {
+    return [{ title: mainMenu.title, path: mainMenu.path }]
+  }
+
+  // 서브 메뉴 일치 시 "상위 > 하위"
+  for (const item of MENU_ITEMS) {
+    if (item.subItems) {
+      const subMenu = item.subItems.find(sub => sub.path === path)
+      if (subMenu) {
+        return [
+          { title: item.title, path: item.path },
+          { title: subMenu.title, path: subMenu.path },
+        ]
+      }
+    }
+  }
+
+  // 부분 경로 일치 처리 (예: /dictionary/user/123 같은 경우 상위/하위까지만 표시)
+  for (const item of MENU_ITEMS) {
+    if (path.startsWith(item.path)) {
+      if (item.subItems) {
+        const matchedSub = item.subItems.find(sub => path.startsWith(sub.path))
+        if (matchedSub) {
+          return [
+            { title: item.title, path: item.path },
+            { title: matchedSub.title, path: matchedSub.path },
+          ]
+        }
+      }
+      return [{ title: item.title, path: item.path }]
+    }
+  }
+
+  // 기본값
+  return []
+}

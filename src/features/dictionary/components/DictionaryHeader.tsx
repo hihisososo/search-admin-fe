@@ -1,10 +1,7 @@
 'use client'
-
-import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Plus, RefreshCw, Trash2 } from "lucide-react"
+import { Plus, RefreshCw, Trash2 } from "lucide-react"
 import type { DictionaryConfig, BaseDictionaryItem } from '../types/dictionary.types'
 import type { DictionaryEnvironmentType } from '@/types/dashboard'
 
@@ -12,10 +9,8 @@ interface DictionaryHeaderProps<T extends BaseDictionaryItem> {
   config: DictionaryConfig<T>
   canEdit: boolean
   environment: DictionaryEnvironmentType
-  search: string
   selectedCount: number
   onEnvironmentChange: (env: DictionaryEnvironmentType) => void
-  onSearchChange: (search: string) => void
   onAdd: () => void
   onDeleteSelected?: () => void
   onApplyChanges?: (env: DictionaryEnvironmentType) => void
@@ -25,15 +20,12 @@ export function DictionaryHeader<T extends BaseDictionaryItem>({
   config,
   canEdit,
   environment,
-  search,
   selectedCount,
   onEnvironmentChange,
-  onSearchChange,
   onAdd,
   onDeleteSelected,
   onApplyChanges
 }: DictionaryHeaderProps<T>) {
-  const [searchInput, setSearchInput] = useState(search)
   return (
     <div className="space-y-4 mb-6">
       <div className="flex items-center justify-between">
@@ -104,31 +96,6 @@ export function DictionaryHeader<T extends BaseDictionaryItem>({
         </div>
       </div>
       
-      <div className="flex items-center gap-4">
-        <div className="flex-1 max-w-md">
-          <div className="flex items-center gap-2">
-            <Input
-              placeholder="검색어를 입력하세요"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  onSearchChange(searchInput)
-                }
-              }}
-              className="h-9"
-            />
-            <Button
-              onClick={() => onSearchChange(searchInput)}
-              size="sm"
-              variant="outline"
-              className="h-9 px-3"
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

@@ -56,7 +56,7 @@ export function useDictionarySynonym({
       setData(response.content || [])
       setTotal(response.totalElements || 0)
     } catch (err) {
-      console.error('유의어 사전 API 에러:', err)
+      console.error('동의어 사전 API 에러:', err)
       if (err instanceof Error) {
         if (err.message.includes('500') || err.message.includes('서버 내부 오류')) {
           setError('서버에서 일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
