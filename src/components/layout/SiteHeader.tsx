@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { Fragment } from 'react'
 import { useLocation, Link } from 'react-router-dom'
 import { getBreadcrumbsByPath } from "@/constants/menu"
 import {
@@ -22,8 +23,8 @@ export function SiteHeader() {
           <Breadcrumb>
             <BreadcrumbList className="text-base">
               {getBreadcrumbsByPath(location.pathname).map((bc, idx, arr) => (
-                <>
-                  <BreadcrumbItem key={`item-${bc.path}`}>
+                <Fragment key={bc.path}>
+                  <BreadcrumbItem>
                     {idx < arr.length - 1 ? (
                       <BreadcrumbLink asChild>
                         <Link to={bc.path}>{bc.title}</Link>
@@ -33,9 +34,9 @@ export function SiteHeader() {
                     )}
                   </BreadcrumbItem>
                   {idx < arr.length - 1 && (
-                    <BreadcrumbSeparator key={`sep-${bc.path}`} />
+                    <BreadcrumbSeparator />
                   )}
-                </>
+                </Fragment>
               ))}
             </BreadcrumbList>
           </Breadcrumb>

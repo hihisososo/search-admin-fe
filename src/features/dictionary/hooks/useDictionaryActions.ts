@@ -78,7 +78,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
 
     try {
       const response = await apiClient.post<T>(
-        `/v1/dictionaries${config.apiPath}`,
+        `/v1/dictionaries${config.apiPath}?environment=${_environment}`,
         editingState.newItem
       )
       
@@ -135,7 +135,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
 
     try {
       await apiClient.put(
-        `/v1/dictionaries${config.apiPath}/${item.id}`,
+        `/v1/dictionaries${config.apiPath}/${item.id}?environment=${_environment}`,
         editingState.editingItem
       )
       
@@ -170,7 +170,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
     }
 
     try {
-      await apiClient.delete(`/v1/dictionaries${config.apiPath}/${id}`)
+      await apiClient.delete(`/v1/dictionaries${config.apiPath}/${id}?environment=${_environment}`)
       
       toast({
         title: '삭제 완료',
@@ -197,7 +197,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
 
     try {
       const deletePromises = Array.from(editingState.selectedIds).map(id => 
-        apiClient.delete(`/v1/dictionaries${config.apiPath}/${id}`)
+        apiClient.delete(`/v1/dictionaries${config.apiPath}/${id}?environment=${_environment}`)
       )
       
       await Promise.all(deletePromises)
