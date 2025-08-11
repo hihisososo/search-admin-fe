@@ -31,7 +31,8 @@ export function useDictionaryData<T extends BaseDictionaryItem>({
     {
       page: page - 1,
       size: pageSize,
-      sort: `${sortField},${sortDirection}`,
+      sortBy: sortField,
+      sortDir: sortDirection,
       search: search || undefined,
       environment
     }
@@ -43,7 +44,8 @@ export function useDictionaryData<T extends BaseDictionaryItem>({
       const params = new URLSearchParams({
         page: String(page - 1),
         size: String(pageSize),
-        sort: `${sortField},${sortDirection}`,
+        sortBy: String(sortField),
+        sortDir: String(sortDirection),
         environment
       })
       

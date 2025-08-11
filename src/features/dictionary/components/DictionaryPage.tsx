@@ -11,6 +11,8 @@ import { PaginationControls } from '@/app/search-evaluation/components/Paginatio
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { EVALUATION_CONFIG } from '@/constants/evaluation'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Search } from 'lucide-react'
 
 interface DictionaryPageProps {
   type: DictionaryType
@@ -23,7 +25,7 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
   const canEdit = (type === 'synonym' || type === 'typo') ? true : environment === 'CURRENT'
   
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(20)
+  const [pageSize, setPageSize] = useState(10)
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
   
@@ -66,7 +68,17 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
             }}
             className="h-9 flex-1"
           />
-          {/* 버튼 제거: Enter 입력으로만 검색 */}
+          <Button
+            onClick={() => setSearch(searchInput)}
+            disabled={state.loading}
+            className={`${environment === 'PROD' ? 'bg-gray-800' : 'bg-blue-600'} px-4 h-9 hover:opacity-90`}
+          >
+            {state.loading ? (
+              <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Search className="h-4 w-4" />
+            )}
+          </Button>
         </div>
         <div className="flex items-center gap-2">
           <Select value={pageSize.toString()} onValueChange={(value) => { setPageSize(Number(value)); setPage(1) }}>
