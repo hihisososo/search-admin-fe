@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { synonymDictionaryService, typoCorrectionDictionaryService, stopwordDictionaryService, userDictionaryService } from '@/services'
 import { queryKeys } from '@/lib/query-client'
-import { getDictionaryConfig } from '../configs/dictionaryConfigs'
 import type { DictionaryType, BaseDictionaryItem } from '../types/dictionary.types'
 import type { DictionaryEnvironmentType, DictionarySortField, DictionarySortDirection } from '@/types/dashboard'
 
@@ -24,7 +23,6 @@ export function useDictionaryData<T extends BaseDictionaryItem>({
   sortDirection,
   environment
 }: UseDictionaryDataParams) {
-  const config = getDictionaryConfig(type)
   
   const paramsForKey = {
     page: page - 1,

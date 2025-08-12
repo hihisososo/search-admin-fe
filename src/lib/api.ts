@@ -1,8 +1,7 @@
 // 서비스 게이트웨이: 서비스 레이어만 재-export (슬림화)
 export * from '@/services'
 
-// 하위 호환 및 타입 제공만 유지
-import { config } from './config'
+// 하위 호환 및 타입 제공만 유지 (미사용 import 제거)
 import { apiFetch } from '@/services/common/api-client'
 // 대시보드 타입은 현재 파일에서 직접 사용하지 않음
 
