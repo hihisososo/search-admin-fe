@@ -129,6 +129,29 @@ export class ApiClient {
     })
   }
 
+  // 바이너리(Blob) 응답 전용 GET 헬퍼
+  async getBlob(endpoint: string, params?: Record<string, string | number | boolean | string[] | undefined>): Promise<Blob> {
+    const queryString = params ? this.buildQueryString(params) : ''
+    const url = queryString ? `${endpoint}?${queryString}` : endpoint
+
+    const absoluteUrl = url.startsWith('http') ? url : `${this.baseUrl}${url}`
+    const response = await fetch(absoluteUrl, {
+      method: 'GET',
+      headers: {
+        ...(this.getAuthorizationHeader()),
+      },
+    })
+
+    if (!response.ok) {
+      const apiError = new APIError(`HTTP ${response.status}: ${response.statusText}`, response.status)
+      logger.error('API 에러 (blob)', apiError)
+      errorTracker.captureException(apiError)
+      throw apiError
+    }
+
+    return response.blob()
+  }
+
   private buildQueryString(params: Record<string, string | number | boolean | string[] | undefined>): string {
     const searchParams = new URLSearchParams()
     

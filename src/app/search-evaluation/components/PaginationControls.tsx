@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
 import { calculatePaginationRange } from "@/utils/evaluation-helpers"
-import { EVALUATION_CONFIG } from "@/constants/evaluation"
+import { PAGINATION } from "@/constants/pagination"
 
 interface PaginationControlsProps {
   currentPage: number
@@ -25,7 +25,7 @@ export function PaginationControls({
   const { startPage, endPage } = calculatePaginationRange(
     currentPage, 
     totalPages, 
-    EVALUATION_CONFIG.MAX_VISIBLE_PAGINATION_PAGES
+    PAGINATION.MAX_VISIBLE_PAGES
   )
 
   const renderPageNumbers = () => {
