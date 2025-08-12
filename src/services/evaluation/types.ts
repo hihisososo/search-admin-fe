@@ -68,16 +68,12 @@ export interface CreateQueryRequest {
   value: string
 }
 
-export interface CreateQueryResponse {
-  id: number
-  query: string
-  count: number
-  createdAt: string
-  updatedAt: string
-}
+// createQuery 응답은 EvaluationQuery 전체를 반환
+export type CreateQueryResponse = EvaluationQuery
 
 export interface UpdateQueryRequest {
-  value: string
+  value?: string
+  reviewed?: boolean
 }
 
 // 일괄 삭제 요청 타입  
@@ -88,6 +84,9 @@ export interface DeleteQueriesRequest {
 // 자동화 관련 타입
 export interface GenerateQueriesRequest {
   count: number
+  minCandidates?: number
+  maxCandidates?: number
+  category?: string
 }
 
 export interface GenerateCandidatesRequest {
@@ -108,11 +107,12 @@ export interface AsyncTaskResponse {
 
 export interface AsyncTaskStatus {
   id: number
-  type: 'QUERY_GENERATION' | 'CANDIDATE_GENERATION' | 'LLM_EVALUATION'
+  taskType: 'QUERY_GENERATION' | 'CANDIDATE_GENERATION' | 'LLM_EVALUATION'
   status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED'
   progress: number
   message: string
-  result?: any
+  errorMessage?: string | null
+  result?: string | null
   createdAt: string
   startedAt?: string
   completedAt?: string
@@ -158,6 +158,18 @@ export interface EvaluationExecuteResponse {
   totalRelevantDocuments: number
   totalRetrievedDocuments: number
   totalCorrectDocuments: number
+  // 백엔드 예시 응답에 포함되는 쿼리별 상세 (선택적)
+  queryDetails?: Array<{
+    query: string
+    precision: number
+    recall: number
+    f1Score: number
+    relevantCount: number
+    retrievedCount: number
+    correctCount: number
+    missingDocuments?: string[]
+    wrongDocuments?: string[]
+  }>
 }
 
 // 리포트 상세 조회 응답 (리포트 리스트와 동일)
@@ -195,3 +207,26 @@ export interface ProductSearchParams {
   size?: number
   [key: string]: string | number | boolean | string[] | undefined
 } 
+
+// 추천 쿼리 응답 타입
+export interface QuerySuggestResponseItem {
+  query: string
+  candidateCount: number
+}
+
+export interface QuerySuggestResponse {
+  requestedCount: number
+  returnedCount: number
+  minCandidates?: number
+  maxCandidates?: number
+  items: QuerySuggestResponseItem[]
+}
+
+// 작업 리스트 응답 타입
+export interface AsyncTaskListResponse {
+  tasks: AsyncTaskStatus[]
+  totalCount: number
+  totalPages: number
+  currentPage: number
+  size: number
+}
