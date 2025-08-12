@@ -121,6 +121,11 @@ class EvaluationService {
     return apiClient.get<EvaluationReport>(`${this.baseEndpoint}/reports/${reportId}`)
   }
 
+  // 추천 쿼리 조회 (저장 없이 프리뷰용)
+  async recommendQueries(params: { count?: number; minCandidates?: number; maxCandidates?: number }): Promise<import('./types').QuerySuggestResponse> {
+    return apiClient.get(`${this.baseEndpoint}/queries/recommend`, params)
+  }
+
   // 4. 상품 검색
 
   // 상품 검색 (매핑 추가시 사용)

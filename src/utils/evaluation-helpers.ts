@@ -56,7 +56,7 @@ export function getTaskProgressText(
  */
 export function getTaskCompletionMessage(
   taskType: 'QUERY_GENERATION' | 'CANDIDATE_GENERATION' | 'LLM_EVALUATION',
-  result?: string
+  result?: string | null
 ): string {
   const baseMessages = {
     QUERY_GENERATION: '쿼리 생성 완료!',

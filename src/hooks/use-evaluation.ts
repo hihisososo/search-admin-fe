@@ -12,6 +12,7 @@ import type {
   EvaluateLlmRequest,
   EvaluationRequest,
   ProductSearchParams,
+  QuerySuggestResponse,
 } from '@/services/evaluation/types'
 
 // 쿼리 키 팩토리
@@ -223,3 +224,11 @@ export function useEvaluate() {
     },
   })
 } 
+
+// 추천 쿼리 조회 훅
+export function useRecommendQueries(params: { count?: number; minCandidates?: number; maxCandidates?: number }) {
+  return useQuery<QuerySuggestResponse>({
+    queryKey: ['evaluation', 'queries', 'recommend', params],
+    queryFn: () => evaluationService.recommendQueries(params),
+  })
+}
