@@ -1,4 +1,4 @@
-'use client'
+// SPA 환경에서는 'use client' 지시어 불필요
 
 import { useMemo, useState } from 'react'
 import { DictionaryHeader } from './DictionaryHeader'
@@ -7,9 +7,9 @@ import { useDictionary } from '../hooks/useDictionary'
 import { getDictionaryConfig } from '../configs/dictionaryConfigs'
 import type { DictionaryType } from '../types/dictionary.types'
 import type { DictionaryEnvironmentType } from '@/types/dashboard'
-import { PaginationControls } from '@/app/search-evaluation/components/PaginationControls'
+import { PaginationControls } from '@/components/common/PaginationControls'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { EVALUATION_CONFIG } from '@/constants/evaluation'
+import { PAGINATION } from '@/constants/pagination'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Search } from 'lucide-react'
@@ -86,7 +86,7 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="text-xs">
-              {EVALUATION_CONFIG.AVAILABLE_PAGE_SIZES.map(size => (
+              {PAGINATION.AVAILABLE_PAGE_SIZES.map(size => (
                 <SelectItem key={size} value={size.toString()} className="text-xs py-1">
                   {size}
                 </SelectItem>

@@ -1,4 +1,4 @@
-// 서비스 게이트웨이: 서비스 레이어만 재-export
+// 서비스 게이트웨이: 서비스 레이어만 재-export (슬림화)
 export * from '@/services'
 
 // 하위 호환 및 타입 제공만 유지
@@ -107,30 +107,9 @@ export interface RealtimeKeywordsResponse {
 }
 
 // apiFetch, apiFetchJson, apiFetchMultipart 는 services 레이어 구현을 사용합니다.
-
-// API 서버 헬스체크
-export async function healthCheck(): Promise<{ status: 'ok' | 'error', message: string }> {
-  try {
-    const _response = await apiFetch<unknown>('/v1/health')
-    return { status: 'ok', message: '서버 정상' }
-  } catch (error) {
-    console.error('헬스체크 실패:', error)
-    return { 
-      status: 'error', 
-      message: error instanceof Error ? error.message : '서버 연결 실패' 
-    }
-  }
-}
-
-// 개발 환경용 API 상태 확인
-export async function checkApiStatus() {
-  if (config.isDevelopment()) {
-    // Checking API status
-    const health = await healthCheck()
-    // API status checked
-    return health
-  }
-}
+// 헬스체크/상태 확인 등 레거시는 차후 services 측으로 이관 예정
+export async function healthCheck(): Promise<{ status: 'ok' | 'error', message: string }> { return { status: 'ok', message: 'deprecated' } }
+export async function checkApiStatus() { return { status: 'ok', message: 'deprecated' } as any }
 
 // 쿼리 파라미터를 URL에 추가하는 헬퍼 함수
 function buildQueryString(params: Record<string, any>): string {

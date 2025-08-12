@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { searchLogApi } from "@/lib/api"
 import type { 
@@ -12,6 +11,8 @@ import type {
 import { SearchLogHeader } from "./components/SearchLogHeader"
 import { SearchLogTable } from "./components/SearchLogTable"
 import { getSearchSessionId } from "@/lib/search-session"
+import { PaginationControls } from "@/components/common/PaginationControls"
+import { PAGINATION } from "@/constants/pagination"
 
 export default function SearchLogs() {
   const [items, setItems] = useState<SearchLogItem[]>([])
@@ -126,10 +127,6 @@ export default function SearchLogs() {
     fetchItems()
   }, [page, pageSize, sortField, sortDirection])
 
-  // 페이지네이션 계산
-  const _startPage = Math.max(1, page - 2)
-  const _endPage = Math.min(totalPages, page + 2)
-
   return (
     <div className="p-1 space-y-1 bg-gray-50 min-h-screen">
       <Card className="shadow-sm border-gray-200">
@@ -167,7 +164,7 @@ export default function SearchLogs() {
           )}
 
           {/* 전체 건수 및 페이지 크기 선택 */}
-          <div className="flex justify-between items-center mb-1">
+              <div className="flex justify-between items-center mb-1">
             <div className="text-xs text-gray-500">
               전체 {total.toLocaleString()}건 (페이지 {page}/{totalPages})
             </div>
@@ -177,10 +174,11 @@ export default function SearchLogs() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="text-xs">
-                  <SelectItem value="10" className="text-xs py-1">10</SelectItem>
-                  <SelectItem value="20" className="text-xs py-1">20</SelectItem>
-                  <SelectItem value="50" className="text-xs py-1">50</SelectItem>
-                  <SelectItem value="100" className="text-xs py-1">100</SelectItem>
+                      {PAGINATION.AVAILABLE_PAGE_SIZES.map(size => (
+                        <SelectItem key={size} value={size.toString()} className="text-xs py-1">
+                          {size}
+                        </SelectItem>
+                      ))}
                 </SelectContent>
               </Select>
             </div>
@@ -209,56 +207,16 @@ export default function SearchLogs() {
                 </div>
               )}
 
-              {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-2 mt-3 pt-2 border-t border-gray-100">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    disabled={page <= 1}
-                    onClick={() => setPage(page - 1)}
-                    className="h-6 px-2 text-xs"
-                  >
-                    이전
-                  </Button>
-                  {(() => {
-                    const startPage = Math.max(1, page - 2);
-                    const endPage = Math.min(totalPages, page + 2);
-                    return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((pageNum) => (
-                      <Button 
-                        key={pageNum}
-                        variant={pageNum === page ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setPage(pageNum)}
-                        className="h-6 px-2 text-xs min-w-[24px]"
-                      >
-                        {pageNum}
-                      </Button>
-                    ));
-                  })()}
-                  {Math.min(totalPages, page + 2) < totalPages && (
-                    <>
-                      <span className="mx-2 text-muted-foreground text-xs">...</span>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setPage(totalPages)}
-                        className="h-6 px-2 text-xs"
-                      >
-                        {totalPages}
-                      </Button>
-                    </>
-                  )}
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    disabled={page >= totalPages}
-                    onClick={() => setPage(page + 1)}
-                    className="h-6 px-2 text-xs"
-                  >
-                    다음
-                  </Button>
-                </div>
-              )}
+              <div className="mt-3 pt-2 border-t border-gray-100">
+                <PaginationControls
+                  currentPage={page - 1}
+                  totalPages={totalPages}
+                  totalCount={total}
+                  pageSize={pageSize}
+                  onPageChange={(p) => setPage(p + 1)}
+                  onPageSizeChange={(ps) => { handlePageSizeChange(ps) }}
+                />
+              </div>
             </>
           )}
         </CardContent>

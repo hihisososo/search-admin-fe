@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react'
-import { apiClient } from '@/lib/api'
-import { synonymDictionaryService, typoCorrectionDictionaryService } from '@/services'
+import { synonymDictionaryService, typoCorrectionDictionaryService, stopwordDictionaryService, userDictionaryService } from '@/services'
 import { useToast } from '@/components/ui/use-toast'
 import { getDictionaryConfig } from '../configs/dictionaryConfigs'
 import type { DictionaryType, BaseDictionaryItem, DictionaryActions } from '../types/dictionary.types'
@@ -77,10 +76,13 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
     }
 
     try {
-      const response = await apiClient.post<T>(
-        `/v1/dictionaries${config.apiPath}?environment=${_environment}`,
-        editingState.newItem
-      )
+      const service =
+        type === 'user' ? userDictionaryService :
+        type === 'stopword' ? stopwordDictionaryService :
+        type === 'synonym' ? synonymDictionaryService :
+        typoCorrectionDictionaryService
+
+      const response = await service.create(editingState.newItem as any)
       
       setEditingState(prev => ({ 
         ...prev, 
@@ -134,10 +136,13 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
     }
 
     try {
-      await apiClient.put(
-        `/v1/dictionaries${config.apiPath}/${item.id}?environment=${_environment}`,
-        editingState.editingItem
-      )
+      const service =
+        type === 'user' ? userDictionaryService :
+        type === 'stopword' ? stopwordDictionaryService :
+        type === 'synonym' ? synonymDictionaryService :
+        typoCorrectionDictionaryService
+
+      await service.update(item.id, editingState.editingItem as any)
       
       setEditingState(prev => ({ 
         ...prev, 
@@ -170,7 +175,13 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
     }
 
     try {
-      await apiClient.delete(`/v1/dictionaries${config.apiPath}/${id}?environment=${_environment}`)
+      const service =
+        type === 'user' ? userDictionaryService :
+        type === 'stopword' ? stopwordDictionaryService :
+        type === 'synonym' ? synonymDictionaryService :
+        typoCorrectionDictionaryService
+
+      await service.delete(id)
       
       toast({
         title: '삭제 완료',
@@ -196,11 +207,13 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
     }
 
     try {
-      const deletePromises = Array.from(editingState.selectedIds).map(id => 
-        apiClient.delete(`/v1/dictionaries${config.apiPath}/${id}?environment=${_environment}`)
-      )
-      
-      await Promise.all(deletePromises)
+      const service =
+        type === 'user' ? userDictionaryService :
+        type === 'stopword' ? stopwordDictionaryService :
+        type === 'synonym' ? synonymDictionaryService :
+        typoCorrectionDictionaryService
+
+      await service.bulkDelete(Array.from(editingState.selectedIds))
       
       setEditingState(prev => ({ 
         ...prev, 

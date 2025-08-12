@@ -45,17 +45,7 @@ abstract class BaseDictionaryService<T, CreateReq, UpdateReq> {
   }
 
   async download(): Promise<Blob> {
-    const absoluteUrl = `${(apiClient as any).baseUrl || ''}${this.endpoint}/download`
-    const response = await fetch(absoluteUrl, {
-      method: 'GET',
-      headers: {
-        ...(localStorage.getItem('token') ? { 'Authorization': `Bearer ${localStorage.getItem('token')}` } : {})
-      }
-    })
-    if (!response.ok) {
-      throw new Error(`Download failed: ${response.statusText}`)
-    }
-    return response.blob()
+    return apiClient.getBlob(`${this.endpoint}/download`)
   }
 
   async upload(file: File): Promise<{ message: string; totalCount: number; successCount: number; failCount: number }> {
