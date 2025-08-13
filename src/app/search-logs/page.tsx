@@ -10,6 +10,7 @@ import type {
 } from "@/types/dashboard"
 import { SearchLogHeader } from "./components/SearchLogHeader"
 import { SearchLogTable } from "./components/SearchLogTable"
+import { SearchLogDetailDialog } from "./components/SearchLogDetailDialog"
 import { getSearchSessionId } from "@/lib/search-session"
 import { PaginationControls } from "@/components/common/PaginationControls"
 import { PAGINATION } from "@/constants/pagination"
@@ -22,6 +23,8 @@ export default function SearchLogs() {
   const [pageSize, setPageSize] = useState(20)
   const [total, setTotal] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [selectedLogId, setSelectedLogId] = useState<string | null>(null)
   
   // 필터 상태
   const [keyword, setKeyword] = useState("")
@@ -198,6 +201,7 @@ export default function SearchLogs() {
                 sortField={sortField}
                 sortDirection={sortDirection}
                 onSort={handleSort}
+                onRowClick={(item) => { setSelectedLogId(item.id); setDetailOpen(true) }}
               />
 
               {items.length === 0 && (
@@ -221,6 +225,7 @@ export default function SearchLogs() {
           )}
         </CardContent>
       </Card>
+      <SearchLogDetailDialog logId={selectedLogId} open={detailOpen} onOpenChange={setDetailOpen} />
     </div>
   )
 } 

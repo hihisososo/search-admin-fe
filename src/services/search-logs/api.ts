@@ -1,6 +1,7 @@
 import { apiClient } from '../common/api-client'
 import type {
   SearchLogPageResponse,
+  SearchLogResponse,
   SearchLogParams,
   PopularKeywordsResponse,
   TrendingKeywordsResponse,
@@ -16,6 +17,11 @@ class SearchLogService {
   // 검색 로그 목록 조회
   async getList(params: SearchLogParams = {}): Promise<SearchLogPageResponse> {
     return apiClient.get<SearchLogPageResponse>(this.baseEndpoint, params)
+  }
+
+  // 검색 로그 상세 조회
+  async getDetail(logId: string): Promise<SearchLogResponse> {
+    return apiClient.get<SearchLogResponse>(`${this.baseEndpoint}/${logId}`)
   }
 
   // 인기 검색어 조회

@@ -76,7 +76,7 @@ export const MENU_ITEMS: MenuItem[] = [
     subItems: [
       {
         id: 'answer-set-management',
-        title: '평가셋관리',
+        title: '정답셋관리',
         path: '/search-evaluation/answer-set'
       },
       {

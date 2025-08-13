@@ -31,6 +31,10 @@ export const evaluationKeys = {
     search: (params: ProductSearchParams) => [...evaluationKeys.products.all, 'search', params] as const,
     detail: (productId: string) => [...evaluationKeys.products.all, 'detail', productId] as const,
   },
+  categories: {
+    all: ['evaluation', 'categories'] as const,
+    list: (size?: number) => ['evaluation', 'categories', 'list', size] as const,
+  },
   reports: {
     all: ['evaluation', 'reports'] as const,
     list: () => [...evaluationKeys.reports.all, 'list'] as const,
@@ -73,6 +77,13 @@ export function useProduct(productId: string) {
     queryKey: evaluationKeys.products.detail(productId),
     queryFn: () => evaluationService.getProduct(productId),
     enabled: !!productId,
+  })
+}
+
+export function useEvaluationCategories(size?: number) {
+  return useQuery({
+    queryKey: evaluationKeys.categories.list(size),
+    queryFn: () => evaluationService.getCategories({ size }),
   })
 }
 

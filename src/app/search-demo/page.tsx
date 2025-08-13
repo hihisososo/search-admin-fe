@@ -4,13 +4,14 @@ import { type KeywordItem } from "@/types/dashboard";
 // import { logger } from "@/lib/logger";
 import { SearchHeader } from "./components/SearchHeader";
 import { PopularKeywords } from "./components/PopularKeywords";
+import { TrendingKeywords } from "./components/TrendingKeywords";
 import { ProductFilters } from "./components/ProductFilters";
 import { ProductList } from "./components/ProductList";
 
 export default function SearchDemo() {
   // 검색/필터 상태
-  const [query, setQuery] = React.useState(""); // 입력창 값
-  const [searchQuery, setSearchQuery] = React.useState(""); // 실제 검색 실행 값
+  const [query, setQuery] = React.useState("노트북"); // 입력창 값
+  const [searchQuery, setSearchQuery] = React.useState("노트북"); // 실제 검색 실행 값
   const [brand, setBrand] = React.useState<string[]>([]);
   const [category, setCategory] = React.useState<string[]>([]);
   const [price, setPrice] = React.useState<{ from: string; to: string }>({ from: "", to: "" });
@@ -28,6 +29,14 @@ export default function SearchDemo() {
   const [totalResults, setTotalResults] = React.useState(0);
   const [totalPages, setTotalPages] = React.useState(0);
   const [popularKeywords, setPopularKeywords] = React.useState<Array<{ 
+    keyword: string, 
+    searchCount: number, 
+    rank: number, 
+    previousRank: number | null, 
+    rankChange: number | null, 
+    changeStatus: "UP" | "DOWN" | "NEW" | "SAME" 
+  }>>([]);
+  const [trendingKeywords, setTrendingKeywords] = React.useState<Array<{ 
     keyword: string, 
     searchCount: number, 
     rank: number, 
@@ -212,22 +221,35 @@ export default function SearchDemo() {
     };
   };
 
-  // 인기 검색어 로드
+  // 인기/급등 검색어 로드
   React.useEffect(() => {
     const loadKeywords = async () => {
       try {
         const { from, to } = getYesterdayDateRange();
 
-        const popularResponse = await dashboardApi.getPopularKeywords({ from, to, limit: 10 });
+        const [popularResponse, trendingResponse] = await Promise.all([
+          dashboardApi.getPopularKeywords({ from, to, limit: 10 }),
+          dashboardApi.getTrendingKeywords({ from, to, limit: 10 })
+        ]);
 
-        // 새로운 API 응답 구조에 맞게 직접 매핑
+        // 인기 검색어 매핑
         setPopularKeywords(popularResponse.keywords.map((k: KeywordItem) => ({
           keyword: k.keyword,
-          searchCount: k.searchCount || 0,
-          rank: k.rank || 0,
+          searchCount: (k as any).searchCount ?? k.count ?? 0,
+          rank: (k as any).rank ?? 0,
+          previousRank: (k as any).previousRank ?? null,
+          rankChange: (k as any).rankChange ?? null,
+          changeStatus: (k as any).changeStatus ?? "SAME"
+        })));
+
+        // 급등 검색어 매핑
+        setTrendingKeywords(trendingResponse.keywords.map((k: any) => ({
+          keyword: k.keyword,
+          searchCount: k.searchCount ?? k.count ?? 0,
+          rank: k.rank ?? 0,
           previousRank: k.previousRank ?? null,
           rankChange: k.rankChange ?? null,
-          changeStatus: k.changeStatus || "SAME"
+          changeStatus: k.changeStatus ?? (k.rankChange && k.rankChange > 0 ? "UP" : k.rankChange && k.rankChange < 0 ? "DOWN" : "SAME")
         })));
 
       } catch (error) {
@@ -313,10 +335,14 @@ export default function SearchDemo() {
           />
         </div>
 
-        {/* 인기검색어 (우측 1칸) */}
+        {/* 인기/급등 검색어 (우측 1칸) */}
         <div className="col-span-2 flex flex-col">
           <PopularKeywords
             keywords={popularKeywords}
+            onKeywordClick={handleSearch}
+          />
+          <TrendingKeywords
+            keywords={trendingKeywords}
             onKeywordClick={handleSearch}
           />
         </div>

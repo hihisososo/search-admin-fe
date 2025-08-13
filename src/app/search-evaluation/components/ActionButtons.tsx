@@ -132,7 +132,37 @@ export function ActionButtons({
   if (compact) {
     return (
       <div className="flex items-center gap-2">
+        {/* 1. 쿼리 추가 */}
         <QueryCreateDialog onCreate={onCreateQuery} />
+        {/* 2. 후보군 생성 */}
+        <Button 
+          size="sm" 
+          variant="outline"
+          onClick={handleGenerateCandidates}
+          disabled={candidateGenTask.isRunning || selectedQueryIds.length === 0}
+          className="border-green-600 text-green-600 hover:bg-green-50"
+        >
+          <RefreshCw className={`h-4 w-4 mr-1 ${candidateGenTask.isRunning ? 'animate-spin' : ''}`} />
+          {candidateGenTask.isRunning 
+            ? getTaskProgressText(candidateGenTask.data, '후보군 생성')
+            : '후보군 생성'
+          }
+        </Button>
+        {/* 3. 후보군 자동평가 */}
+        <Button 
+          size="sm" 
+          variant="outline"
+          onClick={handleEvaluateLlm}
+          disabled={llmEvalTask.isRunning || selectedQueryIds.length === 0}
+          className="border-gray-300 hover:bg-gray-50"
+        >
+          <Zap className={`h-4 w-4 mr-1 ${llmEvalTask.isRunning ? 'animate-pulse' : ''}`} />
+          {llmEvalTask.isRunning 
+            ? getTaskProgressText(llmEvalTask.data, '후보군 자동평가')
+            : '후보군 자동평가'
+          }
+        </Button>
+        {/* 4. 정답셋 자동생성 */}
         <QueryGenerationDialog
           onGenerate={handleGenerateQueries}
           isGenerating={false}
@@ -141,15 +171,36 @@ export function ActionButtons({
         <Button 
           size="sm" 
           variant="outline"
+          onClick={handleDeleteSelected}
+          disabled={isDeleting || selectedQueryIds.length === 0}
+          className="border-red-300 text-red-600 hover:bg-red-50"
+        >
+          <Trash2 className="h-4 w-4 mr-1" />
+          선택 삭제
+        </Button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex items-center justify-between w-full">
+      <div className="flex items-center gap-2">
+        {/* 1. 쿼리 추가 */}
+        <QueryCreateDialog onCreate={onCreateQuery} />
+        {/* 2. 후보군 생성 */}
+        <Button 
+          size="sm" 
+          variant="outline"
           onClick={handleGenerateCandidates}
           disabled={candidateGenTask.isRunning || selectedQueryIds.length === 0}
         >
           <RefreshCw className={`h-4 w-4 mr-2 ${candidateGenTask.isRunning ? 'animate-spin' : ''}`} />
           {candidateGenTask.isRunning 
-            ? getTaskProgressText(candidateGenTask.data, '후보군 자동생성')
-            : '후보군 자동생성'
+            ? getTaskProgressText(candidateGenTask.data, '후보군 생성')
+            : '후보군 생성'
           }
         </Button>
+        {/* 3. 후보군 자동평가 */}
         <Button 
           size="sm" 
           variant="outline"
@@ -162,6 +213,12 @@ export function ActionButtons({
             : '후보군 자동평가'
           }
         </Button>
+        {/* 4. 정답셋 자동생성 */}
+        <QueryGenerationDialog
+          onGenerate={handleGenerateQueries}
+          isGenerating={false}
+          isTaskRunning={queryGenTask.isRunning}
+        />
         <Button 
           size="sm" 
           variant="destructive"
@@ -171,57 +228,6 @@ export function ActionButtons({
           <Trash2 className="h-4 w-4 mr-2" />
           선택 삭제
         </Button>
-      </div>
-    )
-  }
-
-  return (
-    <div className="flex items-center justify-between w-full">
-      <div className="flex items-center gap-2">
-        <QueryCreateDialog onCreate={onCreateQuery} />
-        <QueryGenerationDialog
-          onGenerate={handleGenerateQueries}
-          isGenerating={false}
-          isTaskRunning={queryGenTask.isRunning}
-        />
-      </div>
-
-      <div className="flex items-center gap-2">
-      <Button 
-        size="sm" 
-        variant="outline"
-        onClick={handleGenerateCandidates}
-        disabled={candidateGenTask.isRunning || selectedQueryIds.length === 0}
-      >
-        <RefreshCw className={`h-4 w-4 mr-2 ${candidateGenTask.isRunning ? 'animate-spin' : ''}`} />
-        {candidateGenTask.isRunning 
-          ? getTaskProgressText(candidateGenTask.data, '후보군 자동생성')
-          : '후보군 자동생성'
-        }
-      </Button>
-
-      <Button 
-        size="sm" 
-        variant="outline"
-        onClick={handleEvaluateLlm}
-        disabled={llmEvalTask.isRunning || selectedQueryIds.length === 0}
-      >
-        <Zap className={`h-4 w-4 mr-2 ${llmEvalTask.isRunning ? 'animate-pulse' : ''}`} />
-        {llmEvalTask.isRunning 
-          ? getTaskProgressText(llmEvalTask.data, '후보군 자동평가')
-          : '후보군 자동평가'
-        }
-      </Button>
-
-      <Button 
-        size="sm" 
-        variant="destructive"
-        onClick={handleDeleteSelected}
-        disabled={isDeleting || selectedQueryIds.length === 0}
-      >
-        <Trash2 className="h-4 w-4 mr-2" />
-        선택 삭제
-      </Button>
       </div>
     </div>
   )

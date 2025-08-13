@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Dialog,
   DialogContent,
@@ -20,6 +19,7 @@ interface QueryCreateDialogProps {
 export function QueryCreateDialog({ onCreate, isCreating = false, disabled = false }: QueryCreateDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [text, setText] = useState("")
+  
 
   const canSubmit = text.trim().length > 0
 
@@ -37,27 +37,27 @@ export function QueryCreateDialog({ onCreate, isCreating = false, disabled = fal
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" disabled={disabled}>
-          <SquarePen className="h-4 w-4 mr-2" />
-          쿼리 수동추가
+        <Button size="sm" disabled={disabled} className="bg-blue-600 hover:bg-blue-700">
+          <SquarePen className="h-4 w-4 mr-1" />
+          쿼리 추가
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>쿼리 수동추가</DialogTitle>
+          <DialogTitle>쿼리 추가</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="manualQuery" className="text-sm font-medium">쿼리를 입력하세요</Label>
             <Input
               id="manualQuery"
               type="text"
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder=""
+              placeholder="쿼리를 입력하세요"
               className="text-sm mt-1"
             />
           </div>
+          
           <div className="flex justify-end gap-2">
             <Button variant="outline" size="sm" onClick={() => setIsOpen(false)} disabled={isCreating}>취소</Button>
             <Button size="sm" onClick={handleCreate} disabled={!canSubmit || isCreating}>
