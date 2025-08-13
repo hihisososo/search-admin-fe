@@ -1,6 +1,8 @@
 import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Checkbox } from "@/components/ui/checkbox"
 import { 
@@ -9,6 +11,7 @@ import {
   useEvaluateLlmAsync,
   useUpdateQuery,
   useDeleteQueries,
+  useCreateQuery,
 } from "@/hooks/use-evaluation"
 import { calculateSelectionState } from "@/utils/evaluation-helpers"
 import { EVALUATION_CONFIG } from "@/constants/evaluation"
@@ -18,6 +21,8 @@ import { QueryTableRow } from "./QueryTableRow"
 import { QueryEditDialog } from "./QueryEditDialog"
 import type { EvaluationQuery } from "@/services"
 import { useToast } from "@/components/ui/use-toast"
+import { Search } from "lucide-react"
+// no-op
 
 interface QueryTableProps {
   queries: EvaluationQuery[]
@@ -34,6 +39,7 @@ interface QueryTableProps {
   onPageSizeChange: (pageSize: number) => void
   onRefresh?: () => void
   isLoading: boolean
+  onSearch?: (text: string) => void
 }
 
 export function QueryTable({
@@ -54,6 +60,7 @@ export function QueryTable({
 }: QueryTableProps) {
   const [editingQuery, setEditingQuery] = useState<{ id: number, text: string } | null>(null)
   const { toast } = useToast()
+  const [searchText, setSearchText] = useState("")
   
   // 뮤테이션
   const generateQueriesAsyncMutation = useGenerateQueriesAsync()
@@ -61,10 +68,16 @@ export function QueryTable({
   const evaluateLlmAsyncMutation = useEvaluateLlmAsync()
   const updateQueryMutation = useUpdateQuery()
   const deleteQueryMutation = useDeleteQueries()
+  const createQueryMutation = useCreateQuery()
 
   // 액션 핸들러들
-  const handleGenerateQueries = async (count: number) => {
-    return await generateQueriesAsyncMutation.mutateAsync({ count })
+  const handleGenerateQueries = async (data: { count: number; minCandidates?: number; maxCandidates?: number; category?: string }) => {
+    return await generateQueriesAsyncMutation.mutateAsync(data)
+  }
+
+  const handleCreateQuery = async (text: string) => {
+    await createQueryMutation.mutateAsync({ value: text.trim() })
+    toast({ title: '추가 완료', description: '쿼리가 성공적으로 추가되었습니다.', variant: 'success' })
   }
 
   const handleGenerateCandidates = async () => {
@@ -133,25 +146,50 @@ export function QueryTable({
   }
 
   return (
-    <div className="space-y-4 p-4">
-      {/* 액션 버튼들 */}
-      <ActionButtons
-        selectedQueryIds={selectedQueryIds}
-        onGenerateQueries={handleGenerateQueries}
-        onGenerateCandidates={handleGenerateCandidates}
-        onEvaluateLlm={handleEvaluateLlm}
-        onDeleteSelected={handleDeleteSelected}
-        isDeleting={deleteQueryMutation.isPending}
-      />
+    <div className="space-y-3">
+      {/* 액션 버튼들 - 왼쪽 정렬, 검색창과 여백 확보 */}
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        <ActionButtons
+          selectedQueryIds={selectedQueryIds}
+          onGenerateQueries={handleGenerateQueries}
+          onCreateQuery={handleCreateQuery}
+          onGenerateCandidates={handleGenerateCandidates}
+          onEvaluateLlm={handleEvaluateLlm}
+          onDeleteSelected={handleDeleteSelected}
+          isDeleting={deleteQueryMutation.isPending}
+          compact
+        />
+      </div>
 
-      {/* 전체 건수 및 페이지 크기 선택 */}
-      <div className="flex justify-between items-center">
-        <div className="text-xs text-gray-500">
-          전체 {totalCount.toLocaleString()}건 (페이지 {currentPage + 1}/{totalPages})
+      {/* 검색 입력창 + 페이지 크기 선택 (사전 페이지와 동일 구도) */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-1 w-full max-w-lg">
+          <Input
+            placeholder="검색할 쿼리를 입력하세요"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                onSearch?.(searchText)
+              }
+            }}
+            className="h-9 flex-1 text-sm"
+          />
+          <Button
+            onClick={() => onSearch?.(searchText)}
+            disabled={isLoading}
+            className="h-9 px-4"
+          >
+            {isLoading ? (
+              <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Search className="h-4 w-4" />
+            )}
+          </Button>
         </div>
         <div className="flex items-center gap-2">
           <Select value={pageSize.toString()} onValueChange={(value) => onPageSizeChange(Number(value))}>
-            <SelectTrigger className="w-20 h-6 text-xs">
+            <SelectTrigger className="w-24 h-9 text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="text-xs">
@@ -166,10 +204,11 @@ export function QueryTable({
       </div>
 
       {/* 쿼리 테이블 */}
+      <div className="border border-gray-200 rounded-md overflow-hidden bg-white mt-0">
       <Table>
         <TableHeader>
           <TableRow className="bg-gray-50 hover:bg-gray-50">
-            <TableHead className="w-12 py-2 text-xs font-semibold text-gray-700">
+            <TableHead className="w-10 py-2">
               <Checkbox
                 checked={isAllSelected}
                 onCheckedChange={(checked) => {
@@ -207,12 +246,14 @@ export function QueryTable({
                   onEdit={(queryId, queryText) => setEditingQuery({ id: queryId, text: queryText })}
                   onDelete={handleDeleteQuery}
                   isDeleting={deleteQueryMutation.isPending}
+                  rowClassName={isSelected ? 'bg-blue-50' : ''}
                 />
               )
             })
           )}
         </TableBody>
       </Table>
+      </div>
 
       {/* 페이지네이션 정보와 설정 */}
       <PaginationControls

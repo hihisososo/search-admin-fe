@@ -1,26 +1,32 @@
 import { Button } from "@/components/ui/button"
-import { RefreshCw, Zap, Trash2 } from "lucide-react"
+import { RefreshCw, Zap, Trash2, Plus } from "lucide-react"
 import { useAsyncTask } from "@/hooks/use-async-task"
 import { getTaskProgressText, getTaskCompletionMessage } from "@/utils/evaluation-helpers"
 import { QueryGenerationDialog } from "./QueryGenerationDialog"
+import { QueryCreateDialog } from "./QueryCreateDialog"
 import { useToast } from "@/components/ui/use-toast"
+import type { GenerateQueriesRequest } from "@/services/evaluation/types"
 
 interface ActionButtonsProps {
   selectedQueryIds: number[]
-  onGenerateQueries: (count: number) => Promise<{ taskId: number; message: string }>
+  onGenerateQueries: (data: GenerateQueriesRequest) => Promise<{ taskId: number; message: string }>
+  onCreateQuery: (text: string) => Promise<void>
   onGenerateCandidates: () => Promise<{ taskId: number; message: string }>
   onEvaluateLlm: () => Promise<{ taskId: number; message: string }>
   onDeleteSelected: () => Promise<void>
   isDeleting: boolean
+  compact?: boolean
 }
 
 export function ActionButtons({
   selectedQueryIds,
   onGenerateQueries,
+  onCreateQuery,
   onGenerateCandidates,
   onEvaluateLlm,
   onDeleteSelected,
-  isDeleting
+  isDeleting,
+  compact = false
 }: ActionButtonsProps) {
   const { toast } = useToast()
   
@@ -75,8 +81,8 @@ export function ActionButtons({
     }
   })
 
-  const handleGenerateQueries = async (count: number) => {
-    const response = await onGenerateQueries(count)
+  const handleGenerateQueries = async (data: GenerateQueriesRequest) => {
+    const response = await onGenerateQueries(data)
     queryGenTask.startTask(response.taskId)
   }
 
@@ -123,14 +129,64 @@ export function ActionButtons({
     }
   }
 
-  return (
-    <div className="flex flex-wrap gap-2 p-3 rounded-lg">
-      <QueryGenerationDialog
-        onGenerate={handleGenerateQueries}
-        isGenerating={false}
-        isTaskRunning={queryGenTask.isRunning}
-      />
+  if (compact) {
+    return (
+      <div className="flex items-center gap-2">
+        <QueryCreateDialog onCreate={onCreateQuery} />
+        <QueryGenerationDialog
+          onGenerate={handleGenerateQueries}
+          isGenerating={false}
+          isTaskRunning={queryGenTask.isRunning}
+        />
+        <Button 
+          size="sm" 
+          variant="outline"
+          onClick={handleGenerateCandidates}
+          disabled={candidateGenTask.isRunning || selectedQueryIds.length === 0}
+        >
+          <RefreshCw className={`h-4 w-4 mr-2 ${candidateGenTask.isRunning ? 'animate-spin' : ''}`} />
+          {candidateGenTask.isRunning 
+            ? getTaskProgressText(candidateGenTask.data, '후보군 자동생성')
+            : '후보군 자동생성'
+          }
+        </Button>
+        <Button 
+          size="sm" 
+          variant="outline"
+          onClick={handleEvaluateLlm}
+          disabled={llmEvalTask.isRunning || selectedQueryIds.length === 0}
+        >
+          <Zap className={`h-4 w-4 mr-2 ${llmEvalTask.isRunning ? 'animate-pulse' : ''}`} />
+          {llmEvalTask.isRunning 
+            ? getTaskProgressText(llmEvalTask.data, '후보군 자동평가')
+            : '후보군 자동평가'
+          }
+        </Button>
+        <Button 
+          size="sm" 
+          variant="destructive"
+          onClick={handleDeleteSelected}
+          disabled={isDeleting || selectedQueryIds.length === 0}
+        >
+          <Trash2 className="h-4 w-4 mr-2" />
+          선택 삭제
+        </Button>
+      </div>
+    )
+  }
 
+  return (
+    <div className="flex items-center justify-between w-full">
+      <div className="flex items-center gap-2">
+        <QueryCreateDialog onCreate={onCreateQuery} />
+        <QueryGenerationDialog
+          onGenerate={handleGenerateQueries}
+          isGenerating={false}
+          isTaskRunning={queryGenTask.isRunning}
+        />
+      </div>
+
+      <div className="flex items-center gap-2">
       <Button 
         size="sm" 
         variant="outline"
@@ -166,6 +222,7 @@ export function ActionButtons({
         <Trash2 className="h-4 w-4 mr-2" />
         선택 삭제
       </Button>
+      </div>
     </div>
   )
 } 

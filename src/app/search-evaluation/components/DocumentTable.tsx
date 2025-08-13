@@ -15,6 +15,8 @@ import {
 import type { EvaluationDocument, EvaluationProduct, RelevanceStatus } from "@/services"
 import React from "react"
 import { useToast } from "@/components/ui/use-toast"
+import { PAGINATION } from "@/constants/pagination"
+import { PaginationControls } from "@/components/common/PaginationControls"
 
 // 평가 상태 타입 정의 (UI용)
 type EvaluationStatus = 'correct' | 'incorrect' | 'unspecified'
@@ -29,6 +31,8 @@ interface DocumentTableProps {
   onPageChange: (page: number) => void
   onClose?: () => void
   isLoading: boolean
+  pageSize?: number
+  onPageSizeChange?: (size: number) => void
 }
 
 export function DocumentTable({
@@ -40,7 +44,9 @@ export function DocumentTable({
   totalCount,
   onPageChange,
   onClose,
-  isLoading
+  isLoading,
+  pageSize,
+  onPageSizeChange
 }: DocumentTableProps) {
   const [showProductDialog, setShowProductDialog] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
@@ -250,7 +256,7 @@ export function DocumentTable({
   }
 
   return (
-    <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6">
       {/* 헤더 */}
       <div className="flex justify-between items-start">
         <div>
@@ -329,8 +335,26 @@ export function DocumentTable({
         </div>
       </div>
 
+      {/* 페이지 크기 선택 - 데이터 테이블 바로 위, 우측 정렬 */}
+      {onPageSizeChange && (
+        <div className="flex justify-end mb-2">
+          <Select value={(pageSize ?? 20).toString()} onValueChange={(value) => onPageSizeChange(Number(value))}>
+            <SelectTrigger className="w-20 h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="text-xs">
+              {PAGINATION.AVAILABLE_PAGE_SIZES.map(size => (
+                <SelectItem key={size} value={size.toString()} className="text-xs py-1">
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       {/* 데이터 테이블 */}
-      <div className="border rounded-lg overflow-hidden bg-white">
+      <div className="border border-gray-200 rounded-md overflow-hidden bg-white">
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50 hover:bg-gray-50">
@@ -362,22 +386,22 @@ export function DocumentTable({
                 return (
                   <React.Fragment key={doc.productId}>
                     <TableRow 
-                      className="hover:bg-gray-50 cursor-pointer"
+                      className={`hover:bg-gray-50 cursor-pointer ${isExpanded ? 'bg-amber-50' : ''}`}
                       onClick={() => toggleExpand(doc.productId)}
                     >
-                      <TableCell className="text-center font-medium text-gray-600">
-                        {(currentPage * 10) + index + 1}
+                      <TableCell className="py-2 text-center font-medium text-gray-600">
+                        {(currentPage * (pageSize ?? 20)) + index + 1}
                       </TableCell>
                       
-                      <TableCell>
+                      <TableCell className="py-2 text-xs">
                         <Badge variant="outline" className="font-mono text-xs">
                           {doc.productId}
                         </Badge>
                       </TableCell>
                       
-                      <TableCell>
+                      <TableCell className="py-2">
                         <div className="flex items-center justify-between">
-                          <div className="font-medium text-gray-900">
+                          <div className="font-medium text-xs text-gray-900">
                             {doc.productName}
                           </div>
                           <div className="flex items-center gap-2">
@@ -390,9 +414,23 @@ export function DocumentTable({
                         </div>
                       </TableCell>
                       
-                      <TableCell className="text-center">
+                      <TableCell className="py-2 text-center">
                         <div className="flex justify-center">
-                          {getStatusBadge(status)}
+                          {status === 'correct' && (
+                            <Badge variant="default" className="bg-green-600 text-xs py-0.5 px-2">
+                              <CheckCircle className="h-3 w-3 mr-1" /> 정답
+                            </Badge>
+                          )}
+                          {status === 'incorrect' && (
+                            <Badge variant="destructive" className="text-xs py-0.5 px-2">
+                              <XCircle className="h-3 w-3 mr-1" /> 오답
+                            </Badge>
+                          )}
+                          {status === 'unspecified' && (
+                            <Badge variant="secondary" className="text-xs py-0.5 px-2">
+                              <HelpCircle className="h-3 w-3 mr-1" /> 미지정
+                            </Badge>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -576,125 +614,15 @@ export function DocumentTable({
 
       {/* 페이지네이션 */}
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-1 mt-4 pt-3 border-t border-gray-100">
-          {/* 처음 */}
-          <Button 
-            variant="outline" 
-            size="sm" 
-            disabled={currentPage <= 0}
-            onClick={() => onPageChange(0)}
-            className="h-8 px-2 text-xs"
-          >
-            <ChevronsLeft className="h-3 w-3 mr-1" />
-            처음
-          </Button>
-
-          {/* 이전 */}
-          <Button 
-            variant="outline" 
-            size="sm" 
-            disabled={currentPage <= 0}
-            onClick={() => onPageChange(currentPage - 1)}
-            className="h-8 px-2 text-xs"
-          >
-            <ChevronLeft className="h-3 w-3 mr-1" />
-            이전
-          </Button>
-
-          {/* 페이지 번호들 */}
-          {(() => {
-            const maxVisible = 5 // 최대 5개 페이지 번호 표시
-            let startPage = Math.max(0, currentPage - Math.floor(maxVisible / 2))
-            const endPage = Math.min(totalPages - 1, startPage + maxVisible - 1)
-            
-            // 끝에서 역산하여 시작 페이지 조정
-            if (endPage - startPage + 1 < maxVisible) {
-              startPage = Math.max(0, endPage - maxVisible + 1)
-            }
-
-            const pages = []
-            
-            // 첫 페이지가 범위에 없으면 첫 페이지와 ... 추가
-            if (startPage > 0) {
-              pages.push(
-                <Button 
-                  key={0}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onPageChange(0)}
-                  className="h-8 px-3 text-xs min-w-[32px]"
-                >
-                  1
-                </Button>
-              )
-              if (startPage > 1) {
-                pages.push(
-                  <span key="start-ellipsis" className="px-2 text-xs text-gray-400">...</span>
-                )
-              }
-            }
-
-            // 중간 페이지들
-            for (let i = startPage; i <= endPage; i++) {
-              pages.push(
-                <Button 
-                  key={i}
-                  variant={i === currentPage ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onPageChange(i)}
-                  className="h-8 px-3 text-xs min-w-[32px]"
-                >
-                  {i + 1}
-                </Button>
-              )
-            }
-
-            // 마지막 페이지가 범위에 없으면 ... 과 마지막 페이지 추가
-            if (endPage < totalPages - 1) {
-              if (endPage < totalPages - 2) {
-                pages.push(
-                  <span key="end-ellipsis" className="px-2 text-xs text-gray-400">...</span>
-                )
-              }
-              pages.push(
-                <Button 
-                  key={totalPages - 1}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onPageChange(totalPages - 1)}
-                  className="h-8 px-3 text-xs min-w-[32px]"
-                >
-                  {totalPages}
-                </Button>
-              )
-            }
-
-            return pages
-          })()}
-
-          {/* 다음 */}
-          <Button 
-            variant="outline" 
-            size="sm" 
-            disabled={currentPage >= totalPages - 1}
-            onClick={() => onPageChange(currentPage + 1)}
-            className="h-8 px-2 text-xs"
-          >
-            다음
-            <ChevronRight className="h-3 w-3 ml-1" />
-          </Button>
-
-          {/* 끝 */}
-          <Button 
-            variant="outline" 
-            size="sm" 
-            disabled={currentPage >= totalPages - 1}
-            onClick={() => onPageChange(totalPages - 1)}
-            className="h-8 px-2 text-xs"
-          >
-            끝
-            <ChevronsRight className="h-3 w-3 ml-1" />
-          </Button>
+        <div className="mt-3 pt-2 border-t border-gray-100">
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalCount={totalCount}
+            pageSize={pageSize ?? 20}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange ?? (() => {})}
+          />
         </div>
       )}
     </div>
