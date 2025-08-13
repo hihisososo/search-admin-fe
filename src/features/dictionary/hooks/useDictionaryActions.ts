@@ -82,7 +82,16 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         type === 'synonym' ? synonymDictionaryService :
         typoCorrectionDictionaryService
 
-      const response = await service.create(editingState.newItem as any)
+      // 오타교정은 분리된 필드로 전송(typoWord/correctWord)
+      const payload = type === 'typo'
+        ? {
+            typoWord: String((editingState.newItem as any).keyword || '').trim(),
+            correctWord: String((editingState.newItem as any).correctedWord || '').trim(),
+            description: (editingState.newItem as any).description,
+          }
+        : editingState.newItem
+
+      const response = await (service as any).create(payload)
       
       setEditingState(prev => ({ 
         ...prev, 
@@ -142,7 +151,16 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         type === 'synonym' ? synonymDictionaryService :
         typoCorrectionDictionaryService
 
-      await service.update(item.id, editingState.editingItem as any)
+      // 오타교정은 분리된 필드로 전송(typoWord/correctWord)
+      const payload = type === 'typo'
+        ? {
+            typoWord: String((editingState.editingItem as any).keyword || (item as any).keyword || '').trim(),
+            correctWord: String((editingState.editingItem as any).correctedWord || (item as any).correctedWord || '').trim(),
+            description: (editingState.editingItem as any).description,
+          }
+        : editingState.editingItem
+
+      await (service as any).update(item.id, payload)
       
       setEditingState(prev => ({ 
         ...prev, 

@@ -65,7 +65,9 @@ export function useTypoActions(onRefetch: () => Promise<void>): UseTypoActionsRe
     }
     
     const response = await typoCorrectionDictionaryApi.create({ 
-      keyword: `${newKeyword.trim()} => ${newCorrectedWord.trim()}`
+      typoWord: newKeyword.trim(),
+      correctWord: newCorrectedWord.trim(),
+      // keyword: `${newKeyword.trim()} => ${newCorrectedWord.trim()}` // 하위 호환 필요 시
     })
     
     setAddingItem(false)
@@ -100,7 +102,9 @@ export function useTypoActions(onRefetch: () => Promise<void>): UseTypoActionsRe
     }
     
     const response = await typoCorrectionDictionaryApi.update(item.id, { 
-      keyword: `${editingKeyword.trim()} => ${editingCorrectedWord.trim()}`
+      typoWord: editingKeyword.trim(),
+      correctWord: editingCorrectedWord.trim(),
+      // keyword: `${editingKeyword.trim()} => ${editingCorrectedWord.trim()}` // 하위 호환 필요 시
     })
     
     setError('')

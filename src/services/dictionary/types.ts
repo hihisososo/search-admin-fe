@@ -75,7 +75,11 @@ export interface CreateDictionaryRequest {
 
 // 오타교정 사전 생성 요청
 export interface CreateTypoCorrectionRequest {
-  keyword: string // "오타 => 정답" 형식
+  // 신규 스키마: 분리 필드 사용 권장
+  typoWord?: string
+  correctWord?: string
+  // 하위 호환: "오타 => 정답" 형식 (서버가 파싱 지원 시)
+  keyword?: string // "오타 => 정답" 형식
   description?: string
   typoType?: 'SPELLING' | 'KEYBOARD' | 'PHONETIC' | 'SPACING'
   confidence?: number
@@ -96,7 +100,11 @@ export interface UpdateDictionaryRequest {
 
 // 오타교정 사전 업데이트 요청
 export interface UpdateTypoCorrectionRequest {
-  keyword: string // "오타 => 정답" 형식
+  // 신규 스키마: 분리 필드 사용 권장
+  typoWord?: string
+  correctWord?: string
+  // 하위 호환: "오타 => 정답" 형식 (서버가 파싱 지원 시)
+  keyword?: string // "오타 => 정답" 형식
   description?: string
   typoType?: 'SPELLING' | 'KEYBOARD' | 'PHONETIC' | 'SPACING'
   confidence?: number
