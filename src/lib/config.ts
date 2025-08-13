@@ -10,10 +10,14 @@ class ConfigManager {
   private config: AppConfig
 
   constructor() {
+    const isProd = import.meta.env.MODE === 'production'
+    const defaultBaseUrl = isProd ? '/api' : 'http://localhost:8080/api'
+
     this.config = {
-      apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
-      environment: import.meta.env.MODE === 'production' ? 'production' : 'development',
-      enableDebugMode: import.meta.env.MODE === 'development'
+      // 운영: Nginx 프록시('/api') 사용, 개발: 백엔드(8080) 직접 호출
+      apiBaseUrl: import.meta.env.VITE_API_BASE_URL || defaultBaseUrl,
+      environment: isProd ? 'production' : 'development',
+      enableDebugMode: !isProd
     }
 
     // 개발 환경에서만 설정 출력
