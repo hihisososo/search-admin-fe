@@ -67,6 +67,18 @@ export const MENU_ITEMS: MenuItem[] = [
     title: '검색시뮬레이터',
     path: '/search-simulator',
     icon: Search,
+    subItems: [
+      {
+        id: 'search-simulator-product',
+        title: '상품검색',
+        path: '/search-simulator'
+      },
+      {
+        id: 'search-simulator-autocomplete',
+        title: '자동완성',
+        path: '/search-simulator/autocomplete'
+      }
+    ]
   },
   {
     id: 'search-evaluation',
