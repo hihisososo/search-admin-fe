@@ -55,6 +55,7 @@ export function QueryTable({
   pageSize,
   onPageChange,
   onPageSizeChange,
+  onSearch,
   onRefresh: _onRefresh,
   isLoading
 }: QueryTableProps) {
