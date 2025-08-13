@@ -149,7 +149,7 @@ export function QueryTable({
   return (
     <div className="space-y-3">
       {/* 액션 버튼들 - 왼쪽 정렬, 검색창과 여백 확보 */}
-      <div className="flex flex-wrap items-center gap-3 mb-6">
+      <div className="flex flex-wrap items-center gap-3 mb-8">
         <ActionButtons
           selectedQueryIds={selectedQueryIds}
           onGenerateQueries={handleGenerateQueries}
