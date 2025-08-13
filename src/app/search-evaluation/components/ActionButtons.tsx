@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { RefreshCw, Zap, Trash2, Plus } from "lucide-react"
+import { RefreshCw, Zap, Trash2 } from "lucide-react"
 import { useAsyncTask } from "@/hooks/use-async-task"
 import { getTaskProgressText, getTaskCompletionMessage } from "@/utils/evaluation-helpers"
 import { QueryGenerationDialog } from "./QueryGenerationDialog"
