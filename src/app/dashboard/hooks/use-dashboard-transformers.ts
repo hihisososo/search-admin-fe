@@ -33,7 +33,7 @@ export function useDashboardTransformers() {
     
     return [
       { label: '검색량', value: (dashboardStats.totalSearchCount || 0).toLocaleString() },
-      { label: '검색0건', value: `${(dashboardStats.searchFailureRate || 0).toFixed(1)}%` },
+      { label: '검색0건', value: `${(dashboardStats.zeroHitRate || 0).toFixed(1)}%` },
       { label: '에러건수', value: (dashboardStats.errorCount || 0).toLocaleString() },
       { label: '평균응답시간', value: `${Math.round(dashboardStats.averageResponseTimeMs || 0)}ms` },
       { label: '성공률', value: `${(dashboardStats.successRate || 0).toFixed(1)}%` },
@@ -53,13 +53,18 @@ export function useDashboardTransformers() {
       responseTime: item.averageResponseTime,
     }))
 
-    // 검색량 데이터
-    const searchVolumeData = trendsData.searchVolumeData.map((item: any) => ({
-      date: item.timestamp,
-      searches: item.searchCount,
-      successfulSearches: Math.round(item.searchCount * (1 - 0.02)), // 성공률 98% 가정
-      failedSearches: Math.round(item.searchCount * 0.02), // 실패율 2% 가정
-    }))
+    // 검색량 데이터 (백엔드 제공 필드 반영: searchCount, errorCount)
+    const searchVolumeData = trendsData.searchVolumeData.map((item: any) => {
+      const total = Number(item.searchCount) || 0
+      const errorCount = Number(item.errorCount) || 0
+      const success = Math.max(total - errorCount, 0)
+      return {
+        date: item.timestamp,
+        searches: total,
+        successfulSearches: success,
+        failedSearches: errorCount,
+      }
+    })
 
     return { responseTimeData, searchVolumeData }
   }, [])

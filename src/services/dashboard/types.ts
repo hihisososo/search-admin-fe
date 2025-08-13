@@ -4,7 +4,7 @@ import type { DateRangeParams } from '../common/types'
 export interface DashboardStats {
   totalSearchCount: number
   totalDocumentCount: number
-  searchFailureRate: number
+  zeroHitRate: number
   errorCount: number
   averageResponseTimeMs: number
   successRate: number
