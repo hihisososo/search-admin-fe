@@ -208,14 +208,14 @@ export function TypoCorrectionDictionaryTable({
                                     <TableCell className="py-2">
                                         <div className="break-words">
                                             <span className="font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded text-xs">
-                                                {item.keyword}
+                                                {item.typoWord || item.keyword}
                                             </span>
                                         </div>
                                     </TableCell>
                                     <TableCell className="py-2">
                                         <div className="break-words">
                                             <span className="font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded text-xs">
-                                                {item.correctedWord || '-'}
+                                                {item.correctWord || item.correctedWord || '-'}
                                             </span>
                                         </div>
                                     </TableCell>
