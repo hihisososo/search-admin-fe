@@ -22,7 +22,7 @@ export function useDashboardTransformers() {
     if (!dashboardStats) {
       return [
         { label: '검색량', value: '0' },
-        { label: '검색실패', value: '0%' },
+        { label: '검색0건', value: '0%' },
         { label: '에러건수', value: '0' },
         { label: '평균응답시간', value: '0ms' },
         { label: '성공률', value: '0%' },
@@ -33,7 +33,7 @@ export function useDashboardTransformers() {
     
     return [
       { label: '검색량', value: (dashboardStats.totalSearchCount || 0).toLocaleString() },
-      { label: '검색실패', value: `${(dashboardStats.searchFailureRate || 0).toFixed(1)}%` },
+      { label: '검색0건', value: `${(dashboardStats.searchFailureRate || 0).toFixed(1)}%` },
       { label: '에러건수', value: (dashboardStats.errorCount || 0).toLocaleString() },
       { label: '평균응답시간', value: `${Math.round(dashboardStats.averageResponseTimeMs || 0)}ms` },
       { label: '성공률', value: `${(dashboardStats.successRate || 0).toFixed(1)}%` },

@@ -20,7 +20,7 @@ const STAT_CONFIG: Record<string, StatConfig> = {
     icon: Search,
     color: 'text-blue-600',
   },
-  검색실패: {
+  검색0건: {
     icon: AlertTriangle,
     color: 'text-red-600',
   },
