@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
 import { searchLogApi } from "@/lib/api"
 import type { SearchLogResponse } from "@/services/search-logs/types"
 import { BarChart3 } from "lucide-react"
