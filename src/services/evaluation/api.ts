@@ -137,6 +137,11 @@ class EvaluationService {
   async getProduct(productId: string): Promise<EvaluationProduct> {
     return apiClient.get<EvaluationProduct>(`${this.baseEndpoint}/products/${productId}`)
   }
+
+  // 5. 카테고리 조회
+  async getCategories(params: { size?: number } = {}): Promise<import('./types').EvaluationCategoryListResponse> {
+    return apiClient.get(`${this.baseEndpoint}/categories`, params)
+  }
 }
 
 export const evaluationService = new EvaluationService() 

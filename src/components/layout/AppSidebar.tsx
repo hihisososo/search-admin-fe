@@ -48,7 +48,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.id}>
                   {item.subItems ? (
                     <>
-                      <SidebarMenuButton onClick={() => toggleExpanded(item.id)}>
+                      <SidebarMenuButton onClick={() => toggleExpanded(item.id)} className="hover:cursor-pointer">
                         <item.icon />
                         <span>{item.title}</span>
                         <ChevronRight className={`ml-auto transition-transform duration-200 ${isExpanded(item.id) ? 'rotate-90' : ''}`} />
@@ -60,8 +60,9 @@ export function AppSidebar() {
                               <SidebarMenuSubButton 
                                 asChild
                                 isActive={location.pathname === subItem.path}
+                                className="hover:cursor-pointer"
                               >
-                                <Link to={subItem.path}>
+                                <Link to={subItem.path} className="hover:cursor-pointer">
                                   <span>{subItem.title}</span>
                                 </Link>
                               </SidebarMenuSubButton>
@@ -71,8 +72,8 @@ export function AppSidebar() {
                       )}
                     </>
                   ) : (
-                    <SidebarMenuButton asChild isActive={location.pathname === item.path}>
-                      <Link to={item.path}>
+                    <SidebarMenuButton asChild isActive={location.pathname === item.path} className="hover:cursor-pointer">
+                      <Link to={item.path} className="hover:cursor-pointer">
                         <item.icon />
                         <span>{item.title}</span>
                       </Link>

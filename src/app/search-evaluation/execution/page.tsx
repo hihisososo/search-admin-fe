@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -112,122 +111,109 @@ export default function EvaluationExecutionPage() {
 
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 p-6">
+    <div className="w-full min-h-screen bg-white p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* 새 평가 실행 */}
-        <div className="flex justify-end items-center">
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => reportsQuery.refetch()}
-              disabled={reportsQuery.isLoading}
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className={`h-4 w-4 ${reportsQuery.isLoading ? 'animate-spin' : ''}`} />
-              새로고침
-            </Button>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  새 평가 실행
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>새로운 평가 실행</DialogTitle>
-                  <DialogDescription>
-                    검색 성능을 평가하여 Precision, Recall, F1 Score를 계산합니다. 
-                    모든 쿼리에 대한 평가가 실행되며 결과는 리포트로 저장됩니다.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">리포트 제목</Label>
-                    <Input
-                      id="title"
-                      value={reportTitle}
-                      onChange={(e) => setReportTitle(e.target.value)}
-                      placeholder="예: 2024년 1월 검색 성능 평가"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="retrievalSize">검색 결과 개수</Label>
-                    <Select value={retrievalSize.toString()} onValueChange={(value) => setRetrievalSize(Number(value))}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {EVALUATION_CONFIG.AVAILABLE_RETRIEVAL_SIZES.map(size => (
-                          <SelectItem key={size} value={size.toString()}>
-                            {size}개{size === EVALUATION_CONFIG.DEFAULT_RETRIEVAL_SIZE ? ' (기본값)' : ''}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <p className="text-sm text-gray-500">평가에 사용할 검색 결과의 개수를 설정하세요</p>
-                  </div>
+        {/* 상단 액션 영역 - 좌측 정렬, 정답셋 관리와 동일 간격 */}
+        <div className="flex flex-wrap items-center gap-2 mb-8">
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                새 평가 실행
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>새로운 평가 실행</DialogTitle>
+                <DialogDescription>
+                  검색 성능을 평가하여 Precision, Recall, F1 Score를 계산합니다. 
+                  모든 쿼리에 대한 평가가 실행되며 결과는 리포트로 저장됩니다.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">리포트 제목</Label>
+                  <Input
+                    id="title"
+                    value={reportTitle}
+                    onChange={(e) => setReportTitle(e.target.value)}
+                    placeholder="예: 2024년 1월 검색 성능 평가"
+                  />
                 </div>
-                <DialogFooter>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setIsDialogOpen(false)}
-                    disabled={evaluateMutation.isPending}
-                  >
-                    취소
-                  </Button>
-                  <Button 
-                    onClick={executeEvaluation}
-                    disabled={!reportTitle.trim() || evaluateMutation.isPending}
-                    className="flex items-center gap-2"
-                  >
-                    {evaluateMutation.isPending ? (
-                      <>
-                        <RefreshCw className="h-4 w-4 animate-spin" />
-                        실행중...
-                      </>
-                    ) : (
-                      <>
-                        <Play className="h-4 w-4" />
-                        실행
-                      </>
-                    )}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
+                <div className="space-y-2">
+                  <Label htmlFor="retrievalSize">검색 결과 개수</Label>
+                  <Select value={retrievalSize.toString()} onValueChange={(value) => setRetrievalSize(Number(value))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {EVALUATION_CONFIG.AVAILABLE_RETRIEVAL_SIZES.map(size => (
+                        <SelectItem key={size} value={size.toString()}>
+                          {size}개{size === EVALUATION_CONFIG.DEFAULT_RETRIEVAL_SIZE ? ' (기본값)' : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-gray-500">평가에 사용할 검색 결과의 개수를 설정하세요</p>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsDialogOpen(false)}
+                  disabled={evaluateMutation.isPending}
+                >
+                  취소
+                </Button>
+                <Button 
+                  onClick={executeEvaluation}
+                  disabled={!reportTitle.trim() || evaluateMutation.isPending}
+                  className="flex items-center gap-2"
+                >
+                  {evaluateMutation.isPending ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      실행중...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4" />
+                      실행
+                    </>
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
-        {/* 평가 히스토리 */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
-              평가 히스토리
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
+        {/* 평가 히스토리 - 카드 제거, 테이블 컨테이너 스타일 통일 */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <BarChart3 className="h-5 w-5" />
+            <h3 className="text-base font-semibold text-gray-900">평가 히스토리</h3>
+          </div>
+          <div className="border border-gray-200 rounded-md overflow-hidden bg-white">
             {reportsQuery.isLoading ? (
               <ReportsTableSkeleton />
             ) : (
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gray-50">
-                    <TableHead className="w-16">ID</TableHead>
-                    <TableHead>제목</TableHead>
-                    <TableHead className="text-center w-24">상태</TableHead>
-                    <TableHead className="text-center w-24">Precision</TableHead>
-                    <TableHead className="text-center w-24">Recall</TableHead>
-                    <TableHead className="text-center w-24">F1 Score</TableHead>
-                    <TableHead className="w-44">실행 시간</TableHead>
-                    <TableHead className="text-center w-24">삭제</TableHead>
+                  <TableRow className="bg-gray-50 hover:bg-gray-50">
+                    <TableHead className="w-16 py-2 text-xs font-semibold text-gray-700">ID</TableHead>
+                    <TableHead className="py-2 text-xs font-semibold text-gray-700">제목</TableHead>
+                    <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">상태</TableHead>
+                    <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">Precision</TableHead>
+                    <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">Recall</TableHead>
+                    <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">F1 Score</TableHead>
+                    <TableHead className="w-44 py-2 text-xs font-semibold text-gray-700">실행 시간</TableHead>
+                    <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">삭제</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {!reportsQuery.data || reportsQuery.data.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-12">
+                      <TableCell colSpan={8} className="text-center py-12 text-gray-500">
                         <div className="text-gray-500">
                           <p>아직 실행된 평가가 없습니다.</p>
                           <p className="text-sm text-gray-400 mt-1">새 평가를 실행해보세요.</p>
@@ -237,34 +223,34 @@ export default function EvaluationExecutionPage() {
                   ) : (
                     reportsQuery.data.map((report) => (
                       <TableRow key={report.id} className="hover:bg-gray-50">
-                        <TableCell className="font-medium">#{report.id}</TableCell>
-                        <TableCell>
+                        <TableCell className="py-2 text-xs text-gray-700 font-medium">#{report.id}</TableCell>
+                        <TableCell className="py-2">
                           <div className="flex items-center gap-2">
                             <CheckCircle className="h-4 w-4 text-green-500" />
                             <button
                               onClick={() => viewReport(report.id)}
-                              className="font-medium text-blue-600 hover:text-blue-800 hover:underline text-left transition-colors"
+                              className="text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline text-left transition-colors"
                             >
                               {report.reportName}
                             </button>
                           </div>
                         </TableCell>
-                        <TableCell className="text-center">
-                          <Badge className="bg-green-100 text-green-800">완료</Badge>
+                        <TableCell className="py-2 text-center">
+                          <Badge className="bg-green-100 text-green-800 text-xs py-0.5 px-2">완료</Badge>
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="py-2 text-center">
                           <PerformanceScore score={report.averagePrecision} size="sm" />
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="py-2 text-center">
                           <PerformanceScore score={report.averageRecall} size="sm" />
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="py-2 text-center">
                           <PerformanceScore score={report.averageF1Score} size="sm" />
                         </TableCell>
-                        <TableCell className="text-sm text-gray-600">
+                        <TableCell className="py-2 text-xs text-gray-600">
                           {formatDate(report.createdAt)}
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="py-2 text-center">
                           <Button 
                             variant="outline" 
                             size="sm" 
@@ -283,8 +269,8 @@ export default function EvaluationExecutionPage() {
                 </TableBody>
               </Table>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* 리포트 상세 다이얼로그 */}
         <Dialog open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen}>

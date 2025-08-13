@@ -8,13 +8,15 @@ interface SearchLogTableProps {
   sortField: SearchLogSortField
   sortDirection: SearchLogSortDirection
   onSort: (field: SearchLogSortField) => void
+  onRowClick?: (item: SearchLogItem) => void
 }
 
 export function SearchLogTable({
   items,
   sortField,
   sortDirection,
-  onSort
+  onSort,
+  onRowClick
 }: SearchLogTableProps) {
 
   // 정렬 아이콘 렌더링
@@ -104,7 +106,7 @@ export function SearchLogTable({
         </TableHeader>
         <TableBody>
           {items.map((item) => (
-            <TableRow key={item.id} className="hover:bg-gray-50 h-8">
+            <TableRow key={item.id} className="hover:bg-gray-50 h-8 cursor-pointer" onClick={() => onRowClick?.(item)}>
               <TableCell className="text-xs text-gray-600 py-1 text-center">
                 {formatTimestamp(item.timestamp)}
               </TableCell>

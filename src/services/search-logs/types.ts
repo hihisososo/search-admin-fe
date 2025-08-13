@@ -31,6 +31,9 @@ export interface SearchLogPageResponse extends PageResponse<SearchLogItem> {
   hasPrevious: boolean
 }
 
+// 검색 로그 상세 응답 (목록 아이템과 동일 필드 가정)
+export interface SearchLogResponse extends SearchLogItem {}
+
 
 // 검색 로그 파라미터
 export interface SearchLogParams extends SearchParams, DateRangeParams {

@@ -12,6 +12,8 @@ import {
 import { Plus } from "lucide-react"
 import { EVALUATION_CONFIG } from "@/constants/evaluation"
 import type { GenerateQueriesRequest } from "@/services/evaluation/types"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useEvaluationCategories } from "@/hooks/use-evaluation"
 
 interface QueryGenerationDialogProps {
   onGenerate: (data: GenerateQueriesRequest) => Promise<void>
@@ -31,6 +33,7 @@ export function QueryGenerationDialog({
   const [minCandidates, setMinCandidates] = useState<number | undefined>(60)
   const [maxCandidates, setMaxCandidates] = useState<number | undefined>(200)
   const [category, setCategory] = useState<string>("")
+  const { data: categoriesData } = useEvaluationCategories(100)
 
   const handleGenerate = async () => {
     try {
@@ -52,12 +55,12 @@ export function QueryGenerationDialog({
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" disabled={disabled}>
           <Plus className="h-4 w-4 mr-2" />
-          쿼리 자동생성
+          정답셋 자동생성
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>쿼리 자동생성</DialogTitle>
+          <DialogTitle>정답셋 자동생성</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
@@ -74,15 +77,19 @@ export function QueryGenerationDialog({
               />
             </div>
             <div>
-              <Label htmlFor="category" className="text-sm font-medium">카테고리(선택)</Label>
-              <Input
-                id="category"
-                type="text"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                placeholder="예: 노트북"
-                className="text-sm mt-1"
-              />
+              <Label className="text-sm font-medium">카테고리(선택)</Label>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="w-full text-sm mt-1">
+                  <SelectValue placeholder="카테고리를 선택하세요" />
+                </SelectTrigger>
+                <SelectContent className="text-sm">
+                  {(categoriesData?.categories || []).map((c) => (
+                    <SelectItem key={c.name} value={c.name} className="text-sm">
+                      {c.name} ({c.docCount.toLocaleString()})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="minCandidates" className="text-sm font-medium">최소 후보 수(선택)</Label>

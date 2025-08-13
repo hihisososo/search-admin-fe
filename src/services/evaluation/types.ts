@@ -54,6 +54,16 @@ export interface EvaluationProduct {
   price?: number
 }
 
+// 카테고리 타입
+export interface EvaluationCategory {
+  name: string
+  docCount: number
+}
+
+export interface EvaluationCategoryListResponse {
+  categories: EvaluationCategory[]
+}
+
 
 
 // 매핑 관련 타입
