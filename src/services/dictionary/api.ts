@@ -41,7 +41,11 @@ abstract class BaseDictionaryService<T, CreateReq, UpdateReq> {
   }
 
   async bulkDelete(ids: number[]): Promise<void> {
-    return apiClient.delete<void>(`${this.endpoint}/bulk`, { ids })
+    if (!ids || ids.length === 0) return
+    // 백엔드에서 bulk 삭제 미지원: 개별 삭제 반복 수행
+    for (const id of ids) {
+      await this.delete(id as number)
+    }
   }
 
   async download(): Promise<Blob> {

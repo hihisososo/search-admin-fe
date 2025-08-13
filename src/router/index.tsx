@@ -10,6 +10,7 @@ const StopwordDictionary = lazy(() => import("@/app/dictionary/stopword/page"))
 const TypoCorrectionDictionary = lazy(() => import("@/app/dictionary/typo/page"))
 const SearchLogs = lazy(() => import("@/app/search-logs/page"))
 const SearchSimulator = lazy(() => import("@/app/search-simulator/page"))
+const SearchSimulatorAutocomplete = lazy(() => import("@/app/search-simulator/autocomplete/page"))
 const SearchDemo = lazy(() => import("@/app/search-demo/page"))
 const DeployManagement = lazy(() => import("@/app/deploy/page"))
 const AnswerSetManagement = lazy(() => import("@/app/search-evaluation/answer-set/page"))
@@ -37,6 +38,7 @@ export function AdminRoutes() {
         <Route path="/search-logs" element={<SearchLogs />} />
         <Route path="/deploy" element={<DeployManagement />} />
         <Route path="/search-simulator" element={<SearchSimulator />} />
+        <Route path="/search-simulator/autocomplete" element={<SearchSimulatorAutocomplete />} />
         <Route path="/search-evaluation" element={<Navigate to="/search-evaluation/answer-set" replace />} />
         <Route path="/search-evaluation/answer-set" element={<AnswerSetManagement />} />
         <Route path="/search-evaluation/execution" element={<EvaluationExecution />} />
