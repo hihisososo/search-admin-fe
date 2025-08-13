@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
 import {
   Drawer,
   DrawerContent,
@@ -21,7 +20,7 @@ export default function AnswerSetManagementPage() {
   const [queryPage, setQueryPage] = useState(0)
   const [documentPage, setDocumentPage] = useState(0)
   const [queryPageSize, setQueryPageSize] = useState(20)
-  const documentPageSize = 20
+  const [documentPageSize, setDocumentPageSize] = useState(20)
 
   // API 호출
   const queriesQuery = useEvaluationQueries({ page: queryPage, size: queryPageSize })
@@ -103,6 +102,11 @@ export default function AnswerSetManagementPage() {
     setDocumentPage(page)
   }
 
+  const handleDocumentPageSizeChange = (newPageSize: number) => {
+    setDocumentPageSize(newPageSize)
+    setDocumentPage(0)
+  }
+
   // 페이지 크기 변경 핸들러
   const handleQueryPageSizeChange = (newPageSize: number) => {
     setQueryPageSize(newPageSize)
@@ -116,29 +120,28 @@ export default function AnswerSetManagementPage() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* 쿼리 테이블 */}
-        <Card>
-          <CardContent className="p-0">
-            <QueryTable
-              queries={queriesQuery.data?.queries || []}
-              selectedQueryIds={selectedQueryIds}
-              onSelectQuery={handleSelectQuery}
-              onSelectAll={handleSelectAll}
-              onQueryClick={handleQueryClick}
-              onClearSelection={handleClearSelection}
-              currentPage={queriesQuery.data?.currentPage || 0}
-              totalPages={queriesQuery.data?.totalPages || 1}
-              totalCount={queriesQuery.data?.totalCount || 0}
-              pageSize={queryPageSize}
-              onPageChange={handleQueryPageChange}
-              onPageSizeChange={handleQueryPageSizeChange}
-              onRefresh={handleRefresh}
-              isLoading={queriesQuery.isLoading}
-            />
-          </CardContent>
-        </Card>
+    <div className="p-6">
+      <div className="max-w-7xl mx-auto space-y-4">
+        {/* 쿼리 테이블 (카드 제거) */}
+        <div>
+          <QueryTable
+            queries={queriesQuery.data?.queries || []}
+            selectedQueryIds={selectedQueryIds}
+            onSelectQuery={handleSelectQuery}
+            onSelectAll={handleSelectAll}
+            onQueryClick={handleQueryClick}
+            onClearSelection={handleClearSelection}
+            currentPage={queriesQuery.data?.currentPage || 0}
+            totalPages={queriesQuery.data?.totalPages || 1}
+            totalCount={queriesQuery.data?.totalCount || 0}
+            pageSize={queryPageSize}
+            onPageChange={handleQueryPageChange}
+            onPageSizeChange={handleQueryPageSizeChange}
+            onRefresh={handleRefresh}
+            isLoading={queriesQuery.isLoading}
+            onSearch={() => { /* TODO: API 지원 시 검색 연동 */ }}
+          />
+        </div>
 
         {/* 문서 리스트 Drawer */}
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen} direction="right">
@@ -158,6 +161,8 @@ export default function AnswerSetManagementPage() {
                   onPageChange={handleDocumentPageChange}
                   onClose={() => setIsDrawerOpen(false)}
                   isLoading={documentsQuery.isLoading}
+                  pageSize={documentPageSize}
+                  onPageSizeChange={handleDocumentPageSizeChange}
                 />
               )}
             </div>

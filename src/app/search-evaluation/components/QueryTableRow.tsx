@@ -13,6 +13,7 @@ interface QueryTableRowProps {
   onEdit: (queryId: number, queryText: string) => void
   onDelete: (queryId: number) => void
   isDeleting: boolean
+  rowClassName?: string
 }
 
 export function QueryTableRow({
@@ -22,7 +23,8 @@ export function QueryTableRow({
   onQueryClick,
   onEdit,
   onDelete,
-  isDeleting
+  isDeleting,
+  rowClassName
 }: QueryTableRowProps) {
   // 실제 백엔드 필드명 사용 (기본값 처리)
   const documentCount = query.documentCount ?? 0
@@ -32,9 +34,9 @@ export function QueryTableRow({
 
   return (
     <TableRow 
-      className={`hover:bg-gray-50 ${isSelected ? 'bg-blue-50' : ''}`}
+      className={`hover:bg-gray-50 ${isSelected ? 'bg-blue-50' : ''} ${rowClassName || ''}`}
     >
-      <TableCell>
+      <TableCell className="py-2">
         <Checkbox
           checked={isSelected}
           onCheckedChange={(checked) => {
@@ -42,35 +44,35 @@ export function QueryTableRow({
           }}
         />
       </TableCell>
-      <TableCell>
+      <TableCell className="py-2">
         <button
           onClick={() => onQueryClick(query.id, query.query)}
-          className="text-left hover:text-blue-600 transition-colors font-medium"
+          className="text-left hover:text-blue-600 transition-colors font-medium text-xs"
         >
           {query.query}
         </button>
       </TableCell>
-      <TableCell className="text-center">
-        <Badge variant={documentCount > 0 ? "default" : "secondary"}>
+      <TableCell className="py-2 text-center">
+        <Badge variant={documentCount > 0 ? "default" : "secondary"} className="text-xs py-0.5 px-2">
           {documentCount}
         </Badge>
       </TableCell>
-      <TableCell className="text-center">
-        <Badge variant="default" className="bg-green-600">
+      <TableCell className="py-2 text-center">
+        <Badge variant="default" className="bg-green-600 text-xs py-0.5 px-2">
           {correctCount}
         </Badge>
       </TableCell>
-      <TableCell className="text-center">
-        <Badge variant="destructive">
+      <TableCell className="py-2 text-center">
+        <Badge variant="destructive" className="text-xs py-0.5 px-2">
           {incorrectCount}
         </Badge>
       </TableCell>
-      <TableCell className="text-center">
-        <Badge variant="secondary">
+      <TableCell className="py-2 text-center">
+        <Badge variant="secondary" className="text-xs py-0.5 px-2">
           {unspecifiedCount}
         </Badge>
       </TableCell>
-      <TableCell className="text-center">
+      <TableCell className="py-2 text-center">
         <div className="flex gap-1 justify-center">
           <Button
             size="sm"

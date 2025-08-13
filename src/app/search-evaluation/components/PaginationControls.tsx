@@ -20,7 +20,7 @@ export function PaginationControls({
   onPageChange,
   onPageSizeChange: _onPageSizeChange
 }: PaginationControlsProps) {
-  if (totalPages <= 1) return null
+  // 항상 표시되도록 변경 (단일 페이지여도 노출)
 
   const { startPage, endPage } = calculatePaginationRange(
     currentPage, 
