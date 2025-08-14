@@ -24,7 +24,7 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
   // 동의어, 오타교정 사전은 실시간 반영이 있으므로 모든 환경에서 편집 가능
   const canEdit = (type === 'synonym' || type === 'typo') ? true : environment === 'CURRENT'
   
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(10)
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
@@ -81,7 +81,7 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
           </Button>
         </div>
         <div className="flex items-center gap-2">
-          <Select value={pageSize.toString()} onValueChange={(value) => { setPageSize(Number(value)); setPage(1) }}>
+          <Select value={pageSize.toString()} onValueChange={(value) => { setPageSize(Number(value)); setPage(0) }}>
             <SelectTrigger className="w-24 h-9 text-xs">
               <SelectValue />
             </SelectTrigger>
@@ -114,24 +114,24 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
       {totalPages > 1 && (
         <div className="mt-2">
           <PaginationControls
-            currentPage={page - 1}
+            currentPage={page}
             totalPages={totalPages}
             totalCount={state.total}
             pageSize={pageSize}
-            onPageChange={(p) => setPage(p + 1)}
-            onPageSizeChange={(ps) => { setPageSize(ps); setPage(1) }}
+            onPageChange={(p) => setPage(p)}
+            onPageSizeChange={(ps) => { setPageSize(ps); setPage(0) }}
           />
         </div>
       )}
       {totalPages <= 1 && (
         <div className="mt-2">
           <PaginationControls
-            currentPage={page - 1}
+            currentPage={page}
             totalPages={Math.max(1, totalPages)}
             totalCount={state.total}
             pageSize={pageSize}
-            onPageChange={(p) => setPage(p + 1)}
-            onPageSizeChange={(ps) => { setPageSize(ps); setPage(1) }}
+            onPageChange={(p) => setPage(p)}
+            onPageSizeChange={(ps) => { setPageSize(ps); setPage(0) }}
           />
         </div>
       )}

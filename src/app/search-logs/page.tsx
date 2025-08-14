@@ -20,7 +20,7 @@ export default function SearchLogs() {
   const [items, setItems] = useState<SearchLogItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(20)
   const [total, setTotal] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
@@ -50,7 +50,7 @@ export default function SearchLogs() {
     try {
       const sessionId = getSearchSessionId()
       const params: SearchLogParams = {
-        page: page - 1, // API는 0부터 시작
+        page, // API는 0부터 시작 (state도 0-base)
         size: pageSize,
         sort: sortField,
         order: sortDirection,
@@ -97,12 +97,12 @@ export default function SearchLogs() {
       setSortField(field)
       setSortDirection('desc')
     }
-    setPage(1)
+    setPage(0)
   }
 
   // 검색 실행
   const handleSearch = () => {
-    setPage(1)
+    setPage(0)
     fetchItems()
   }
 
@@ -117,12 +117,12 @@ export default function SearchLogs() {
     setMaxResponseTime(undefined)
     setMinResultCount(undefined)
     setMaxResultCount(undefined)
-    setPage(1)
+    setPage(0)
   }
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize)
-    setPage(1) // 페이지 크기 변경시 첫 페이지로 이동
+    setPage(0) // 페이지 크기 변경시 첫 페이지(0)로 이동
   }
 
 
@@ -171,7 +171,7 @@ export default function SearchLogs() {
           {/* 전체 건수 및 페이지 크기 선택 */}
               <div className="flex justify-between items-center mb-1">
             <div className="text-xs text-gray-500">
-              전체 {total.toLocaleString()}건 (페이지 {page}/{totalPages})
+              전체 {total.toLocaleString()}건 (페이지 {page + 1}/{totalPages})
             </div>
             <div className="flex items-center gap-2">
               <Select value={pageSize.toString()} onValueChange={(value) => handlePageSizeChange(Number(value))}>
@@ -217,11 +217,11 @@ export default function SearchLogs() {
 
               <div className="mt-3 pt-2 border-t border-gray-100">
                 <PaginationControls
-                  currentPage={page - 1}
+                  currentPage={page}
                   totalPages={totalPages}
                   totalCount={total}
                   pageSize={pageSize}
-                  onPageChange={(p) => setPage(p + 1)}
+                  onPageChange={(p) => setPage(p)}
                   onPageSizeChange={(ps) => { handlePageSizeChange(ps) }}
                 />
               </div>

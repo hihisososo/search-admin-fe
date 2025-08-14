@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { Drawer, DrawerContent } from "@/components/ui/drawer"
 import { 
   Select,
   SelectContent,
@@ -22,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Play, BarChart3, CheckCircle, RefreshCw, Plus, Trash2 } from "lucide-react"
-import { useEvaluationReports, useEvaluate } from "@/hooks/use-evaluation"
+import { useEvaluationReports, useEvaluate, useDeleteEvaluationReport } from "@/hooks/use-evaluation"
 import { evaluationService } from "@/services/evaluation/api"
 import { formatDate } from "@/utils/evaluation-helpers"
 import { EVALUATION_CONFIG } from "@/constants/evaluation"
@@ -35,11 +36,12 @@ export default function EvaluationExecutionPage() {
   const [reportTitle, setReportTitle] = useState("")
   const [retrievalSize, setRetrievalSize] = useState<number>(EVALUATION_CONFIG.DEFAULT_RETRIEVAL_SIZE)
   const [selectedReport, setSelectedReport] = useState<EvaluationReport | null>(null)
-  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false)
+  const [isReportDrawerOpen, setIsReportDrawerOpen] = useState(false)
 
   // API 훅들
   const reportsQuery = useEvaluationReports()
   const evaluateMutation = useEvaluate()
+  const deleteReportMutation = useDeleteEvaluationReport()
 
   // 평가 실행
   const executeEvaluation = async () => {
@@ -80,7 +82,7 @@ export default function EvaluationExecutionPage() {
       // TODO: useEvaluationReport 훅으로 변경 고려
       const report = await evaluationService.getReport(reportId)
       setSelectedReport(report)
-      setIsReportDialogOpen(true)
+      setIsReportDrawerOpen(true)
     } catch (error) {
       console.error('❌ 리포트 조회 실패:', error)
       alert('리포트 조회에 실패했습니다. 다시 시도해주세요.')
@@ -94,12 +96,15 @@ export default function EvaluationExecutionPage() {
     }
 
     try {
-      // TODO: 백엔드에 deleteReport API 추가 필요
-      // await evaluationService.deleteReport(reportId)
-      // Delete report request
-      alert('리포트 삭제 기능은 준비중입니다.')
-      // 삭제 성공 시 목록 새로고침
-      // await fetchReports()
+      await deleteReportMutation.mutateAsync(reportId)
+
+      // 상세 드로어가 열려 있고 동일 리포트를 보고 있었다면 닫기
+      if (selectedReport?.id === reportId) {
+        setIsReportDrawerOpen(false)
+        setSelectedReport(null)
+      }
+
+      alert('리포트가 삭제되었습니다.')
     } catch (error) {
       console.error('❌ 리포트 삭제 실패:', error)
       alert('리포트 삭제에 실패했습니다. 다시 시도해주세요.')
@@ -113,8 +118,8 @@ export default function EvaluationExecutionPage() {
   return (
     <div className="w-full min-h-screen bg-white p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* 상단 액션 영역 - 좌측 정렬, 정답셋 관리와 동일 간격 */}
-        <div className="flex flex-wrap items-center gap-2 mb-8">
+		{/* 상단 액션 영역 - 우측 정렬 */}
+		<div className="flex flex-wrap items-center justify-end w-full gap-2 mb-8">
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="flex items-center gap-2">
@@ -272,23 +277,22 @@ export default function EvaluationExecutionPage() {
           </div>
         </div>
 
-        {/* 리포트 상세 다이얼로그 */}
-        <Dialog open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen}>
-          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>평가 리포트 상세</DialogTitle>
-              <DialogDescription>
-                {selectedReport?.reportName}
-              </DialogDescription>
-            </DialogHeader>
-            
-            {selectedReport && (
-              <div className="py-4">
-                <EvaluationReportViewer report={selectedReport} />
+        {/* 리포트 상세 슬라이드(드로어) */}
+        <Drawer open={isReportDrawerOpen} onOpenChange={setIsReportDrawerOpen} direction="right">
+          <DrawerContent className="h-full !w-[80vw] !max-w-none ml-auto fixed bottom-0 right-0 border-l shadow-2xl" data-vaul-no-drag>
+            <div className="flex flex-col h-full bg-white">
+              <div className="px-6 py-4 border-b">
+                <h3 className="text-base font-semibold text-gray-900">평가 리포트 상세</h3>
+                <p className="text-xs text-gray-500 mt-1">{selectedReport?.reportName}</p>
               </div>
-            )}
-          </DialogContent>
-        </Dialog>
+              <div className="flex-1 overflow-auto px-6 py-4 select-text touch-pan-y" data-vaul-no-drag>
+                {selectedReport && (
+                  <EvaluationReportViewer report={selectedReport} />
+                )}
+              </div>
+            </div>
+          </DrawerContent>
+        </Drawer>
       </div>
     </div>
   )

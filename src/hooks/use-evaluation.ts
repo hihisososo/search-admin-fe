@@ -103,6 +103,16 @@ export function useEvaluationReport(reportId: number) {
   })
 }
 
+export function useDeleteEvaluationReport() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (reportId: number) => evaluationService.deleteReport(reportId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: evaluationKeys.reports.all })
+    },
+  })
+}
+
 // 비동기 작업 상태 조회
 export function useTaskStatus(taskId: number | null) {
   return useQuery({

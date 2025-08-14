@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -33,8 +33,7 @@ export function QueryGenerationDialog({
   const [minCandidates, setMinCandidates] = useState<number | undefined>(60)
   const [maxCandidates, setMaxCandidates] = useState<number | undefined>(200)
   const [category, setCategory] = useState<string>("")
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const { data: categoriesData, refetch: refetchCategories } = useEvaluationCategories(100, dialogOpen)
+  const { data: categoriesData } = useEvaluationCategories(100, isOpen)
 
   // 다양한 응답 스키마 대응: { categories: [...] } | { data: { categories: [...] } } | string[]
   const categoryOptions = ((): Array<{ name: string; docCount?: number }> => {
@@ -63,15 +62,7 @@ export function QueryGenerationDialog({
     }
   }
 
-  // 다이얼로그 열릴 때 카테고리 트리거
-  useEffect(() => {
-    if (isOpen) {
-      setDialogOpen(true)
-      refetchCategories()
-    } else {
-      setDialogOpen(false)
-    }
-  }, [isOpen, refetchCategories])
+  // 다이얼로그가 열릴 때만 카테고리 조회 (enabled: isOpen)
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

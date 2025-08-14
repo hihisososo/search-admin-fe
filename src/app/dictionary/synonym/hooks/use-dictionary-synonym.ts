@@ -41,7 +41,7 @@ export function useDictionarySynonym({
     setError('')
     try {
       const params = new URLSearchParams({
-        page: (page - 1).toString(),
+        page: page.toString(),
         size: '20',
         sortBy: sortField,
         sortDir: sortDirection,
