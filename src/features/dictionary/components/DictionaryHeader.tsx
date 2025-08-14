@@ -59,15 +59,16 @@ export function DictionaryHeader<T extends BaseDictionaryItem>({
         </div>
         
         <div className="flex items-center gap-2">
-          {canEdit && selectedCount > 0 && (
+          {canEdit && (
             <Button
               onClick={onDeleteSelected}
               size="sm"
               variant="outline"
+              disabled={selectedCount === 0}
               className="border-red-300 text-red-600 hover:bg-red-50"
             >
               <Trash2 className="h-4 w-4 mr-1" />
-              선택 삭제 ({selectedCount})
+              선택 삭제{selectedCount > 0 ? ` (${selectedCount})` : ''}
             </Button>
           )}
           

@@ -31,12 +31,15 @@ export function useDashboardTransformers() {
       ]
     }
     
+    const successRate = dashboardStats.successRate ?? 0
+    const successRateDisplay = successRate >= 100 ? '100%' : `${successRate.toFixed(2)}%`
+
     return [
       { label: '검색량', value: (dashboardStats.totalSearchCount || 0).toLocaleString() },
       { label: '검색0건', value: `${(dashboardStats.zeroHitRate || 0).toFixed(1)}%` },
       { label: '에러건수', value: (dashboardStats.errorCount || 0).toLocaleString() },
       { label: '평균응답시간', value: `${Math.round(dashboardStats.averageResponseTimeMs || 0)}ms` },
-      { label: '성공률', value: `${(dashboardStats.successRate || 0).toFixed(1)}%` },
+      { label: '성공률', value: successRateDisplay },
       { label: '클릭수', value: (dashboardStats.clickCount || 0).toLocaleString() },
       { label: 'CTR', value: `${(dashboardStats.clickThroughRate || 0).toFixed(1)}%` },
     ]

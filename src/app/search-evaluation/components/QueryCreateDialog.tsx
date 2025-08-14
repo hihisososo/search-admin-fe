@@ -37,7 +37,7 @@ export function QueryCreateDialog({ onCreate, isCreating = false, disabled = fal
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" disabled={disabled} className="bg-blue-600 hover:bg-blue-700">
+        <Button size="sm" variant="outline" disabled={disabled}>
           <SquarePen className="h-4 w-4 mr-1" />
           쿼리 추가
         </Button>

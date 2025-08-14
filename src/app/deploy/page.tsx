@@ -266,7 +266,7 @@ export default function DeployManagement() {
           isDeploying={isDeploying}
         />
 
-        {/* 배포 이력 */}
+        {/* 색인/배포 이력 */}
         <DeploymentHistory history={deployHistory} />
       </div>
     </div>

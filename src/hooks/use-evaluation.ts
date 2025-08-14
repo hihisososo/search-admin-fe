@@ -80,10 +80,11 @@ export function useProduct(productId: string) {
   })
 }
 
-export function useEvaluationCategories(size?: number) {
+export function useEvaluationCategories(size?: number, enabled: boolean = true) {
   return useQuery({
     queryKey: evaluationKeys.categories.list(size),
     queryFn: () => evaluationService.getCategories({ size }),
+    enabled,
   })
 }
 

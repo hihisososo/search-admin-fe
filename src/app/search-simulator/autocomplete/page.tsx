@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { EnvironmentSelector } from "@/app/dictionary/user/components/EnvironmentSelector"
 import { DictionaryEnvironmentType } from "@/types/dashboard"
 import type { AutocompleteResponse } from "@/lib/api"
@@ -14,7 +13,21 @@ export default function AutocompleteSimulatorPage() {
   const [error, setError] = useState("")
   const [suggestions, setSuggestions] = useState<string[]>([])
 
-  const envLabel = useMemo(() => selectedEnv === DictionaryEnvironmentType.PROD ? "운영" : "개발", [selectedEnv])
+  // const envLabel = useMemo(() => selectedEnv === DictionaryEnvironmentType.PROD ? "운영" : "개발", [selectedEnv])
+
+  const highlight = (text: string, keyword: string) => {
+    if (!keyword) return text
+    const tokens = keyword.trim().split(/\s+/).filter(Boolean)
+    if (tokens.length === 0) return text
+    const escaped = tokens.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    const regex = new RegExp(`(${escaped.join('|')})`, 'gi')
+    const parts = text.split(regex)
+    return parts.map((part, idx) =>
+      regex.test(part)
+        ? <span key={idx} className="text-blue-600 font-semibold">{part}</span>
+        : <span key={idx}>{part}</span>
+    )
+  }
 
   useEffect(() => {
     const timeout = setTimeout(async () => {
@@ -52,10 +65,9 @@ export default function AutocompleteSimulatorPage() {
             <Input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
-              placeholder={`자동완성 키워드 입력 (${envLabel})`}
+              placeholder="자동완성 키워드 입력"
               className="h-9 max-w-md"
             />
-            <Button variant="outline" size="sm" onClick={() => setKeyword("")}>초기화</Button>
           </div>
           {error && <div className="text-sm text-red-600 mt-2">{error}</div>}
           <div className="mt-4">
@@ -63,7 +75,7 @@ export default function AutocompleteSimulatorPage() {
             <ul className="space-y-1">
               {suggestions.map((s, i) => (
                 <li key={`${s}-${i}`} className="text-sm px-3 py-1 rounded hover:bg-muted cursor-default border border-transparent hover:border-muted-foreground/10">
-                  {s}
+                  {highlight(s, keyword)}
                 </li>
               ))}
               {!loading && suggestions.length === 0 && keyword.trim() && (

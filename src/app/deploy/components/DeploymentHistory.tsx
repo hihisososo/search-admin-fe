@@ -154,7 +154,7 @@ export default function DeploymentHistory({ history = [] }: DeploymentHistoryPro
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <History className="h-4 w-4 text-gray-600" />
-          배포 이력
+          색인/배포 이력
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
@@ -214,7 +214,7 @@ export default function DeploymentHistory({ history = [] }: DeploymentHistoryPro
               {paginatedData.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-6 text-gray-500 text-sm">
-                    배포 이력이 없습니다.
+                    색인/배포 이력이 없습니다.
                   </TableCell>
                 </TableRow>
               ) : (
