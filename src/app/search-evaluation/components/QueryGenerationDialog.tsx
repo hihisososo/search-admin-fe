@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -33,7 +33,20 @@ export function QueryGenerationDialog({
   const [minCandidates, setMinCandidates] = useState<number | undefined>(60)
   const [maxCandidates, setMaxCandidates] = useState<number | undefined>(200)
   const [category, setCategory] = useState<string>("")
-  const { data: categoriesData } = useEvaluationCategories(100)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const { data: categoriesData, refetch: refetchCategories } = useEvaluationCategories(100, dialogOpen)
+
+  // 다양한 응답 스키마 대응: { categories: [...] } | { data: { categories: [...] } } | string[]
+  const categoryOptions = ((): Array<{ name: string; docCount?: number }> => {
+    const raw: any = categoriesData as any
+    const list = raw?.categories ?? raw?.data?.categories ?? raw ?? []
+    if (Array.isArray(list)) {
+      return list.map((c: any) =>
+        typeof c === 'string' ? { name: c, docCount: 0 } : { name: c.name ?? String(c), docCount: c.docCount }
+      )
+    }
+    return []
+  })()
 
   const handleGenerate = async () => {
     try {
@@ -50,10 +63,20 @@ export function QueryGenerationDialog({
     }
   }
 
+  // 다이얼로그 열릴 때 카테고리 트리거
+  useEffect(() => {
+    if (isOpen) {
+      setDialogOpen(true)
+      refetchCategories()
+    } else {
+      setDialogOpen(false)
+    }
+  }, [isOpen, refetchCategories])
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" disabled={disabled}>
+        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" disabled={disabled}>
           <Plus className="h-4 w-4 mr-2" />
           정답셋 자동생성
         </Button>
@@ -83,9 +106,9 @@ export function QueryGenerationDialog({
                   <SelectValue placeholder="카테고리를 선택하세요" />
                 </SelectTrigger>
                 <SelectContent className="text-sm">
-                  {(categoriesData?.categories || []).map((c) => (
+                  {categoryOptions.map((c) => (
                     <SelectItem key={c.name} value={c.name} className="text-sm">
-                      {c.name} ({c.docCount.toLocaleString()})
+                      {c.name}{typeof c.docCount === 'number' ? ` (${c.docCount.toLocaleString()})` : ''}
                     </SelectItem>
                   ))}
                 </SelectContent>
