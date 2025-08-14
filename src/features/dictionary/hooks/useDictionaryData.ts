@@ -25,7 +25,7 @@ export function useDictionaryData<T extends BaseDictionaryItem>({
 }: UseDictionaryDataParams) {
   
   const paramsForKey = {
-    page: page - 1,
+    page: page,
     size: pageSize,
     sortBy: sortField,
     sortDir: sortDirection,
@@ -44,7 +44,7 @@ export function useDictionaryData<T extends BaseDictionaryItem>({
     queryKey,
     queryFn: async () => {
       const params = {
-        page: page - 1,
+        page: page,
         size: pageSize,
         sortBy: sortField,
         sortDir: sortDirection,

@@ -149,8 +149,8 @@ export interface QueryEvaluationDetail {
   relevantCount: number
   retrievedCount: number
   correctCount: number
-  missingDocuments: string[]
-  wrongDocuments: string[]
+  missingDocuments: DocumentInfo[]
+  wrongDocuments: DocumentInfo[]
 }
 
 // 평가 실행 응답 (evaluate API)
@@ -177,8 +177,8 @@ export interface EvaluationExecuteResponse {
     relevantCount: number
     retrievedCount: number
     correctCount: number
-    missingDocuments?: string[]
-    wrongDocuments?: string[]
+    missingDocuments?: DocumentInfo[]
+    wrongDocuments?: DocumentInfo[]
   }>
 }
 
@@ -190,7 +190,7 @@ export interface EvaluationReport {
   averagePrecision: number
   averageRecall: number
   averageF1Score: number
-  detailedResults: string
+  queryDetails: QueryEvaluationDetail[]
   totalRelevantDocuments: number
   totalRetrievedDocuments: number
   totalCorrectDocuments: number
@@ -204,7 +204,6 @@ export interface EvaluationReportSummary {
   averagePrecision: number
   averageRecall: number
   averageF1Score: number
-  detailedResults: string
   totalRelevantDocuments: number
   totalRetrievedDocuments: number
   totalCorrectDocuments: number
@@ -239,4 +238,11 @@ export interface AsyncTaskListResponse {
   totalPages: number
   currentPage: number
   size: number
+}
+
+// 평가 리포트 상세에 포함되는 문서 정보 타입
+export interface DocumentInfo {
+  productId: string
+  productName: string | null
+  productSpecs: string | null
 }

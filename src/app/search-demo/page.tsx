@@ -227,9 +227,11 @@ export default function SearchDemo() {
       try {
         const { from, to } = getYesterdayDateRange();
 
+        // 데모 페이지: 어제 하루치 기준으로 조회
+        const commonParams = { from, to, limit: 10, interval: 'day' as const };
         const [popularResponse, trendingResponse] = await Promise.all([
-          dashboardApi.getPopularKeywords({ from, to, limit: 10 }),
-          dashboardApi.getTrendingKeywords({ from, to, limit: 10 })
+          dashboardApi.getPopularKeywords(commonParams),
+          dashboardApi.getTrendingKeywords(commonParams)
         ]);
 
         // 인기 검색어 매핑
@@ -315,10 +317,10 @@ export default function SearchDemo() {
       />
 
 
-      {/* 중앙: 필터/인기검색어/상품리스트 */}
-      <div className="w-full grid grid-cols-10 gap-4 mt-2">
-        {/* 필터 (좌측 3칸) */}
-        <div className="col-span-8 mb-2">
+      {/* 중앙: 좌측(필터+리스트), 우측(인기/급등) 2열 레이아웃 */}
+      <div className="w-full grid grid-cols-10 gap-4 mt-2 items-start">
+        {/* 좌측: 필터 + 상품리스트 (같은 컬럼에 세로 배치) */}
+        <div className="col-span-8 space-y-4">
           <ProductFilters
             category={category}
             setCategory={setCategory}
@@ -333,22 +335,7 @@ export default function SearchDemo() {
             onResetFilters={resetFilters}
             onPriceSearch={handlePriceSearch}
           />
-        </div>
 
-        {/* 인기/급등 검색어 (우측 1칸) */}
-        <div className="col-span-2 flex flex-col">
-          <PopularKeywords
-            keywords={popularKeywords}
-            onKeywordClick={handleSearch}
-          />
-          <TrendingKeywords
-            keywords={trendingKeywords}
-            onKeywordClick={handleSearch}
-          />
-        </div>
-
-        {/* 상품리스트 (좌측 3칸) */}
-        <div className="col-span-8">
           <ProductList
             products={products}
             loading={loading}
@@ -359,6 +346,18 @@ export default function SearchDemo() {
             sort={sort}
             onSortChange={handleSortChange}
             searchQuery={searchQuery}
+          />
+        </div>
+
+        {/* 우측: 인기/급등 검색어 */}
+        <div className="col-span-2 flex flex-col">
+          <PopularKeywords
+            keywords={popularKeywords}
+            onKeywordClick={handleSearch}
+          />
+          <TrendingKeywords
+            keywords={trendingKeywords}
+            onKeywordClick={handleSearch}
           />
         </div>
       </div>

@@ -159,8 +159,8 @@ export function ReportDialog({
                 {/* 쿼리별 상세 결과 (처음 5개만) */}
                 {(() => {
                   try {
-                    const queryDetails = JSON.parse(latestReport.detailedResults || '[]')
-                    if (queryDetails && queryDetails.length > 0) {
+                    const queryDetails = (latestReport as any).queryDetails || []
+                    if (Array.isArray(queryDetails) && queryDetails.length > 0) {
                       return (
                         <div>
                           <h4 className="font-medium mb-2">쿼리별 상세 결과 (상위 5개)</h4>
@@ -208,7 +208,7 @@ export function ReportDialog({
                       )
                     }
                   } catch (error) {
-                    console.error('detailedResults 파싱 오류:', error)
+                    console.error('queryDetails 처리 오류:', error)
                   }
                   return null
                 })()}
@@ -275,8 +275,8 @@ export function ReportDialog({
               <CardContent>
                 {(() => {
                   try {
-                    const queryDetails = JSON.parse(selectedReport.detailedResults || '[]')
-                    if (queryDetails && queryDetails.length > 0) {
+                    const queryDetails = (selectedReport as any).queryDetails || []
+                    if (Array.isArray(queryDetails) && queryDetails.length > 0) {
                       return (
                         <div className="space-y-3">
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded">
@@ -359,7 +359,7 @@ export function ReportDialog({
                       )
                     }
                   } catch (error) {
-                    console.error('detailedResults 파싱 오류:', error)
+                    console.error('queryDetails 처리 오류:', error)
                     return (
                       <div className="text-center py-8 text-gray-500">
                         <p>상세 결과를 불러올 수 없습니다.</p>

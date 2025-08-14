@@ -3,11 +3,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
 
 interface DictionaryPaginationProps {
-  currentPage: number
+  currentPage: number // 1-based (레거시 컴포넌트)
   totalPages: number
   itemsPerPage: number
   totalItems: number
-  onPageChange: (page: number) => void
+  onPageChange: (page: number) => void // expects 1-based
   onItemsPerPageChange: (items: number) => void
 }
 
