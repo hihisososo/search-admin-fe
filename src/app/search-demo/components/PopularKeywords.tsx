@@ -42,7 +42,7 @@ export function PopularKeywords({ keywords, onKeywordClick }: PopularKeywordsPro
 
   return (
     <Card className="px-4 py-2 shadow-sm border border-gray-100 rounded-lg bg-white w-[240px]">
-      <div className="font-bold text-blue-700 mb-2 text-base leading-tight">인기 검색어</div>
+      <div className="font-bold text-black mb-2 text-base leading-tight">인기 검색어</div>
       <ol className="list-decimal list-inside space-y-0">
         {keywords.slice(0, 10).map((k) => (
           <li 
