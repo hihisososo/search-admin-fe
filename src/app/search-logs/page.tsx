@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 // 상단 입력 제거되어 미사용 import 삭제
 import { searchLogApi } from "@/lib/api"
 import type { 
