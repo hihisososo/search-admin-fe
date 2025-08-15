@@ -148,8 +148,9 @@ export default function AnswerSetManagementPage() {
           <DrawerContent 
             className="h-full !w-[70vw] !max-w-none ml-auto fixed bottom-0 right-0 border-l shadow-2xl"
             style={{ width: '70vw', maxWidth: 'none' }}
+            data-vaul-no-drag
           >
-            <div className="flex-1 overflow-auto bg-white">
+            <div className="flex-1 overflow-auto bg-white select-text touch-pan-y" data-vaul-no-drag>
               {selectedQueryForDocuments && (
                 <DocumentTable
                   queryId={selectedQueryForDocuments.id}

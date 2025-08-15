@@ -201,23 +201,19 @@ export default function SearchDemo() {
     }
   }, [searchQuery, page, pageSize, sort, brand, category, categorySub, price, ensureMinimumLoadingTime]);
 
-  // 어제 날짜 범위를 계산하는 함수
+  // 어제 날짜 범위를 계산하는 함수 (대시보드와 동일 포맷: 로컬 기준 YYYY-MM-DDTHH:mm:ss)
   const getYesterdayDateRange = () => {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
 
-    // from: 어제 00:00:00
-    const from = new Date(yesterday);
-    from.setHours(0, 0, 0, 0);
-
-    // to: 어제 23:59:59
-    const to = new Date(yesterday);
-    to.setHours(23, 59, 59, 999);
+    const y = yesterday.getFullYear();
+    const m = String(yesterday.getMonth() + 1).padStart(2, '0');
+    const d = String(yesterday.getDate()).padStart(2, '0');
 
     return {
-      from: from.toISOString(),
-      to: to.toISOString()
+      from: `${y}-${m}-${d}T00:00:00`,
+      to: `${y}-${m}-${d}T23:59:59`
     };
   };
 
@@ -227,28 +223,47 @@ export default function SearchDemo() {
       try {
         const { from, to } = getYesterdayDateRange();
 
-        // 데모 페이지: 어제 하루치 기준으로 조회
-        const commonParams = { from, to, limit: 10, interval: 'day' as const };
+        // 데모 페이지: 어제 하루치 기준으로 조회 (대시보드와 동일 파라미터 구성)
+        const commonParams = { from, to, limit: 10 };
         const [popularResponse, trendingResponse] = await Promise.all([
           dashboardApi.getPopularKeywords(commonParams),
           dashboardApi.getTrendingKeywords(commonParams)
         ]);
 
-        // 인기 검색어 매핑
-        setPopularKeywords(popularResponse.keywords.map((k: KeywordItem) => ({
+        // 인기 검색어 정렬/상위 10개 제한 + 표시용 순번 보정
+        const sortedPopular = [...popularResponse.keywords].sort((a: any, b: any) => {
+          const ra = a.rank ?? Number.MAX_SAFE_INTEGER
+          const rb = b.rank ?? Number.MAX_SAFE_INTEGER
+          if (ra !== rb) return ra - rb
+          const ca = (a as any).searchCount ?? a.count ?? 0
+          const cb = (b as any).searchCount ?? b.count ?? 0
+          return cb - ca
+        }).slice(0, 10)
+
+        setPopularKeywords(sortedPopular.map((k: any, idx: number) => ({
           keyword: k.keyword,
           searchCount: (k as any).searchCount ?? k.count ?? 0,
-          rank: (k as any).rank ?? 0,
+          rank: idx + 1,
           previousRank: (k as any).previousRank ?? null,
           rankChange: (k as any).rankChange ?? null,
           changeStatus: (k as any).changeStatus ?? "SAME"
         })));
 
-        // 급등 검색어 매핑
-        setTrendingKeywords(trendingResponse.keywords.map((k: any) => ({
+        // 급등 검색어 정렬/상위 10개 제한 + 표시용 순번 보정
+        const sortedTrending = [...trendingResponse.keywords].sort((a: any, b: any) => {
+          const ra = a.rank ?? Number.MAX_SAFE_INTEGER
+          const rb = b.rank ?? Number.MAX_SAFE_INTEGER
+          if (ra !== rb) return ra - rb
+          const ca = a.searchCount ?? a.count ?? 0
+          const cb = b.searchCount ?? b.count ?? 0
+          return cb - ca
+        }).slice(0, 10)
+
+        setTrendingKeywords(sortedTrending.map((k: any, idx: number) => ({
           keyword: k.keyword,
           searchCount: k.searchCount ?? k.count ?? 0,
-          rank: k.rank ?? 0,
+          // UI 표시는 1~10로 보정
+          rank: idx + 1,
           previousRank: k.previousRank ?? null,
           rankChange: k.rankChange ?? null,
           changeStatus: k.changeStatus ?? (k.rankChange && k.rankChange > 0 ? "UP" : k.rankChange && k.rankChange < 0 ? "DOWN" : "SAME")

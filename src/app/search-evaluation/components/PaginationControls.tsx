@@ -15,10 +15,10 @@ interface PaginationControlsProps {
 export function PaginationControls({
   currentPage,
   totalPages,
-  totalCount,
-  pageSize,
+  totalCount: _totalCount,
+  pageSize: _pageSize,
   onPageChange,
-  onPageSizeChange
+  onPageSizeChange: _onPageSizeChange
 }: PaginationControlsProps) {
   // 항상 표시되도록 변경 (단일 페이지여도 노출)
 
@@ -51,25 +51,6 @@ export function PaginationControls({
 
   return (
     <>
-      {/* 상단: 총 건수/페이지 정보 + 페이지당 출력 수 (왼쪽) */}
-      <div className="flex items-center justify-between mb-2">
-        <div className="text-xs text-gray-500">
-          전체 {totalCount.toLocaleString()}건 (페이지 {currentPage + 1}/{Math.max(totalPages, 1)})
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500">페이지당</span>
-          <select
-            value={pageSize}
-            onChange={(e) => onPageSizeChange(Number(e.target.value))}
-            className="h-7 text-xs border border-gray-300 rounded px-2 bg-white"
-          >
-            {PAGINATION.AVAILABLE_PAGE_SIZES.map(size => (
-              <option key={size} value={size}>{size}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
       {/* 페이지네이션 버튼들 */}
       <div className="flex justify-center items-center gap-1 mt-2">
         {/* 처음 */}

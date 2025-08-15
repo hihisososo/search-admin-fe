@@ -263,9 +263,7 @@ export function DocumentTable({
           <h3 className="text-lg font-semibold text-gray-900">
             "{query}"
           </h3>
-          <p className="text-xs text-gray-500 mt-1">
-            전체 {totalCount.toLocaleString()}개 (페이지 {currentPage + 1}/{totalPages})
-          </p>
+          {/* 상단 총 건수/페이지 문구 제거 */}
         </div>
         
         <div className="flex items-center gap-2">
@@ -335,23 +333,7 @@ export function DocumentTable({
         </div>
       </div>
 
-      {/* 페이지 크기 선택 - 데이터 테이블 바로 위, 우측 정렬 */}
-      {onPageSizeChange && (
-        <div className="flex justify-end mb-2">
-          <Select value={(pageSize ?? 20).toString()} onValueChange={(value) => onPageSizeChange(Number(value))}>
-            <SelectTrigger className="w-20 h-8 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="text-xs">
-              {PAGINATION.AVAILABLE_PAGE_SIZES.map(size => (
-                <SelectItem key={size} value={size.toString()} className="text-xs py-1">
-                  {size}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
+      {/* 페이지 크기 선택 제거 */}
 
       {/* 데이터 테이블 */}
       <div className="border border-gray-200 rounded-md overflow-hidden bg-white">

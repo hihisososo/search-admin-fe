@@ -8,8 +8,6 @@ import { getDictionaryConfig } from '../configs/dictionaryConfigs'
 import type { DictionaryType } from '../types/dictionary.types'
 import type { DictionaryEnvironmentType } from '@/types/dashboard'
 import { PaginationControls } from '@/components/common/PaginationControls'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { PAGINATION } from '@/constants/pagination'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Search } from 'lucide-react'
@@ -80,20 +78,7 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
             )}
           </Button>
         </div>
-        <div className="flex items-center gap-2">
-          <Select value={pageSize.toString()} onValueChange={(value) => { setPageSize(Number(value)); setPage(0) }}>
-            <SelectTrigger className="w-24 h-9 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="text-xs">
-              {PAGINATION.AVAILABLE_PAGE_SIZES.map(size => (
-                <SelectItem key={size} value={size.toString()} className="text-xs py-1">
-                  {size}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <div className="flex items-center gap-2"></div>
       </div>
 
       <DictionaryTable

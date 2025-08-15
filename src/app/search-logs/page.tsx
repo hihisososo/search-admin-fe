@@ -168,26 +168,7 @@ export default function SearchLogs() {
             </div>
           )}
 
-          {/* 전체 건수 및 페이지 크기 선택 */}
-              <div className="flex justify-between items-center mb-1">
-            <div className="text-xs text-gray-500">
-              전체 {total.toLocaleString()}건 (페이지 {page + 1}/{totalPages})
-            </div>
-            <div className="flex items-center gap-2">
-              <Select value={pageSize.toString()} onValueChange={(value) => handlePageSizeChange(Number(value))}>
-                <SelectTrigger className="w-20 h-6 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="text-xs">
-                      {PAGINATION.AVAILABLE_PAGE_SIZES.map(size => (
-                        <SelectItem key={size} value={size.toString()} className="text-xs py-1">
-                          {size}
-                        </SelectItem>
-                      ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          {/* 상단 총 건수/페이지, 페이지당 선택 제거 */}
 
           {loading ? (
             <div className="text-center py-4">
