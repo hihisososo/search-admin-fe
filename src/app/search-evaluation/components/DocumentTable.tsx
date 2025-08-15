@@ -3,16 +3,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, CheckCircle, XCircle, HelpCircle, Edit, Trash2, ChevronDown, ChevronUp, X, Save, RotateCcw } from "lucide-react"
+// removed add-document dialog imports
+// select 제거: 버튼형 세그먼트로 대체
+import { cn } from "@/lib/utils"
+import { Edit, Trash2, ChevronDown, ChevronUp, X, Save, RotateCcw } from "lucide-react"
 import { 
-  useProductSearch,
-  useAddDocumentMapping,
+  // useProductSearch, (removed add-document feature)
+  // useAddDocumentMapping,
   useUpdateCandidate
 } from "@/hooks/use-evaluation"
-import type { EvaluationDocument, EvaluationProduct, RelevanceStatus } from "@/services"
+import type { EvaluationDocument, RelevanceStatus } from "@/services"
 import React from "react"
 import { useToast } from "@/components/ui/use-toast"
 // import { PAGINATION } from "@/constants/pagination"
@@ -33,10 +33,13 @@ interface DocumentTableProps {
   isLoading: boolean
   pageSize?: number
   onPageSizeChange?: (size: number) => void
+  sortField?: string
+  sortDirection?: 'asc' | 'desc'
+  onSort?: (field: string) => void
 }
 
 export function DocumentTable({
-  queryId,
+  queryId: _queryId,
   query,
   documents,
   currentPage,
@@ -46,11 +49,12 @@ export function DocumentTable({
   onClose,
   isLoading,
   pageSize,
-  onPageSizeChange
+  onPageSizeChange,
+  sortField: _sortField,
+  sortDirection: _sortDirection,
+  onSort
 }: DocumentTableProps) {
-  const [showProductDialog, setShowProductDialog] = useState(false)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedProduct, setSelectedProduct] = useState<EvaluationProduct | null>(null)
+  // removed add-document dialog states
   const [expandedDocument, setExpandedDocument] = useState<string | null>(null)
   const { toast } = useToast()
   
@@ -59,16 +63,18 @@ export function DocumentTable({
   const [editForm, setEditForm] = useState<{
     relevanceStatus: RelevanceStatus
     evaluationReason: string
+    score: number // -1 | 0 | 1 | 2
   }>({
     relevanceStatus: 'UNSPECIFIED',
-    evaluationReason: ''
+    evaluationReason: '',
+    score: -1
   })
 
   // API 호출
-  const productsQuery = useProductSearch(searchTerm, 20)
+  // removed add-document query
   
   // 뮤테이션
-  const addDocumentMutation = useAddDocumentMapping()
+  // removed add-document mutation
   const updateCandidateMutation = useUpdateCandidate()
 
   // 평가 상태 변환 함수
@@ -81,38 +87,7 @@ export function DocumentTable({
     }
   }
 
-  const getStatusBadge = (status: EvaluationStatus) => {
-    switch (status) {
-      case 'correct':
-        return (
-          <Badge variant="default" className="bg-green-600 hover:bg-green-700">
-            <CheckCircle className="h-3 w-3 mr-1" />
-            정답
-          </Badge>
-        )
-      case 'incorrect':
-        return (
-          <Badge variant="destructive">
-            <XCircle className="h-3 w-3 mr-1" />
-            오답
-          </Badge>
-        )
-      case 'unspecified':
-        return (
-          <Badge variant="secondary">
-            <HelpCircle className="h-3 w-3 mr-1" />
-            미지정
-          </Badge>
-        )
-      default:
-        return (
-          <Badge variant="secondary">
-            <HelpCircle className="h-3 w-3 mr-1" />
-            미지정
-          </Badge>
-        )
-    }
-  }
+  // 상태 뱃지(정답/오답/미지정) 사용 중단 → 점수 뱃지로 대체
 
   // evaluationReason 에 포함된 (score: n) 추출
   const extractScore = (reason?: string | null): number | null => {
@@ -123,58 +98,35 @@ export function DocumentTable({
     return Number.isFinite(num) ? num : null
   }
 
-  const getScoreBadge = (score: number) => {
+  const getScoreBadge = (score: number | null) => {
+    if (score === null || score === -1) {
+      return (
+        <Badge variant="secondary" className="text-[10px] px-1.5 py-0">미평가</Badge>
+      )
+    }
     const colorClass = score >= 2
       ? 'bg-green-50 text-green-700 border-green-200'
       : score === 1
         ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
         : 'bg-red-50 text-red-700 border-red-200'
+    const label = score >= 2 ? '매우관련' : (score === 1 ? '관련' : '관련없음')
     return (
       <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${colorClass}`}>
-        score: {score}
+        {label}
       </Badge>
     )
   }
 
   // 상품 추가 핸들러
-  const handleAddProduct = async () => {
-    if (!selectedProduct) {
-      toast({
-        title: "선택 필요",
-        description: "상품을 선택해주세요.",
-        variant: "destructive"
-      })
-      return
-    }
-
-    try {
-      await addDocumentMutation.mutateAsync({
-        queryId,
-        data: { productId: selectedProduct.id }
-      })
-      setShowProductDialog(false)
-      setSelectedProduct(null)
-      setSearchTerm("")
-      toast({
-        title: "상품 추가 완료",
-        description: "정답 문서가 성공적으로 추가되었습니다.",
-        variant: "success"
-      })
-    } catch (error) {
-      toast({
-        title: "상품 추가 실패",
-        description: (error as Error).message,
-        variant: "destructive"
-      })
-    }
-  }
+  // removed add-document handler
 
   // 편집 시작 핸들러
   const handleStartEdit = (doc: EvaluationDocument) => {
     setEditingDocument(doc.productId)
     setEditForm({
       relevanceStatus: doc.relevanceStatus,
-      evaluationReason: doc.evaluationReason || ''
+      evaluationReason: doc.evaluationReason || '',
+      score: extractScore(doc.evaluationReason) ?? -1
     })
   }
 
@@ -183,24 +135,39 @@ export function DocumentTable({
     setEditingDocument(null)
     setEditForm({
       relevanceStatus: 'UNSPECIFIED',
-      evaluationReason: ''
+      evaluationReason: '',
+      score: -1
     })
   }
 
   // 편집 저장 핸들러
   const handleSaveEdit = async (doc: EvaluationDocument) => {
     try {
+      // score 기반으로 relevanceStatus 결정
+      const newStatus: RelevanceStatus = editForm.score >= 1
+        ? 'RELEVANT'
+        : (editForm.score === 0 ? 'IRRELEVANT' : 'UNSPECIFIED')
+
+      // evaluationReason에 (score: n) 반영
+      const upsertScore = (reason: string, score: number): string => {
+        const base = (reason || '').trim()
+        const replaced = base.replace(/\(score:\s*-?\d+\)/i, '').trim()
+        const suffix = `(score: ${score})`
+        return replaced.length > 0 ? `${replaced} ${suffix}` : suffix
+      }
+
       await updateCandidateMutation.mutateAsync({
         candidateId: doc.candidateId,
         data: {
-          relevanceStatus: editForm.relevanceStatus,
-          evaluationReason: editForm.evaluationReason.trim()
+          relevanceStatus: newStatus,
+          evaluationReason: upsertScore(editForm.evaluationReason, editForm.score)
         }
       })
       setEditingDocument(null)
       setEditForm({
         relevanceStatus: 'UNSPECIFIED',
-        evaluationReason: ''
+        evaluationReason: '',
+        score: -1
       })
       // 문서 데이터 새로고침을 위해 부모 컴포넌트에서 처리하도록 함
       toast({
@@ -238,6 +205,34 @@ export function DocumentTable({
   const formatText = (text: string | null) => {
     if (!text) return ''
     return text.replace(/\\n/g, '\n').replace(/\n/g, '\n')
+  }
+
+  // util: evaluationReason에 (score: n) 값을 갱신/삽입
+  const upsertScore = (reason: string, score: number): string => {
+    const base = (reason || '').trim()
+    const replaced = base.replace(/\(score:\s*-?\d+\)/i, '').trim()
+    const suffix = `(score: ${score})`
+    return replaced.length > 0 ? `${replaced} ${suffix}` : suffix
+  }
+
+  const mapScoreToStatus = (score: number): RelevanceStatus => {
+    return score >= 1 ? 'RELEVANT' : (score === 0 ? 'IRRELEVANT' : 'UNSPECIFIED')
+  }
+
+  // 인라인 score 선택 처리
+  const handleQuickSetScore = async (doc: EvaluationDocument, score: number) => {
+    try {
+      await updateCandidateMutation.mutateAsync({
+        candidateId: doc.candidateId,
+        data: {
+          relevanceStatus: mapScoreToStatus(score),
+          evaluationReason: upsertScore(doc.evaluationReason || '', score)
+        }
+      })
+      toast({ title: 'score 변경', description: `score가 ${score}로 변경되었습니다.`, variant: 'success' })
+    } catch (error) {
+      toast({ title: '변경 실패', description: (error as Error).message, variant: 'destructive' })
+    }
   }
 
 
@@ -289,65 +284,6 @@ export function DocumentTable({
         </div>
         
         <div className="flex items-center gap-2">
-          <Dialog open={showProductDialog} onOpenChange={setShowProductDialog}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Plus className="h-3 w-3 mr-1" />
-                정답 문서 추가
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-lg">
-              <DialogHeader>
-                <DialogTitle>정답 문서 추가</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="flex gap-2">
-                  <Input
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="상품명으로 검색..."
-                    className="flex-1"
-                  />
-                  <Button size="sm" variant="outline" disabled={!searchTerm.trim()}>
-                    <Search className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                {productsQuery.data && productsQuery.data.length > 0 && (
-                  <div className="max-h-64 overflow-y-auto border rounded-lg">
-                    {productsQuery.data.map((product: EvaluationProduct) => (
-                      <div
-                        key={product.id}
-                        className={`p-3 cursor-pointer border-b last:border-b-0 hover:bg-gray-50 ${
-                          selectedProduct?.id === product.id ? 'bg-blue-50 border-blue-200' : ''
-                        }`}
-                        onClick={() => setSelectedProduct(product)}
-                      >
-                        <div className="font-medium text-sm">{product.name}</div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          브랜드: {product.brand} | ID: {product.id}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setShowProductDialog(false)}>
-                    취소
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={handleAddProduct}
-                    disabled={addDocumentMutation.isPending || !selectedProduct}
-                  >
-                    {addDocumentMutation.isPending ? '추가중...' : '추가'}
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-
           {onClose && (
             <Button variant="outline" size="sm" onClick={onClose} className="h-8 w-8 p-0">
               <X className="h-4 w-4" />
@@ -364,11 +300,16 @@ export function DocumentTable({
           <TableHeader>
             <TableRow className="bg-gray-50 hover:bg-gray-50">
               <TableHead className="w-16 py-2 text-xs font-semibold text-gray-700 text-center">순번</TableHead>
-              <TableHead className="w-32 py-2 text-xs font-semibold text-gray-700">상품 ID</TableHead>
-              <TableHead className="py-2 text-xs font-semibold text-gray-700">상품명</TableHead>
-              <TableHead className="w-32 py-2 text-xs font-semibold text-gray-700 text-center">
+              <TableHead
+                className="w-32 py-2 text-xs font-semibold text-gray-700 cursor-pointer"
+                onClick={() => onSort?.('productId')}
+              >
+                상품 ID
+              </TableHead>
+              <TableHead className="py-2 text-xs font-semibold text-gray-700 cursor-pointer" onClick={() => onSort?.('productName')}>상품명</TableHead>
+              <TableHead className="w-32 py-2 text-xs font-semibold text-gray-700 text-center cursor-pointer" onClick={() => onSort?.('relevanceScore')}>
                 <div className="flex items-center justify-center gap-1">
-                  <span>평가 상태</span>
+                  <span>평가</span>
                 </div>
               </TableHead>
             </TableRow>
@@ -385,7 +326,7 @@ export function DocumentTable({
               </TableRow>
             ) : (
               documents.map((doc, index) => {
-                const status = getEvaluationStatus(doc.relevanceStatus)
+                const _status = getEvaluationStatus(doc.relevanceStatus)
                 const isExpanded = expandedDocument === doc.productId
                 
                 return (
@@ -420,26 +361,37 @@ export function DocumentTable({
                       </TableCell>
                       
                       <TableCell className="py-2 text-center">
-                        <div className="flex justify-center items-center gap-2">
-                          {status === 'correct' && (
-                            <Badge variant="default" className="bg-green-600 text-xs py-0.5 px-2">
-                              <CheckCircle className="h-3 w-3 mr-1" /> 정답
-                            </Badge>
-                          )}
-                          {status === 'incorrect' && (
-                            <Badge variant="destructive" className="text-xs py-0.5 px-2">
-                              <XCircle className="h-3 w-3 mr-1" /> 오답
-                            </Badge>
-                          )}
-                          {status === 'unspecified' && (
-                            <Badge variant="secondary" className="text-xs py-0.5 px-2">
-                              <HelpCircle className="h-3 w-3 mr-1" /> 미지정
-                            </Badge>
-                          )}
-                          {(() => {
-                            const s = extractScore(doc.evaluationReason)
-                            return s !== null ? getScoreBadge(s) : null
-                          })()}
+                        <div className="flex justify-center items-center gap-1">
+                          {([2,1,0,-1] as const).map((val) => {
+                            const current = extractScore(doc.evaluationReason) ?? -1
+                            const isActive = current === val
+                            const label = val === 2 ? '매우관련' : val === 1 ? '관련' : val === 0 ? '관련없음' : '미평가'
+                            const colorClass = val === 2
+                              ? 'bg-green-50 text-green-700 border-green-200'
+                              : val === 1
+                                ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                                : val === 0
+                                  ? 'bg-red-50 text-red-700 border-red-200'
+                                  : 'bg-gray-50 text-gray-700 border-gray-200'
+                            return (
+                              <Button
+                                key={val}
+                                variant={isActive ? 'outline' : 'outline'}
+                                size="sm"
+                                disabled={updateCandidateMutation.isPending}
+                                className={cn(
+                                  'h-6 text-[10px] px-2 py-0',
+                                  isActive ? colorClass : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                                )}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleQuickSetScore(doc, val)
+                                }}
+                              >
+                                {label}
+                              </Button>
+                            )
+                          })}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -477,44 +429,41 @@ export function DocumentTable({
                                   />
                                 </div>
 
-                                {/* 평가 상태 선택 */}
+                                {/* 평가 선택 */}
                                 <div className="mb-6">
                                   <label className="text-sm font-semibold text-gray-700 block mb-2">
-                                    🏷️ 평가 상태 *
+                                    🏷️ 평가 *
                                   </label>
-                                                    <Select 
-                    value={editForm.relevanceStatus === 'RELEVANT' ? 'correct' : editForm.relevanceStatus === 'IRRELEVANT' ? 'incorrect' : 'unspecified'}
-                                                        onValueChange={(value) => {
-                      let newStatus: RelevanceStatus = 'UNSPECIFIED'
-                      if (value === 'correct') newStatus = 'RELEVANT'
-                      else if (value === 'incorrect') newStatus = 'IRRELEVANT'
-                      setEditForm({ ...editForm, relevanceStatus: newStatus })
-                    }}
-                                  >
-                                    <SelectTrigger className="w-48">
-                                      <SelectValue placeholder="평가 상태 선택" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="correct">
-                                        <div className="flex items-center gap-2">
-                                          <CheckCircle className="h-4 w-4 text-green-600" />
-                                          정답
-                                        </div>
-                                      </SelectItem>
-                                      <SelectItem value="incorrect">
-                                        <div className="flex items-center gap-2">
-                                          <XCircle className="h-4 w-4 text-red-600" />
-                                          오답
-                                        </div>
-                                      </SelectItem>
-                                                            <SelectItem value="unspecified">
-                        <div className="flex items-center gap-2">
-                          <HelpCircle className="h-4 w-4 text-gray-600" />
-                          미지정
-                        </div>
-                      </SelectItem>
-                                    </SelectContent>
-                                  </Select>
+                                  <div className="flex gap-2">
+                                    {([2,1,0,-1] as const).map((val) => {
+                                      const isActive = editForm.score === val
+                                      const label = val === 2 ? '매우관련' : val === 1 ? '관련' : val === 0 ? '관련없음' : '미평가'
+                                      const colorClass = val === 2
+                                        ? 'bg-green-50 text-green-700 border-green-200'
+                                        : val === 1
+                                          ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                                          : val === 0
+                                            ? 'bg-red-50 text-red-700 border-red-200'
+                                            : 'bg-gray-50 text-gray-700 border-gray-200'
+                                      return (
+                                        <Button
+                                          key={val}
+                                          variant={isActive ? 'outline' : 'outline'}
+                                          size="sm"
+                                          className={cn(
+                                            'h-7 text-xs px-2',
+                                            isActive ? colorClass : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                                          )}
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            setEditForm({ ...editForm, score: val })
+                                          }}
+                                        >
+                                          {label}
+                                        </Button>
+                                      )
+                                    })}
+                                  </div>
                                 </div>
 
                                 {/* 편집 액션 버튼들 */}
@@ -571,13 +520,13 @@ export function DocumentTable({
                                   </div>
                                 </div>
 
-                                {/* 현재 평가 상태 표시 */}
+                                {/* 현재 평가 표시 */}
                                 <div className="mb-6">
                                   <label className="text-sm font-semibold text-gray-700 block mb-2">
-                                    🏷️ 평가 상태
+                                    🏷️ 평가
                                   </label>
                                   <div className="flex items-center">
-                                    {getStatusBadge(status)}
+                                    {getScoreBadge(extractScore(doc.evaluationReason))}
                                   </div>
                                 </div>
 

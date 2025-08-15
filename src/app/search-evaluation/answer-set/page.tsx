@@ -21,12 +21,16 @@ export default function AnswerSetManagementPage() {
   const [documentPage, setDocumentPage] = useState(0)
   const [queryPageSize, setQueryPageSize] = useState(20)
   const [documentPageSize, setDocumentPageSize] = useState(20)
+  const [querySortField, setQuerySortField] = useState<string>('updatedAt')
+  const [querySortDirection, setQuerySortDirection] = useState<'asc' | 'desc'>('desc')
+  const [docSortField, setDocSortField] = useState<string>('relevanceScore')
+  const [docSortDirection, setDocSortDirection] = useState<'asc' | 'desc'>('desc')
 
   // API 호출
-  const queriesQuery = useEvaluationQueries({ page: queryPage, size: queryPageSize })
+  const queriesQuery = useEvaluationQueries({ page: queryPage, size: queryPageSize, sort: querySortField, order: querySortDirection })
   const documentsQuery = useEvaluationDocuments(
     selectedQueryForDocuments?.id || null, 
-    { page: documentPage, size: documentPageSize }
+    { page: documentPage, size: documentPageSize, sort: docSortField, order: docSortDirection }
   )
 
   // 디버깅용 로그 - 쿼리 데이터 확인
@@ -98,8 +102,20 @@ export default function AnswerSetManagementPage() {
     setSelectedQueryIds([]) // 페이지 변경 시 선택 초기화
   }
 
+  const handleQuerySortChange = (field: string) => {
+    setQuerySortDirection(prev => (field === querySortField ? (prev === 'asc' ? 'desc' : 'asc') : 'desc'))
+    setQuerySortField(field)
+    setQueryPage(0)
+  }
+
   const handleDocumentPageChange = (page: number) => {
     setDocumentPage(page)
+  }
+
+  const handleDocumentSortChange = (field: string) => {
+    setDocSortDirection(prev => (field === docSortField ? (prev === 'asc' ? 'desc' : 'asc') : 'desc'))
+    setDocSortField(field)
+    setDocumentPage(0)
   }
 
   const handleDocumentPageSizeChange = (newPageSize: number) => {
@@ -140,6 +156,9 @@ export default function AnswerSetManagementPage() {
             onRefresh={handleRefresh}
             isLoading={queriesQuery.isLoading}
             onSearch={() => { /* TODO: API 지원 시 검색 연동 */ }}
+            sortField={querySortField}
+            sortDirection={querySortDirection}
+            onSort={handleQuerySortChange}
           />
         </div>
 
@@ -164,6 +183,9 @@ export default function AnswerSetManagementPage() {
                   isLoading={documentsQuery.isLoading}
                   pageSize={documentPageSize}
                   onPageSizeChange={handleDocumentPageSizeChange}
+                  sortField={docSortField}
+                  sortDirection={docSortDirection}
+                  onSort={handleDocumentSortChange}
                 />
               )}
             </div>

@@ -15,7 +15,7 @@ interface DataTableToolbarProps {
   totalPages?: number
   pageSize: number
   onPageSizeChange: (size: number) => void
-  pageSizeOptions?: number[]
+  pageSizeOptions?: ReadonlyArray<number>
   className?: string
   disabled?: boolean
 }
@@ -51,9 +51,9 @@ export function DataTableToolbar({
               value={searchValue}
               onChange={(e) => onSearchChange?.(e.target.value)}
               onKeyDown={handleSearchKeyDown}
-              className="h-9 flex-1 text-sm"
+              className="flex-1 text-sm"
             />
-            <Button onClick={onSearch} disabled={disabled} size="icon" variant="outline" className="h-9 w-9" aria-label="검색">
+            <Button onClick={onSearch} disabled={disabled} size="icon" variant="outline" className="w-9" aria-label="검색">
               <Search className="w-4 h-4" />
             </Button>
           </>
@@ -64,7 +64,7 @@ export function DataTableToolbar({
           전체 {Number(totalCount || 0).toLocaleString()}건 (페이지 {currentPage + 1}/{Math.max(totalPages || 1, 1)})
         </div>
         <Select value={pageSize.toString()} onValueChange={(value) => onPageSizeChange(Number(value))}>
-          <SelectTrigger className="w-24 h-9 text-xs">
+          <SelectTrigger className="w-24 text-xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="text-xs">

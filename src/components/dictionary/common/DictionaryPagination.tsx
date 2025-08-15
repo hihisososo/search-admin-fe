@@ -18,8 +18,8 @@ export function DictionaryPagination({
   onPageChange,
   onItemsPerPageChange: _onItemsPerPageChange
 }: DictionaryPaginationProps) {
-  const startIndex = 0
-  const endIndex = 0
+  const _startIndex = 0
+  const _endIndex = 0
   
   // 최대 10개의 페이지 번호 표시
   const maxVisiblePages = 10
@@ -42,7 +42,7 @@ export function DictionaryPagination({
           variant="outline"
           size="sm"
           onClick={() => onPageChange(i)}
-          className={`h-7 px-2 min-w-[28px] border-gray-300 ${i === currentPage ? 'bg-gray-900 text-white border-gray-900' : ''}`}
+          className={`px-2 min-w-[28px] border-gray-300 ${i === currentPage ? 'bg-gray-900 text-white border-gray-900' : ''}`}
         >
           {i}
         </Button>
@@ -61,7 +61,7 @@ export function DictionaryPagination({
             size="sm"
             onClick={() => onPageChange(1)}
             disabled={currentPage === 1}
-            className="h-7 px-2 border-gray-300"
+            className="px-2 border-gray-300"
             title="처음 페이지"
           >
             <ChevronsLeft className="h-3 w-3" />
@@ -71,7 +71,7 @@ export function DictionaryPagination({
             size="sm"
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="h-7 px-2 border-gray-300"
+            className="px-2 border-gray-300"
             title="이전 페이지"
           >
             <ChevronLeft className="h-3 w-3" />
@@ -84,7 +84,7 @@ export function DictionaryPagination({
             size="sm"
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="h-7 px-2 border-gray-300"
+            className="px-2 border-gray-300"
             title="다음 페이지"
           >
             <ChevronRight className="h-3 w-3" />
@@ -94,7 +94,7 @@ export function DictionaryPagination({
             size="sm"
             onClick={() => onPageChange(totalPages)}
             disabled={currentPage === totalPages}
-            className="h-7 px-2 border-gray-300"
+            className="px-2 border-gray-300"
             title="마지막 페이지"
           >
             <ChevronsRight className="h-3 w-3" />

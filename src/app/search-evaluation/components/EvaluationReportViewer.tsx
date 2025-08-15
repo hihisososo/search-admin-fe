@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatDate } from "@/utils/evaluation-helpers"
 import { EVALUATION_CONFIG } from "@/constants/evaluation"
 import { PerformanceScore } from "./PerformanceScore"
-import type { EvaluationReport } from "@/services/evaluation/types"
+import type { EvaluationReport, RetrievedDocument, GroundTruthDocument } from "@/services/evaluation/types"
 
 interface EvaluationReportViewerProps {
   report: EvaluationReport
@@ -109,12 +109,30 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
               />
             </button>
             {expanded && (
-              <div className="p-3 border-t space-y-3">
+              <div className="p-3 border-t space-y-4">
                 <div className="flex items-center justify-end gap-4 text-xs text-gray-600">
                   <div>관련: {detail.relevantCount}</div>
                   <div>검색: {detail.retrievedCount}</div>
                   <div>정답: {detail.correctCount}</div>
                 </div>
+
+                {/* 실제 검색 결과 (순위 유지) */}
+                {Array.isArray(detail.retrievedDocuments) && detail.retrievedDocuments.length > 0 && (
+                  <div>
+                    <div className="font-medium text-sm mb-1">검색 결과</div>
+                    <RetrievedList documents={detail.retrievedDocuments as RetrievedDocument[]} />
+                  </div>
+                )}
+
+                {/* 정답셋 (score 내림차순) */}
+                {Array.isArray(detail.groundTruthDocuments) && detail.groundTruthDocuments.length > 0 && (
+                  <div>
+                    <div className="font-medium text-sm mb-1">정답셋</div>
+                    <GroundTruthList documents={detail.groundTruthDocuments as GroundTruthDocument[]} />
+                  </div>
+                )}
+
+                {/* 누락/오답 영역 */}
                 {(detail.missingDocuments?.length > 0 || detail.wrongDocuments?.length > 0) ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                     {detail.missingDocuments?.length > 0 && (
@@ -157,6 +175,62 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
 // removed old QueryDetailCard in favor of clickable rows with expand/collapse
 
 type ReportDoc = string | { productId: string; productName: string | null; productSpecs: string | null }
+
+function RetrievedList({ documents }: { documents: RetrievedDocument[] }) {
+  return (
+    <div className="text-xs border rounded">
+      <div className="grid grid-cols-12 gap-2 px-2 py-1 bg-gray-50 text-gray-600">
+        <div className="col-span-1">순위</div>
+        <div className="col-span-2">상품ID</div>
+        <div className="col-span-5">상품명</div>
+        <div className="col-span-3">스펙</div>
+        <div className="col-span-1 text-center">gain</div>
+      </div>
+      <div>
+        {documents.map((doc, i) => (
+          <div key={i} className="grid grid-cols-12 gap-2 px-2 py-1 border-t items-start">
+            <div className="col-span-1 font-mono">{doc.rank}</div>
+            <div className="col-span-2">
+              <span className="font-mono text-[11px] bg-white px-1 py-0.5 rounded border">{doc.productId}</span>
+            </div>
+            <div className="col-span-5 truncate">{doc.productName || '-'}</div>
+            <div className="col-span-3 truncate">{doc.productSpecs || '-'}</div>
+            <div className="col-span-1 text-center">
+              <span className={`text-[11px] px-1 py-0.5 rounded border ${doc.gain >= 2 ? 'bg-green-50 text-green-700 border-green-200' : doc.gain === 1 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 'bg-red-50 text-red-700 border-red-200'}`}>{doc.gain}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function GroundTruthList({ documents }: { documents: GroundTruthDocument[] }) {
+  return (
+    <div className="text-xs border rounded">
+      <div className="grid grid-cols-12 gap-2 px-2 py-1 bg-gray-50 text-gray-600">
+        <div className="col-span-2">상품ID</div>
+        <div className="col-span-5">상품명</div>
+        <div className="col-span-4">스펙</div>
+        <div className="col-span-1 text-center">score</div>
+      </div>
+      <div>
+        {documents.map((doc, i) => (
+          <div key={i} className="grid grid-cols-12 gap-2 px-2 py-1 border-t items-start">
+            <div className="col-span-2">
+              <span className="font-mono text-[11px] bg-white px-1 py-0.5 rounded border">{doc.productId}</span>
+            </div>
+            <div className="col-span-5 truncate">{doc.productName || '-'}</div>
+            <div className="col-span-4 truncate">{doc.productSpecs || '-'}</div>
+            <div className="col-span-1 text-center">
+              <span className={`text-[11px] px-1 py-0.5 rounded border ${doc.score >= 2 ? 'bg-green-50 text-green-700 border-green-200' : doc.score === 1 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : doc.score === 0 ? 'bg-red-50 text-red-700 border-red-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>{doc.score}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 function DocumentList({ 
   documents, 

@@ -342,13 +342,13 @@ export default function SearchSimulator() {
                                             handleSearch(selectedEnv, envState.query)
                                         }
                                     }}
-                                    className="flex-1 max-w-md h-9"
+                                    className="flex-1 max-w-md"
                                 />
                                 <Button
                                     onClick={() => handleSearch(currentEnvId, envState.query)}
                                     disabled={envState.loading}
                                     variant="outline"
-                                    className="px-4 h-9"
+                                    className="px-4"
                                 >
                                     {envState.loading ? (
                                         <div className="w-3 h-3 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />

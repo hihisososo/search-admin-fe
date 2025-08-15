@@ -19,13 +19,15 @@ interface QueryGenerationDialogProps {
   isGenerating: boolean
   isTaskRunning: boolean
   disabled?: boolean
+  progressText?: string
 }
 
 export function QueryGenerationDialog({
   onGenerate,
   isGenerating,
   isTaskRunning,
-  disabled = false
+  disabled = false,
+  progressText
 }: QueryGenerationDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [queryCount, setQueryCount] = useState<number>(EVALUATION_CONFIG.DEFAULT_QUERY_COUNT)
@@ -36,8 +38,8 @@ export function QueryGenerationDialog({
       const payload: GenerateQueriesRequest = {
         count: queryCount,
       }
-      await onGenerate(payload)
       setIsOpen(false)
+      await onGenerate(payload)
     } catch (_error) {
       // 에러는 부모에서 처리
     }
@@ -49,8 +51,17 @@ export function QueryGenerationDialog({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" disabled={disabled}>
-          <Plus className="h-4 w-4 mr-2" />
-          정답셋 자동생성
+          {isGenerating || isTaskRunning ? (
+            <>
+              <span className="mr-2 inline-flex"><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"></svg></span>
+              {isGenerating ? '시작중...' : (progressText || '진행중...')}
+            </>
+          ) : (
+            <>
+              <Plus className="h-4 w-4 mr-2" />
+              정답셋 자동생성
+            </>
+          )}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
