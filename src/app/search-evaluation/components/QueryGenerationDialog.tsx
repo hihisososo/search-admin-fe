@@ -50,7 +50,8 @@ export function QueryGenerationDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" disabled={disabled}>
+        <Button size="sm" variant="outline" disabled={disabled} className={isTaskRunning ? 'relative overflow-hidden' : ''}>
+          <span className={`pointer-events-none absolute inset-0 ${isTaskRunning ? 'bg-gradient-to-r from-transparent via-blue-100/60 to-transparent animate-[shimmer_1.5s_linear_infinite] rounded-md' : ''}`} />
           {isGenerating || isTaskRunning ? (
             <>
               <span className="mr-2 inline-flex"><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"></svg></span>

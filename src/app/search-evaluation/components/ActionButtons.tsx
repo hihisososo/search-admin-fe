@@ -204,7 +204,7 @@ export function ActionButtons({
           disabled={candidateGenTask.isRunning || selectedQueryIds.length === 0}
           className={candidateGenTask.isRunning ? 'relative overflow-hidden' : ''}
         >
-          <span className={`absolute inset-0 ${candidateGenTask.isRunning ? 'bg-gradient-to-r from-transparent via-blue-100/60 to-transparent animate-[shimmer_1.5s_linear_infinite]' : ''}`} />
+          <span className={`pointer-events-none absolute inset-0 ${candidateGenTask.isRunning ? 'bg-gradient-to-r from-transparent via-blue-100/60 to-transparent animate-[shimmer_1.5s_linear_infinite]' : ''}`} />
           <RefreshCw className={`h-4 w-4 mr-1 ${(candStarting || candidateGenTask.isRunning) ? 'animate-spin' : ''}`} />
           {candStarting
             ? '시작중...'
@@ -221,7 +221,7 @@ export function ActionButtons({
           disabled={llmEvalTask.isRunning || selectedQueryIds.length === 0}
           className={llmEvalTask.isRunning ? 'relative overflow-hidden' : ''}
         >
-          <span className={`absolute inset-0 ${llmEvalTask.isRunning ? 'bg-gradient-to-r from-transparent via-amber-100/60 to-transparent animate-[shimmer_1.5s_linear_infinite]' : ''}`} />
+          <span className={`pointer-events-none absolute inset-0 ${llmEvalTask.isRunning ? 'bg-gradient-to-r from-transparent via-amber-100/60 to-transparent animate-[shimmer_1.5s_linear_infinite]' : ''}`} />
           <Zap className={`h-4 w-4 mr-1 ${(llmStarting || llmEvalTask.isRunning) ? 'animate-pulse' : ''}`} />
           {llmStarting
             ? '시작중...'
