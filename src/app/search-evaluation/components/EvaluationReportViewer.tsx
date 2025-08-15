@@ -26,6 +26,30 @@ export function EvaluationReportViewer({ report }: EvaluationReportViewerProps) 
             />
           </CardContent>
         </Card>
+        {typeof (report as any).ndcgAt10 === 'number' && (
+          <Card>
+            <CardContent className="pt-6">
+              <PerformanceScore 
+                score={(report as any).ndcgAt10}
+                label="nDCG@10"
+                size="lg"
+                showPercentage={false}
+              />
+            </CardContent>
+          </Card>
+        )}
+        {typeof (report as any).mrrAt10 === 'number' && (
+          <Card>
+            <CardContent className="pt-6">
+              <PerformanceScore 
+                score={(report as any).mrrAt10}
+                label="MRR@10"
+                size="lg"
+                showPercentage={false}
+              />
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* 통계 정보 */}
@@ -110,10 +134,12 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
             </button>
             {expanded && (
               <div className="p-3 border-t space-y-4">
-                <div className="flex items-center justify-end gap-4 text-xs text-gray-600">
+                <div className="flex flex-wrap items-center justify-end gap-3 text-[11px] text-gray-600">
                   <div>관련: {detail.relevantCount}</div>
                   <div>검색: {detail.retrievedCount}</div>
                   <div>정답: {detail.correctCount}</div>
+                  {typeof detail.ndcgAt10 === 'number' && (<div>nDCG@10: {Number(detail.ndcgAt10).toFixed(3)}</div>)}
+                  {typeof detail.mrrAt10 === 'number' && (<div>MRR@10: {Number(detail.mrrAt10).toFixed(3)}</div>)}
                 </div>
 
                 {/* 실제 검색 결과 (순위 유지) */}

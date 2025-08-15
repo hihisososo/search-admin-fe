@@ -144,6 +144,12 @@ export interface EvaluationRequest {
 export interface QueryEvaluationDetail {
   query: string
   ndcg: number
+  ndcgAt10?: number
+  ndcgAt20?: number
+  mrrAt10?: number
+  recallAt50?: number
+  map?: number
+  recallAt300?: number
   relevantCount: number
   retrievedCount: number
   correctCount: number
@@ -179,6 +185,12 @@ export interface EvaluationReport {
   reportName: string
   totalQueries: number
   averageNdcg: number
+  ndcgAt10?: number
+  ndcgAt20?: number
+  mrrAt10?: number
+  recallAt50?: number
+  map?: number
+  recallAt300?: number
   queryDetails: Array<
     QueryEvaluationDetail & {
       retrievedDocuments?: RetrievedDocument[]

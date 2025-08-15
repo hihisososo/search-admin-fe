@@ -15,7 +15,7 @@ function App() {
       url: window.location.href
     })
 
-    document.title = '검색관리 콘솔'
+    document.title = 'Search Admin'
 
     return () => {
       logger.info('Application unmounting')
