@@ -146,7 +146,6 @@ export function ActionButtons({
           variant="outline"
           onClick={handleGenerateCandidates}
           disabled={candidateGenTask.isRunning || selectedQueryIds.length === 0}
-          className="border-green-600 text-green-600 hover:bg-green-50"
         >
           <RefreshCw className={`h-4 w-4 mr-1 ${candidateGenTask.isRunning ? 'animate-spin' : ''}`} />
           {candidateGenTask.isRunning 
@@ -160,7 +159,6 @@ export function ActionButtons({
           variant="outline"
           onClick={handleEvaluateLlm}
           disabled={llmEvalTask.isRunning || selectedQueryIds.length === 0}
-          className="border-gray-300 hover:bg-gray-50"
         >
           <Zap className={`h-4 w-4 mr-1 ${llmEvalTask.isRunning ? 'animate-pulse' : ''}`} />
           {llmEvalTask.isRunning 
@@ -228,9 +226,10 @@ export function ActionButtons({
         />
         <Button 
           size="sm" 
-          variant="destructive"
+          variant="outline"
           onClick={handleDeleteSelected}
           disabled={isDeleting || selectedQueryIds.length === 0}
+          className="border-red-300 text-red-600 hover:bg-red-50"
         >
           <Trash2 className="h-4 w-4 mr-2" />
           선택 삭제

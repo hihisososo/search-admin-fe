@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTaskStatus, useRunningTasks } from './use-evaluation'
 
@@ -6,6 +6,7 @@ interface AsyncTaskHookOptions {
   onComplete?: (result?: string) => void
   onError?: (error: string) => void
   shouldRefreshData?: boolean
+  recoverOnMountOnly?: boolean
 }
 
 export function useAsyncTask(
@@ -15,22 +16,30 @@ export function useAsyncTask(
   const [taskId, setTaskId] = useState<number | null>(null)
   const [completedTaskIds, setCompletedTaskIds] = useState<Set<number>>(new Set())
   const queryClient = useQueryClient()
+  const hasAttemptedRecoveryRef = useRef(false)
   
-  const { onComplete, onError, shouldRefreshData = true } = options
+  const { onComplete, onError, shouldRefreshData = true, recoverOnMountOnly = true } = options
   
   const runningTasksQuery = useRunningTasks()
   const taskStatus = useTaskStatus(taskId)
 
   // 페이지 로드 시 실행 중인 작업 복구
   useEffect(() => {
-    if (runningTasksQuery.data && runningTasksQuery.data.length > 0 && !taskId) {
-      const runningTask = runningTasksQuery.data.find(task => task.taskType === taskType)
-      if (runningTask) {
-        setTaskId(runningTask.id)
-        // Task recovery: ${taskType}
-      }
+    if (!runningTasksQuery.data || taskId) return
+
+    // 복구는 마운트 시 1회만 시도 (다른 작업으로 재복구되는 문제 방지)
+    if (recoverOnMountOnly && hasAttemptedRecoveryRef.current) return
+
+    const runningTask = runningTasksQuery.data.find(task => task.taskType === taskType)
+    if (runningTask) {
+      setTaskId(runningTask.id)
+      // Task recovery: ${taskType}
     }
-  }, [runningTasksQuery.data, taskId, taskType])
+
+    if (recoverOnMountOnly) {
+      hasAttemptedRecoveryRef.current = true
+    }
+  }, [runningTasksQuery.data, taskId, taskType, recoverOnMountOnly])
 
   // 작업 완료/실패 처리
   useEffect(() => {

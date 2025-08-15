@@ -147,7 +147,8 @@ export function ProductFilters({
             <Button
               size="sm"
               onClick={onPriceSearch}
-              className="h-7 px-3 text-xs bg-gray-600 hover:bg-gray-700"
+              variant="outline"
+              className="h-7 px-3 text-xs"
             >
               검색
             </Button>

@@ -51,10 +51,10 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
             {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((pageNum) => (
                 <Button 
                     key={pageNum}
-                    variant={pageNum === displayPage ? "default" : "outline"}
+                    variant="outline"
                     size="sm"
                     onClick={() => onPageChange(pageNum - 1)}
-                    className="h-7 px-2 min-w-[28px] border-gray-300"
+                    className={`h-7 px-2 min-w-[28px] border-gray-300 ${pageNum === displayPage ? 'bg-gray-900 text-white border-gray-900' : ''}`}
                 >
                     {pageNum}
                 </Button>

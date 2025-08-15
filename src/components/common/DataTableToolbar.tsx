@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { PAGINATION } from "@/constants/pagination"
+import { Search } from "lucide-react"
 
 interface DataTableToolbarProps {
   showSearch?: boolean
@@ -52,8 +53,8 @@ export function DataTableToolbar({
               onKeyDown={handleSearchKeyDown}
               className="h-9 flex-1 text-sm"
             />
-            <Button onClick={onSearch} disabled={disabled} className="h-9 px-4">
-              검색
+            <Button onClick={onSearch} disabled={disabled} size="icon" variant="outline" className="h-9 w-9" aria-label="검색">
+              <Search className="w-4 h-4" />
             </Button>
           </>
         )}

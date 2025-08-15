@@ -60,9 +60,7 @@ export default function EvaluationExecutionPage() {
       
       // 성공 알림
       alert(`평가가 완료되었습니다!\n\n` +
-        `📊 Precision: ${(result.averagePrecision * 100).toFixed(1)}%\n` +
-        `📊 Recall: ${(result.averageRecall * 100).toFixed(1)}%\n` +
-        `📊 F1 Score: ${(result.averageF1Score * 100).toFixed(1)}%\n\n` +
+        `📊 nDCG: ${result.averageNdcg.toFixed(3)}\n\n` +
         `🔍 총 쿼리: ${result.totalQueries}개\n` +
         `📋 관련 문서: ${result.totalRelevantDocuments}개\n` +
         `🔍 검색된 문서: ${result.totalRetrievedDocuments}개\n` +
@@ -131,7 +129,7 @@ export default function EvaluationExecutionPage() {
               <DialogHeader>
                 <DialogTitle>새로운 평가 실행</DialogTitle>
                 <DialogDescription>
-                  검색 성능을 평가하여 Precision, Recall, F1 Score를 계산합니다. 
+                  검색 성능을 평가하여 nDCG를 계산합니다.
                   모든 쿼리에 대한 평가가 실행되며 결과는 리포트로 저장됩니다.
                 </DialogDescription>
               </DialogHeader>
@@ -208,9 +206,7 @@ export default function EvaluationExecutionPage() {
                     <TableHead className="w-16 py-2 text-xs font-semibold text-gray-700">ID</TableHead>
                     <TableHead className="py-2 text-xs font-semibold text-gray-700">제목</TableHead>
                     <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">상태</TableHead>
-                    <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">Precision</TableHead>
-                    <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">Recall</TableHead>
-                    <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">F1 Score</TableHead>
+                    <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">nDCG</TableHead>
                     <TableHead className="w-44 py-2 text-xs font-semibold text-gray-700">실행 시간</TableHead>
                     <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">삭제</TableHead>
                   </TableRow>
@@ -218,7 +214,7 @@ export default function EvaluationExecutionPage() {
                 <TableBody>
                   {!reportsQuery.data || reportsQuery.data.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-12 text-gray-500">
+                      <TableCell colSpan={6} className="text-center py-12 text-gray-500">
                         <div className="text-gray-500">
                           <p>아직 실행된 평가가 없습니다.</p>
                           <p className="text-sm text-gray-400 mt-1">새 평가를 실행해보세요.</p>
@@ -244,13 +240,7 @@ export default function EvaluationExecutionPage() {
                           <Badge className="bg-green-100 text-green-800 text-xs py-0.5 px-2">완료</Badge>
                         </TableCell>
                         <TableCell className="py-2 text-center">
-                          <PerformanceScore score={report.averagePrecision} size="sm" />
-                        </TableCell>
-                        <TableCell className="py-2 text-center">
-                          <PerformanceScore score={report.averageRecall} size="sm" />
-                        </TableCell>
-                        <TableCell className="py-2 text-center">
-                          <PerformanceScore score={report.averageF1Score} size="sm" />
+                          <PerformanceScore score={report.averageNdcg} size="sm" showPercentage={false} label="nDCG" />
                         </TableCell>
                         <TableCell className="py-2 text-xs text-gray-600">
                           {formatDate(report.createdAt)}

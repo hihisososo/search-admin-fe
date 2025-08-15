@@ -98,7 +98,7 @@ export default function EnvironmentOverview({
         })
         .map((env) => (
         <Card key={env.environmentType} className="relative shadow-sm border-gray-200">
-          <CardHeader className="pb-2">
+          <CardHeader className="pt-1 pb-1">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base flex items-center gap-2">
                 <Server className="h-4 w-4 text-gray-600" />
@@ -118,23 +118,22 @@ export default function EnvironmentOverview({
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-3 pt-0">
-            <div className="space-y-3">
+          <CardContent className="space-y-2 pt-0 pb-2">
+            <div className="space-y-2">
               <div className="flex items-start gap-2">
                 <Database className="h-3 w-3 text-gray-400 mt-0.5" />
                 <div className="min-w-0 flex-1">
                   <div className="text-xs text-gray-600 font-medium">색인명</div>
-                  <div className="text-xs text-gray-500 truncate font-mono">
-                    {env.indexName}
+                  <div className="text-xs text-gray-500 break-all font-mono leading-snug">
+                    <span className="text-gray-400">상품: </span>
+                    <span>{env.indexName}</span>
+                    {env.autocompleteIndexName && (
+                      <>
+                        <span className="text-gray-400"> · 자동완성: </span>
+                        <span>{env.autocompleteIndexName}</span>
+                      </>
+                    )}
                   </div>
-                  {env.autocompleteIndexName && (
-                    <div className="mt-1">
-                      <div className="text-xs text-gray-600 font-medium">자동완성 색인명</div>
-                      <div className="text-xs text-gray-500 truncate font-mono">
-                        {env.autocompleteIndexName}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
               <div className="flex items-start gap-2">
@@ -148,7 +147,7 @@ export default function EnvironmentOverview({
               </div>
             </div>
             
-            <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+            <div className="flex items-center gap-2 pt-1 border-t border-gray-100">
               <Calendar className="h-3 w-3 text-gray-400" />
               <div className="text-xs text-gray-500">
                 {formatDate(env.indexDate)}
@@ -157,7 +156,7 @@ export default function EnvironmentOverview({
 
             {/* 색인 진행률 표시 */}
             {env.environmentType === 'DEV' && isEnvironmentIndexing(env) && env.indexingProgress !== null && env.indexingProgress !== undefined && (
-              <div className="space-y-2 pt-2">
+              <div className="space-y-1 pt-1">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-gray-600">색인 진행중</span>
                   <span className="font-semibold text-blue-600">{env.indexingProgress}%</span>
@@ -179,13 +178,13 @@ export default function EnvironmentOverview({
 
             {/* 개발 환경에만 버튼들 표시 */}
             {env.environmentType === 'DEV' && (
-              <div className="flex gap-2 pt-2">
+              <div className="flex gap-2 pt-1">
                 <Button
                   onClick={() => onReindex(env)}
                   variant="outline"
                   size="sm"
                   disabled={!canReindex(env)}
-                  className="flex-1 text-xs h-8 border-blue-300 text-blue-700 hover:bg-blue-50 disabled:opacity-50"
+                  className="flex-1 text-xs h-8"
                 >
                   {isEnvironmentIndexing(env) ? (
                     <>
@@ -204,7 +203,7 @@ export default function EnvironmentOverview({
                   disabled={isDeploying || !canDeploy()}
                   variant="outline"
                   size="sm"
-                  className="flex-1 text-xs h-8 border-green-300 text-green-700 hover:bg-green-50 disabled:opacity-50"
+                  className="flex-1 text-xs h-8"
                 >
                   {isDeploying ? (
                     <>

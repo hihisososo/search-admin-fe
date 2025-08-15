@@ -12,8 +12,7 @@ import {
 import { Plus } from "lucide-react"
 import { EVALUATION_CONFIG } from "@/constants/evaluation"
 import type { GenerateQueriesRequest } from "@/services/evaluation/types"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useEvaluationCategories } from "@/hooks/use-evaluation"
+ 
 
 interface QueryGenerationDialogProps {
   onGenerate: (data: GenerateQueriesRequest) => Promise<void>
@@ -30,30 +29,12 @@ export function QueryGenerationDialog({
 }: QueryGenerationDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [queryCount, setQueryCount] = useState<number>(EVALUATION_CONFIG.DEFAULT_QUERY_COUNT)
-  const [minCandidates, setMinCandidates] = useState<number | undefined>(60)
-  const [maxCandidates, setMaxCandidates] = useState<number | undefined>(200)
-  const [category, setCategory] = useState<string>("")
-  const { data: categoriesData } = useEvaluationCategories(100, isOpen)
-
-  // 다양한 응답 스키마 대응: { categories: [...] } | { data: { categories: [...] } } | string[]
-  const categoryOptions = ((): Array<{ name: string; docCount?: number }> => {
-    const raw: any = categoriesData as any
-    const list = raw?.categories ?? raw?.data?.categories ?? raw ?? []
-    if (Array.isArray(list)) {
-      return list.map((c: any) =>
-        typeof c === 'string' ? { name: c, docCount: 0 } : { name: c.name ?? String(c), docCount: c.docCount }
-      )
-    }
-    return []
-  })()
+ 
 
   const handleGenerate = async () => {
     try {
       const payload: GenerateQueriesRequest = {
         count: queryCount,
-        minCandidates,
-        maxCandidates,
-        category: category || undefined,
       }
       await onGenerate(payload)
       setIsOpen(false)
@@ -67,7 +48,7 @@ export function QueryGenerationDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" disabled={disabled}>
+        <Button size="sm" variant="outline" disabled={disabled}>
           <Plus className="h-4 w-4 mr-2" />
           정답셋 자동생성
         </Button>
@@ -77,7 +58,7 @@ export function QueryGenerationDialog({
           <DialogTitle>정답셋 자동생성</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             <div>
               <Label htmlFor="queryCount" className="text-sm font-medium">생성 개수</Label>
               <Input
@@ -87,43 +68,6 @@ export function QueryGenerationDialog({
                 onChange={(e) => setQueryCount(Number(e.target.value))}
                 min={1}
                 max={EVALUATION_CONFIG.MAX_QUERY_COUNT}
-                className="text-sm mt-1"
-              />
-            </div>
-            <div>
-              <Label className="text-sm font-medium">카테고리(선택)</Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="w-full text-sm mt-1">
-                  <SelectValue placeholder="카테고리를 선택하세요" />
-                </SelectTrigger>
-                <SelectContent className="text-sm">
-                  {categoryOptions.map((c) => (
-                    <SelectItem key={c.name} value={c.name} className="text-sm">
-                      {c.name}{typeof c.docCount === 'number' ? ` (${c.docCount.toLocaleString()})` : ''}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="minCandidates" className="text-sm font-medium">최소 후보 수(선택)</Label>
-              <Input
-                id="minCandidates"
-                type="number"
-                value={minCandidates ?? ''}
-                onChange={(e) => setMinCandidates(e.target.value === '' ? undefined : Number(e.target.value))}
-                min={1}
-                className="text-sm mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="maxCandidates" className="text-sm font-medium">최대 후보 수(선택)</Label>
-              <Input
-                id="maxCandidates"
-                type="number"
-                value={maxCandidates ?? ''}
-                onChange={(e) => setMaxCandidates(e.target.value === '' ? undefined : Number(e.target.value))}
-                min={1}
                 className="text-sm mt-1"
               />
             </div>

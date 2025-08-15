@@ -39,10 +39,10 @@ export function DictionaryPagination({
       pages.push(
         <Button 
           key={i}
-          variant={i === currentPage ? "default" : "outline"}
+          variant="outline"
           size="sm"
           onClick={() => onPageChange(i)}
-          className="h-7 px-2 min-w-[28px] border-gray-300"
+          className={`h-7 px-2 min-w-[28px] border-gray-300 ${i === currentPage ? 'bg-gray-900 text-white border-gray-900' : ''}`}
         >
           {i}
         </Button>

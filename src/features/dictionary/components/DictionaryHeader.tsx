@@ -63,7 +63,7 @@ export function DictionaryHeader<T extends BaseDictionaryItem>({
             <Button
               onClick={onAdd}
               size="sm"
-              className="bg-blue-600 hover:bg-blue-700"
+              variant="outline"
             >
               <Plus className="h-4 w-4 mr-1" />
               추가
@@ -75,7 +75,6 @@ export function DictionaryHeader<T extends BaseDictionaryItem>({
               onClick={() => onApplyChanges(environment)}
               size="sm"
               variant="outline"
-              className="border-green-600 text-green-600 hover:bg-green-50"
             >
               <RefreshCw className="h-4 w-4 mr-1" />
               실시간 반영
@@ -88,7 +87,7 @@ export function DictionaryHeader<T extends BaseDictionaryItem>({
               size="sm"
               variant="outline"
               disabled={selectedCount === 0}
-              className="border-red-300 text-red-600 hover:bg-red-50"
+              className="text-red-600 border-red-300 hover:bg-red-50"
             >
               <Trash2 className="h-4 w-4 mr-1" />
               선택 삭제{selectedCount > 0 ? ` (${selectedCount})` : ''}

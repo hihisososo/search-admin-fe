@@ -36,10 +36,10 @@ export function PaginationControls({
       pages.push(
         <Button 
           key={i}
-          variant={i === currentPage ? "default" : "outline"}
+          variant="outline"
           size="sm"
           onClick={() => onPageChange(i)}
-          className="h-8 px-3 text-xs min-w-[32px]"
+          className={`h-8 px-3 text-xs min-w-[32px] ${i === currentPage ? 'bg-gray-900 text-white border-gray-900' : ''}`}
         >
           {i + 1}
         </Button>

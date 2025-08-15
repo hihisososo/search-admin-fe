@@ -49,12 +49,6 @@ export function ReportDialog({
     return "text-red-600"
   }
 
-  const getScoreBadgeVariant = (score: number) => {
-    if (score >= 0.8) return "default"
-    if (score >= 0.6) return "secondary"
-    return "destructive"
-  }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
@@ -113,24 +107,10 @@ export function ReportDialog({
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center">
-                    <div className={`text-2xl font-bold ${getScoreColor(latestReport.averagePrecision)}`}>
-                      {(latestReport.averagePrecision * 100).toFixed(1)}%
+                    <div className={`text-2xl font-bold ${getScoreColor(latestReport.averageNdcg)}`}>
+                      {latestReport.averageNdcg.toFixed(3)}
                     </div>
-                    <div className="text-sm text-gray-600">평균 Precision</div>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className={`text-2xl font-bold ${getScoreColor(latestReport.averageRecall)}`}>
-                      {(latestReport.averageRecall * 100).toFixed(1)}%
-                    </div>
-                    <div className="text-sm text-gray-600">평균 Recall</div>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className={`text-2xl font-bold ${getScoreColor(latestReport.averageF1Score)}`}>
-                      {(latestReport.averageF1Score * 100).toFixed(1)}%
-                    </div>
-                    <div className="text-sm text-gray-600">평균 F1 Score</div>
+                    <div className="text-sm text-gray-600">평균 nDCG</div>
                   </div>
                   
                   <div className="text-center">
@@ -169,13 +149,12 @@ export function ReportDialog({
                               <div key={index} className="p-3 border rounded text-sm">
                                 <div className="flex justify-between items-center mb-2">
                                   <span className="font-medium">{detail.query}</span>
-                                  <Badge variant={getScoreBadgeVariant(detail.f1Score)}>
-                                    F1: {(detail.f1Score * 100).toFixed(1)}%
+                                  <Badge>
+                                    nDCG: {Number(detail.ndcg).toFixed(3)}
                                   </Badge>
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 text-xs text-gray-600">
-                                  <span>Precision: {(detail.precision * 100).toFixed(1)}%</span>
-                                  <span>Recall: {(detail.recall * 100).toFixed(1)}%</span>
+                                  <span>nDCG: {Number(detail.ndcg).toFixed(3)}</span>
                                   <span>정확: {detail.correctCount}/{detail.retrievedCount}</span>
                                 </div>
                                 {/* 누락/오답 문서 표시 */}
@@ -242,13 +221,7 @@ export function ReportDialog({
                         <div className="text-right">
                           <div className="flex gap-2">
                             <Badge variant="outline" className="text-xs">
-                              P: {(report.averagePrecision * 100).toFixed(1)}%
-                            </Badge>
-                            <Badge variant="outline" className="text-xs">
-                              R: {(report.averageRecall * 100).toFixed(1)}%
-                            </Badge>
-                            <Badge variant={getScoreBadgeVariant(report.averageF1Score)} className="text-xs">
-                              F1: {(report.averageF1Score * 100).toFixed(1)}%
+                              nDCG: {report.averageNdcg.toFixed(3)}
                             </Badge>
                           </div>
                           <div className="text-xs text-gray-500 mt-1">
@@ -281,22 +254,10 @@ export function ReportDialog({
                         <div className="space-y-3">
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded">
                             <div className="text-center">
-                              <div className={`text-xl font-bold ${getScoreColor(selectedReport.averagePrecision)}`}>
-                                {(selectedReport.averagePrecision * 100).toFixed(1)}%
+                              <div className={`text-xl font-bold ${getScoreColor(selectedReport.averageNdcg)}`}>
+                                {selectedReport.averageNdcg.toFixed(3)}
                               </div>
-                              <div className="text-sm text-gray-600">평균 Precision</div>
-                            </div>
-                            <div className="text-center">
-                              <div className={`text-xl font-bold ${getScoreColor(selectedReport.averageRecall)}`}>
-                                {(selectedReport.averageRecall * 100).toFixed(1)}%
-                              </div>
-                              <div className="text-sm text-gray-600">평균 Recall</div>
-                            </div>
-                            <div className="text-center">
-                              <div className={`text-xl font-bold ${getScoreColor(selectedReport.averageF1Score)}`}>
-                                {(selectedReport.averageF1Score * 100).toFixed(1)}%
-                              </div>
-                              <div className="text-sm text-gray-600">평균 F1 Score</div>
+                              <div className="text-sm text-gray-600">평균 nDCG</div>
                             </div>
                             <div className="text-center">
                               <div className="text-xl font-bold text-blue-600">
@@ -314,13 +275,7 @@ export function ReportDialog({
                                   <span className="font-medium">{detail.query}</span>
                                   <div className="flex gap-2">
                                     <Badge variant="outline" className="text-xs">
-                                      P: {(detail.precision * 100).toFixed(1)}%
-                                    </Badge>
-                                    <Badge variant="outline" className="text-xs">
-                                      R: {(detail.recall * 100).toFixed(1)}%
-                                    </Badge>
-                                    <Badge variant={getScoreBadgeVariant(detail.f1Score)} className="text-xs">
-                                      F1: {(detail.f1Score * 100).toFixed(1)}%
+                                      nDCG: {Number(detail.ndcg).toFixed(3)}
                                     </Badge>
                                   </div>
                                 </div>
