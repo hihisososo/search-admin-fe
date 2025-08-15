@@ -185,12 +185,15 @@ export function ActionButtons({
     return (
       <div className="flex w-full justify-end items-center gap-2">
         {/* 4. 정답셋 자동생성 - 맨 왼쪽, 파란색 */}
-        <QueryGenerationDialog
-          onGenerate={handleGenerateQueries}
-          isGenerating={queryStarting}
-          isTaskRunning={queryGenTask.isRunning}
-          progressText={queryGenTask.isRunning ? getTaskProgressText(queryGenTask.data, '정답셋 자동생성') : undefined}
-        />
+        <div className={queryGenTask.isRunning ? 'relative overflow-hidden' : ''}>
+          <span className={`absolute inset-0 ${queryGenTask.isRunning ? 'bg-gradient-to-r from-transparent via-blue-100/60 to-transparent animate-[shimmer_1.5s_linear_infinite] rounded-md' : ''}`} />
+          <QueryGenerationDialog
+            onGenerate={handleGenerateQueries}
+            isGenerating={queryStarting}
+            isTaskRunning={queryGenTask.isRunning}
+            progressText={queryGenTask.isRunning ? getTaskProgressText(queryGenTask.data, '정답셋 자동생성') : undefined}
+          />
+        </div>
         {/* 1. 쿼리 추가 - 흰색 */}
         <QueryCreateDialog onCreate={onCreateQuery} />
         {/* 2. 후보군 생성 */}
@@ -199,7 +202,9 @@ export function ActionButtons({
           variant="outline"
           onClick={handleGenerateCandidates}
           disabled={candidateGenTask.isRunning || selectedQueryIds.length === 0}
+          className={candidateGenTask.isRunning ? 'relative overflow-hidden' : ''}
         >
+          <span className={`absolute inset-0 ${candidateGenTask.isRunning ? 'bg-gradient-to-r from-transparent via-blue-100/60 to-transparent animate-[shimmer_1.5s_linear_infinite]' : ''}`} />
           <RefreshCw className={`h-4 w-4 mr-1 ${(candStarting || candidateGenTask.isRunning) ? 'animate-spin' : ''}`} />
           {candStarting
             ? '시작중...'
@@ -214,7 +219,9 @@ export function ActionButtons({
           variant="outline"
           onClick={handleEvaluateLlm}
           disabled={llmEvalTask.isRunning || selectedQueryIds.length === 0}
+          className={llmEvalTask.isRunning ? 'relative overflow-hidden' : ''}
         >
+          <span className={`absolute inset-0 ${llmEvalTask.isRunning ? 'bg-gradient-to-r from-transparent via-amber-100/60 to-transparent animate-[shimmer_1.5s_linear_infinite]' : ''}`} />
           <Zap className={`h-4 w-4 mr-1 ${(llmStarting || llmEvalTask.isRunning) ? 'animate-pulse' : ''}`} />
           {llmStarting
             ? '시작중...'
@@ -279,11 +286,14 @@ export function ActionButtons({
           }
         </Button>
         {/* 4. 정답셋 자동생성 */}
-        <QueryGenerationDialog
-          onGenerate={handleGenerateQueries}
-          isGenerating={false}
-          isTaskRunning={queryGenTask.isRunning}
-        />
+        <div className={queryGenTask.isRunning ? 'relative overflow-hidden' : ''}>
+          <span className={`absolute inset-0 ${queryGenTask.isRunning ? 'bg-gradient-to-r from-transparent via-blue-100/60 to-transparent animate-[shimmer_1.5s_linear_infinite] rounded-md' : ''}`} />
+          <QueryGenerationDialog
+            onGenerate={handleGenerateQueries}
+            isGenerating={false}
+            isTaskRunning={queryGenTask.isRunning}
+          />
+        </div>
         <Button 
           size="sm" 
           variant="outline"
