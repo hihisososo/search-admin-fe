@@ -9,6 +9,7 @@ import {
 } from "@/hooks/use-evaluation"
 import { QueryTable } from "../components/QueryTable"
 import { DocumentTable } from "../components/DocumentTable"
+import { RunningTasksIndicator } from "../components/RunningTasksIndicator"
 
 export default function AnswerSetManagementPage() {
   // 상태 관리
@@ -138,6 +139,7 @@ export default function AnswerSetManagementPage() {
   return (
     <div className="p-6">
       <div className="max-w-7xl mx-auto space-y-4">
+        <RunningTasksIndicator />
         {/* 쿼리 테이블 (카드 제거) */}
         <div>
           <QueryTable
