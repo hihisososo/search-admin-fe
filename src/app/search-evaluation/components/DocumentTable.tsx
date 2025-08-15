@@ -114,6 +114,28 @@ export function DocumentTable({
     }
   }
 
+  // evaluationReason 에 포함된 (score: n) 추출
+  const extractScore = (reason?: string | null): number | null => {
+    if (!reason) return null
+    const match = reason.match(/\(score:\s*(\d)\)/i)
+    if (!match) return null
+    const num = Number(match[1])
+    return Number.isFinite(num) ? num : null
+  }
+
+  const getScoreBadge = (score: number) => {
+    const colorClass = score >= 2
+      ? 'bg-green-50 text-green-700 border-green-200'
+      : score === 1
+        ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
+        : 'bg-red-50 text-red-700 border-red-200'
+    return (
+      <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${colorClass}`}>
+        score: {score}
+      </Badge>
+    )
+  }
+
   // 상품 추가 핸들러
   const handleAddProduct = async () => {
     if (!selectedProduct) {
@@ -269,7 +291,7 @@ export function DocumentTable({
         <div className="flex items-center gap-2">
           <Dialog open={showProductDialog} onOpenChange={setShowProductDialog}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="bg-white">
+              <Button variant="outline" size="sm">
                 <Plus className="h-3 w-3 mr-1" />
                 정답 문서 추가
               </Button>
@@ -286,7 +308,7 @@ export function DocumentTable({
                     placeholder="상품명으로 검색..."
                     className="flex-1"
                   />
-                  <Button size="sm" disabled={!searchTerm.trim()}>
+                  <Button size="sm" variant="outline" disabled={!searchTerm.trim()}>
                     <Search className="h-4 w-4" />
                   </Button>
                 </div>
@@ -315,6 +337,7 @@ export function DocumentTable({
                     취소
                   </Button>
                   <Button 
+                    variant="outline"
                     onClick={handleAddProduct}
                     disabled={addDocumentMutation.isPending || !selectedProduct}
                   >
@@ -326,7 +349,7 @@ export function DocumentTable({
           </Dialog>
 
           {onClose && (
-            <Button variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0">
+            <Button variant="outline" size="sm" onClick={onClose} className="h-8 w-8 p-0">
               <X className="h-4 w-4" />
             </Button>
           )}
@@ -397,7 +420,7 @@ export function DocumentTable({
                       </TableCell>
                       
                       <TableCell className="py-2 text-center">
-                        <div className="flex justify-center">
+                        <div className="flex justify-center items-center gap-2">
                           {status === 'correct' && (
                             <Badge variant="default" className="bg-green-600 text-xs py-0.5 px-2">
                               <CheckCircle className="h-3 w-3 mr-1" /> 정답
@@ -413,6 +436,10 @@ export function DocumentTable({
                               <HelpCircle className="h-3 w-3 mr-1" /> 미지정
                             </Badge>
                           )}
+                          {(() => {
+                            const s = extractScore(doc.evaluationReason)
+                            return s !== null ? getScoreBadge(s) : null
+                          })()}
                         </div>
                       </TableCell>
                     </TableRow>

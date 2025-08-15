@@ -94,9 +94,6 @@ export interface DeleteQueriesRequest {
 // 자동화 관련 타입
 export interface GenerateQueriesRequest {
   count: number
-  minCandidates?: number
-  maxCandidates?: number
-  category?: string
 }
 
 export interface GenerateCandidatesRequest {

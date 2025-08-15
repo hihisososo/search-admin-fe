@@ -18,6 +18,7 @@ import { DataTableToolbar } from "@/components/common/DataTableToolbar"
 import { PAGINATION } from "@/constants/pagination"
 
 export default function SearchLogs() {
+  const MAX_TOTAL = 10000
   const [items, setItems] = useState<SearchLogItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -25,6 +26,7 @@ export default function SearchLogs() {
   const [pageSize, setPageSize] = useState(20)
   const [total, setTotal] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
+  const [isCapped, setIsCapped] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
   const [selectedLogId, setSelectedLogId] = useState<string | null>(null)
   
@@ -68,9 +70,19 @@ export default function SearchLogs() {
       }
       
       const response = await searchLogApi.getList(params)
+      const serverTotal = response.totalElements || 0
+      const cappedTotal = Math.min(serverTotal, MAX_TOTAL)
+      const cappedTotalPages = Math.max(1, Math.ceil(cappedTotal / pageSize))
+
       setItems(response.content || [])
-      setTotal(response.totalElements || 0)
-      setTotalPages(response.totalPages || 0)
+      setTotal(cappedTotal)
+      setTotalPages(cappedTotalPages)
+      setIsCapped(serverTotal > MAX_TOTAL)
+
+      // 현재 페이지가 캡을 초과하면 마지막 허용 페이지로 이동
+      if (page >= cappedTotalPages) {
+        setPage(cappedTotalPages - 1)
+      }
     } catch (err) {
       console.error('검색 로그 API 에러:', err)
       if (err instanceof Error) {
@@ -137,7 +149,7 @@ export default function SearchLogs() {
       <Card className="shadow-sm border-gray-200">
         <CardHeader>
           <SearchLogHeader
-            keyword=""
+            keyword={keyword}
             indexName=""
             isError={isError}
             clientIp={clientIp}
@@ -147,7 +159,7 @@ export default function SearchLogs() {
             maxResponseTime={maxResponseTime}
             minResultCount={minResultCount}
             maxResultCount={maxResultCount}
-            onKeywordChange={() => {}}
+            onKeywordChange={setKeyword}
             onIndexNameChange={() => {}}
             onIsErrorChange={setIsError}
             onClientIpChange={setClientIp}
@@ -159,7 +171,6 @@ export default function SearchLogs() {
             onMaxResultCountChange={setMaxResultCount}
             onSearch={handleSearch}
             onResetFilters={handleResetFilters}
-            hideKeyword
           />
         </CardHeader>
         <CardContent className="px-3">
@@ -171,6 +182,11 @@ export default function SearchLogs() {
             pageSize={pageSize}
             onPageSizeChange={handlePageSizeChange}
           />
+          {isCapped && (
+            <div className="mt-1 mb-2 text-[11px] text-gray-500 bg-gray-50 border border-gray-200 rounded px-2 py-1">
+              검색 결과는 상위 10,000개까지만 제공합니다. 더 깊은 데이터는 기간/필터를 좁혀 조회하세요.
+            </div>
+          )}
           {error && (
             <div className="text-red-700 text-xs mb-2 p-2 bg-red-50 rounded border border-red-200">
               {error}

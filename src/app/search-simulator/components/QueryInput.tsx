@@ -74,11 +74,12 @@ export function QueryInput({
                                 <Button 
                                     onClick={onSearch} 
                                     disabled={loading || !selectedIndex || !safeQuery.trim()}
-                                    className="bg-blue-600 hover:bg-blue-700 h-6 px-2 text-xs"
+                                    variant="outline"
+                                    className="h-6 px-2 text-xs"
                                     size="sm"
                                 >
                                     {loading ? (
-                                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-900"></div>
                                     ) : (
                                         <Play className="h-3 w-3" />
                                     )}

@@ -125,16 +125,15 @@ export default function EnvironmentOverview({
                 <div className="min-w-0 flex-1">
                   <div className="text-xs text-gray-600 font-medium">색인명</div>
                   <div className="text-xs text-gray-500 break-all font-mono leading-snug">
-                    {env.indexName}
+                    <span className="text-gray-400">상품: </span>
+                    <span>{env.indexName}</span>
+                    {env.autocompleteIndexName && (
+                      <>
+                        <span className="text-gray-400"> · 자동완성: </span>
+                        <span>{env.autocompleteIndexName}</span>
+                      </>
+                    )}
                   </div>
-                  {env.autocompleteIndexName && (
-                    <div className="mt-0.5">
-                      <div className="text-xs text-gray-600 font-medium">자동완성 색인명</div>
-                      <div className="text-xs text-gray-500 break-all font-mono leading-snug">
-                        {env.autocompleteIndexName}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
               <div className="flex items-start gap-2">
@@ -185,7 +184,7 @@ export default function EnvironmentOverview({
                   variant="outline"
                   size="sm"
                   disabled={!canReindex(env)}
-                  className="flex-1 text-xs h-8 border-blue-300 text-blue-700 hover:bg-blue-50 disabled:opacity-50"
+                  className="flex-1 text-xs h-8"
                 >
                   {isEnvironmentIndexing(env) ? (
                     <>
@@ -204,7 +203,7 @@ export default function EnvironmentOverview({
                   disabled={isDeploying || !canDeploy()}
                   variant="outline"
                   size="sm"
-                  className="flex-1 text-xs h-8 border-green-300 text-green-700 hover:bg-green-50 disabled:opacity-50"
+                  className="flex-1 text-xs h-8"
                 >
                   {isDeploying ? (
                     <>

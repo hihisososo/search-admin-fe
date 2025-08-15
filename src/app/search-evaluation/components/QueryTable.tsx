@@ -73,7 +73,7 @@ export function QueryTable({
   const createQueryMutation = useCreateQuery()
 
   // 액션 핸들러들
-  const handleGenerateQueries = async (data: { count: number; minCandidates?: number; maxCandidates?: number; category?: string }) => {
+  const handleGenerateQueries = async (data: { count: number }) => {
     return await generateQueriesAsyncMutation.mutateAsync(data)
   }
 

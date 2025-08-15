@@ -40,8 +40,9 @@ export function getTaskProgressText(
         countInfo = ` (${result.processedCount}/${result.totalCount})`
       } else if (result.evaluatedCount && result.totalCount) {
         countInfo = ` (${result.evaluatedCount}/${result.totalCount})`
-      } else if (result.generatedCount && result.targetCount) {
-        countInfo = ` (${result.generatedCount}/${result.targetCount})`
+      } else if (result.generatedCount && (result.targetCount || result.requestedCount)) {
+        const total = result.targetCount ?? result.requestedCount
+        countInfo = ` (${result.generatedCount}/${total})`
       }
     }
   } catch {

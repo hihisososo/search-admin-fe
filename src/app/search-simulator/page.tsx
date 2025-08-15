@@ -89,7 +89,7 @@ const initialEnvironmentState: EnvironmentState = {
     price: { from: '', to: '' },
     page: 0,
     sort: 'score',
-    showExplain: false,
+    showExplain: true,
     applyTypoCorrection: true,  // 🆕 기본값 true
     products: [],
     totalResults: 0,
@@ -347,10 +347,11 @@ export default function SearchSimulator() {
                                 <Button
                                     onClick={() => handleSearch(currentEnvId, envState.query)}
                                     disabled={envState.loading}
-                                    className={`px-4 h-9 ${selectedEnv === DictionaryEnvironmentType.PROD ? 'bg-gray-800' : 'bg-blue-600'} hover:opacity-90`}
+                                    variant="outline"
+                                    className="px-4 h-9"
                                 >
                                     {envState.loading ? (
-                                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                        <div className="w-3 h-3 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
                                     ) : (
                                         <Search className="h-4 w-4" />
                                     )}

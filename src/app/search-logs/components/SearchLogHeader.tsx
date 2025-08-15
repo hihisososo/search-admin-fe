@@ -1,10 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { Search, RotateCcw, CalendarIcon } from "lucide-react"
-import { ko } from "date-fns/locale"
+import { Search, RotateCcw } from "lucide-react"
 // import type { SearchLogFilterOptions } from "@/types/dashboard"
 
 interface SearchLogHeaderProps {
@@ -57,10 +54,11 @@ export function SearchLogHeader({
   onResetFilters
 }: SearchLogHeaderProps) {
   
-  // 날짜 입력값을 API 형식으로 변환
-  const formatDateForApi = (dateStr: string, isEndDate = false) => {
-    if (!dateStr) return ""
-    return isEndDate ? `${dateStr}T23:59:59` : `${dateStr}T00:00:00`
+  // datetime-local 값을 항상 초 단위까지 맞춤
+  const normalizeDatetimeLocal = (value: string) => {
+    if (!value) return ""
+    // value: YYYY-MM-DDTHH:MM 또는 YYYY-MM-DDTHH:MM:SS
+    return value.length === 16 ? `${value}:00` : value
   }
 
   // 숫자 입력 처리
@@ -82,51 +80,25 @@ export function SearchLogHeader({
             className="h-8 text-sm placeholder:text-sm"
           />
         </div>
-        <div className="w-44 space-y-1">
-          <label className="text-sm font-medium text-gray-700">시작 날짜</label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full h-8 text-sm justify-start font-normal"
-              >
-                <CalendarIcon className="w-4 h-4 mr-1" />
-                {startDate ? new Date(startDate).toLocaleDateString('ko-KR') : "선택"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={startDate ? new Date(startDate) : undefined}
-                onSelect={(date) => onStartDateChange(date ? formatDateForApi(date.toISOString().split('T')[0]) : "")}
-                locale={ko}
-                className="border-0"
-              />
-            </PopoverContent>
-          </Popover>
+        <div className="w-60 space-y-1">
+          <label className="text-sm font-medium text-gray-700">시작 일시</label>
+          <Input
+            type="datetime-local"
+            step={1}
+            value={startDate || ""}
+            onChange={(e) => onStartDateChange(normalizeDatetimeLocal(e.target.value))}
+            className="h-8 text-sm"
+          />
         </div>
-        <div className="w-44 space-y-1">
-          <label className="text-sm font-medium text-gray-700">종료 날짜</label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full h-8 text-sm justify-start font-normal"
-              >
-                <CalendarIcon className="w-4 h-4 mr-1" />
-                {endDate ? new Date(endDate).toLocaleDateString('ko-KR') : "선택"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={endDate ? new Date(endDate) : undefined}
-                onSelect={(date) => onEndDateChange(date ? formatDateForApi(date.toISOString().split('T')[0], true) : "")}
-                locale={ko}
-                className="border-0"
-              />
-            </PopoverContent>
-          </Popover>
+        <div className="w-60 space-y-1">
+          <label className="text-sm font-medium text-gray-700">종료 일시</label>
+          <Input
+            type="datetime-local"
+            step={1}
+            value={endDate || ""}
+            onChange={(e) => onEndDateChange(normalizeDatetimeLocal(e.target.value))}
+            className="h-8 text-sm"
+          />
         </div>
         <div className="w-60 space-y-1">
           <label className="text-sm font-medium text-gray-700">클라이언트 IP</label>
@@ -198,7 +170,7 @@ export function SearchLogHeader({
 
       {/* 세 번째 행: 버튼들 */}
       <div className="flex gap-2 mt-5">
-        <Button onClick={onSearch} size="sm" className="h-8 px-3 text-sm">
+        <Button onClick={onSearch} size="sm" variant="outline" className="h-8 px-3 text-sm">
           <Search className="w-4 h-4 mr-1" />
           검색
         </Button>

@@ -60,7 +60,7 @@ export function QueryCreateDialog({ onCreate, isCreating = false, disabled = fal
           
           <div className="flex justify-end gap-2">
             <Button variant="outline" size="sm" onClick={() => setIsOpen(false)} disabled={isCreating}>취소</Button>
-            <Button size="sm" onClick={handleCreate} disabled={!canSubmit || isCreating}>
+            <Button size="sm" variant="outline" onClick={handleCreate} disabled={!canSubmit || isCreating}>
               {isCreating ? '추가중...' : '추가'}
             </Button>
           </div>

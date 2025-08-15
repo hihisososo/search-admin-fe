@@ -104,9 +104,9 @@ class EvaluationService {
     return apiClient.get<AsyncTaskStatus[]>(`${this.baseEndpoint}/tasks/running`)
   }
 
-  // 3. 평가 실행
+  // 3. 평가 실행 (nDCG 계산)
 
-  // 평가 실행 (precision, recall 계산)
+  // 평가 실행 (nDCG 계산)
   async evaluate(data: EvaluationRequest): Promise<EvaluationExecuteResponse> {
     return apiClient.post<EvaluationExecuteResponse>(`${this.baseEndpoint}/evaluate`, data)
   }

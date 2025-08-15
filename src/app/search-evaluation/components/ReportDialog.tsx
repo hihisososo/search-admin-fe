@@ -221,13 +221,7 @@ export function ReportDialog({
                         <div className="text-right">
                           <div className="flex gap-2">
                             <Badge variant="outline" className="text-xs">
-                              P: {(report.averagePrecision * 100).toFixed(1)}%
-                            </Badge>
-                            <Badge variant="outline" className="text-xs">
-                              R: {(report.averageRecall * 100).toFixed(1)}%
-                            </Badge>
-                            <Badge variant={getScoreBadgeVariant(report.averageF1Score)} className="text-xs">
-                              F1: {(report.averageF1Score * 100).toFixed(1)}%
+                              nDCG: {report.averageNdcg.toFixed(3)}
                             </Badge>
                           </div>
                           <div className="text-xs text-gray-500 mt-1">
@@ -281,13 +275,7 @@ export function ReportDialog({
                                   <span className="font-medium">{detail.query}</span>
                                   <div className="flex gap-2">
                                     <Badge variant="outline" className="text-xs">
-                                      P: {(detail.precision * 100).toFixed(1)}%
-                                    </Badge>
-                                    <Badge variant="outline" className="text-xs">
-                                      R: {(detail.recall * 100).toFixed(1)}%
-                                    </Badge>
-                                    <Badge variant={getScoreBadgeVariant(detail.f1Score)} className="text-xs">
-                                      F1: {(detail.f1Score * 100).toFixed(1)}%
+                                      nDCG: {Number(detail.ndcg).toFixed(3)}
                                     </Badge>
                                   </div>
                                 </div>
