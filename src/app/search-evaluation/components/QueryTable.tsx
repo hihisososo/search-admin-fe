@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { DataTableToolbar } from "@/components/common/DataTableToolbar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Checkbox } from "@/components/ui/checkbox"
 import { 
@@ -162,34 +163,18 @@ export function QueryTable({
         />
       </div>
 
-      {/* 검색 입력창 (페이지 크기 선택 제거) */}
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-1 w-full max-w-lg">
-          <Input
-            placeholder="검색할 쿼리를 입력하세요"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                onSearch?.(searchText)
-              }
-            }}
-            className="h-9 flex-1 text-sm"
-          />
-          <Button
-            onClick={() => onSearch?.(searchText)}
-            disabled={isLoading}
-            className="h-9 px-4"
-          >
-            {isLoading ? (
-              <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <Search className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
-        <div className="flex items-center gap-2"></div>
-      </div>
+      <DataTableToolbar
+        showSearch
+        searchValue={searchText}
+        onSearchChange={setSearchText}
+        onSearch={() => onSearch?.(searchText)}
+        totalCount={totalCount}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        onPageSizeChange={onPageSizeChange}
+        disabled={isLoading}
+      />
 
       {/* 쿼리 테이블 */}
       <div className="border border-gray-200 rounded-md overflow-hidden bg-white mt-0">
