@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+// import { Input } from "@/components/ui/input"
+// import { Button } from "@/components/ui/button"
 import { DataTableToolbar } from "@/components/common/DataTableToolbar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -15,14 +15,14 @@ import {
   useCreateQuery,
 } from "@/hooks/use-evaluation"
 import { calculateSelectionState } from "@/utils/evaluation-helpers"
-import { EVALUATION_CONFIG } from "@/constants/evaluation"
+// import { EVALUATION_CONFIG } from "@/constants/evaluation"
 import { ActionButtons } from "./ActionButtons"
 import { PaginationControls } from "./PaginationControls"
 import { QueryTableRow } from "./QueryTableRow"
 import { QueryEditDialog } from "./QueryEditDialog"
 import type { EvaluationQuery } from "@/services"
 import { useToast } from "@/components/ui/use-toast"
-import { Search } from "lucide-react"
+// import { Search } from "lucide-react"
 // no-op
 
 interface QueryTableProps {
@@ -41,6 +41,9 @@ interface QueryTableProps {
   onRefresh?: () => void
   isLoading: boolean
   onSearch?: (text: string) => void
+  sortField?: string
+  sortDirection?: 'asc' | 'desc'
+  onSort?: (field: string) => void
 }
 
 export function QueryTable({
@@ -58,7 +61,10 @@ export function QueryTable({
   onPageSizeChange,
   onSearch,
   onRefresh: _onRefresh,
-  isLoading
+  isLoading,
+  sortField: _sortField,
+  sortDirection: _sortDirection,
+  onSort
 }: QueryTableProps) {
   const [editingQuery, setEditingQuery] = useState<{ id: number, text: string } | null>(null)
   const { toast } = useToast()
@@ -189,18 +195,20 @@ export function QueryTable({
                 }}
               />
             </TableHead>
-            <TableHead className="py-2 text-xs font-semibold text-gray-700">쿼리</TableHead>
+            <TableHead className="py-2 text-xs font-semibold text-gray-700 cursor-pointer" onClick={() => onSort?.('query')}>쿼리</TableHead>
             <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-24">문서수</TableHead>
-            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-16">정답</TableHead>
-            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-16">오답</TableHead>
-            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-20">미지정</TableHead>
+            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-16 cursor-pointer" onClick={() => onSort?.('score2Count')}>매우관련</TableHead>
+            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-16 cursor-pointer" onClick={() => onSort?.('score1Count')}>관련</TableHead>
+            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-16 cursor-pointer" onClick={() => onSort?.('score0Count')}>관련없음</TableHead>
+            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-20 cursor-pointer" onClick={() => onSort?.('scoreMinus1Count')}>미평가</TableHead>
+            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-28">검수 필요수</TableHead>
             <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-24">액션</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {queries.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+              <TableCell colSpan={9} className="text-center py-8 text-gray-500">
                 <p className="text-sm">등록된 쿼리가 없습니다</p>
                 <p className="text-xs text-gray-400 mt-1">새 쿼리를 추가하거나 LLM으로 생성해보세요</p>
               </TableCell>
@@ -267,6 +275,7 @@ function QueryTableSkeleton() {
             <TableHead className="text-center w-16">정답</TableHead>
             <TableHead className="text-center w-16">오답</TableHead>
             <TableHead className="text-center w-20">미지정</TableHead>
+            <TableHead className="text-center w-28">검수 필요수</TableHead>
             <TableHead className="text-center w-24">액션</TableHead>
           </TableRow>
         </TableHeader>
@@ -279,6 +288,7 @@ function QueryTableSkeleton() {
               <TableCell><Skeleton className="h-6 w-8 mx-auto" /></TableCell>
               <TableCell><Skeleton className="h-6 w-8 mx-auto" /></TableCell>
               <TableCell><Skeleton className="h-6 w-8 mx-auto" /></TableCell>
+              <TableCell><Skeleton className="h-6 w-16 mx-auto" /></TableCell>
               <TableCell><Skeleton className="h-6 w-16 mx-auto" /></TableCell>
             </TableRow>
           ))}

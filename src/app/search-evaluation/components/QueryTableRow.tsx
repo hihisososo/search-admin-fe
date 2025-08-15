@@ -28,9 +28,12 @@ export function QueryTableRow({
 }: QueryTableRowProps) {
   // 실제 백엔드 필드명 사용 (기본값 처리)
   const documentCount = query.documentCount ?? 0
-  const correctCount = query.correctCount ?? 0
-  const incorrectCount = query.incorrectCount ?? 0
-  const unspecifiedCount = query.unspecifiedCount ?? 0
+  const score2Count = query.score2Count ?? 0
+  const score1Count = query.score1Count ?? 0
+  const score0Count = query.score0Count ?? 0
+  const scoreMinus1Count = query.scoreMinus1Count ?? 0
+  const reviewed = query.reviewed === true
+  const humanReviewCount = reviewed ? 0 : scoreMinus1Count
 
   return (
     <TableRow 
@@ -58,18 +61,23 @@ export function QueryTableRow({
         </Badge>
       </TableCell>
       <TableCell className="py-2 text-center">
-        <Badge variant="default" className="bg-green-600 text-xs py-0.5 px-2">
-          {correctCount}
-        </Badge>
+        <Badge variant="outline" className="text-xs py-0.5 px-2 bg-green-50 text-green-700 border-green-200">{score2Count}</Badge>
       </TableCell>
       <TableCell className="py-2 text-center">
-        <Badge variant="destructive" className="text-xs py-0.5 px-2">
-          {incorrectCount}
-        </Badge>
+        <Badge variant="outline" className="text-xs py-0.5 px-2 bg-yellow-50 text-yellow-700 border-yellow-200">{score1Count}</Badge>
       </TableCell>
       <TableCell className="py-2 text-center">
-        <Badge variant="secondary" className="text-xs py-0.5 px-2">
-          {unspecifiedCount}
+        <Badge variant="outline" className="text-xs py-0.5 px-2 bg-red-50 text-red-700 border-red-200">{score0Count}</Badge>
+      </TableCell>
+      <TableCell className="py-2 text-center">
+        <Badge variant="secondary" className="text-xs py-0.5 px-2">{scoreMinus1Count}</Badge>
+      </TableCell>
+      <TableCell className="py-2 text-center">
+        <Badge
+          variant="outline"
+          className={`text-xs py-0.5 px-2 ${humanReviewCount > 0 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}
+        >
+          {humanReviewCount}
         </Badge>
       </TableCell>
       <TableCell className="py-2 text-center">
@@ -88,7 +96,7 @@ export function QueryTableRow({
             variant="outline"
             onClick={() => onDelete(query.id)}
             disabled={isDeleting}
-            className="h-7 w-7 p-0"
+            className="h-7 w-7 p-0 text-red-600 border-red-300 hover:bg-red-50"
           >
             <Trash2 className="h-3 w-3" />
           </Button>

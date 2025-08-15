@@ -61,12 +61,12 @@ export function QueryInput({
                             <Label className="text-sm">ES Query DSL</Label>
                             <div className="flex items-center gap-1">
                                 {/* 쿼리 저장 버튼 */}
-                                <Button variant="outline" size="sm" onClick={onSaveDialog} className="h-6 px-2 text-xs">
+                                <Button variant="outline" size="sm" onClick={onSaveDialog} className="px-2 text-xs">
                                     <Save className="h-3 w-3" />
                                 </Button>
 
                                 {/* 쿼리 불러오기 버튼 */}
-                                <Button variant="outline" size="sm" onClick={onLoadDialog} className="h-6 px-2 text-xs">
+                                <Button variant="outline" size="sm" onClick={onLoadDialog} className="px-2 text-xs">
                                     <BookOpen className="h-3 w-3" />
                                 </Button>
 
@@ -75,7 +75,7 @@ export function QueryInput({
                                     onClick={onSearch} 
                                     disabled={loading || !selectedIndex || !safeQuery.trim()}
                                     variant="outline"
-                                    className="h-6 px-2 text-xs"
+                                    className="px-2 text-xs"
                                     size="sm"
                                 >
                                     {loading ? (

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { useState } from "react"
 import { RefreshCw, Zap, Trash2 } from "lucide-react"
 import { useAsyncTask } from "@/hooks/use-async-task"
 import { getTaskProgressText, getTaskCompletionMessage } from "@/utils/evaluation-helpers"
@@ -29,6 +30,9 @@ export function ActionButtons({
   compact = false
 }: ActionButtonsProps) {
   const { toast } = useToast()
+  const [llmStarting, setLlmStarting] = useState(false)
+  const [queryStarting, setQueryStarting] = useState(false)
+  const [candStarting, setCandStarting] = useState(false)
   
   const queryGenTask = useAsyncTask('QUERY_GENERATION', {
     onComplete: (result) => {
@@ -82,8 +86,24 @@ export function ActionButtons({
   })
 
   const handleGenerateQueries = async (data: GenerateQueriesRequest) => {
-    const response = await onGenerateQueries(data)
-    queryGenTask.startTask(response.taskId)
+    try {
+      setQueryStarting(true)
+      toast({
+        title: '정답셋 자동생성 시작',
+        description: '백그라운드에서 쿼리 생성 중입니다.',
+        variant: 'default'
+      })
+      const response = await onGenerateQueries(data)
+      queryGenTask.startTask(response.taskId)
+    } catch (error) {
+      toast({
+        title: '정답셋 자동생성 시작 실패',
+        description: error instanceof Error ? error.message : '요청 중 오류가 발생했습니다.',
+        variant: 'destructive'
+      })
+    } finally {
+      setQueryStarting(false)
+    }
   }
 
   const handleGenerateCandidates = async () => {
@@ -96,8 +116,24 @@ export function ActionButtons({
       return
     }
     
-    const response = await onGenerateCandidates()
-    candidateGenTask.startTask((response as any).taskId)
+    try {
+      setCandStarting(true)
+      toast({
+        title: '후보군 생성 시작',
+        description: '백그라운드에서 후보군을 생성합니다.',
+        variant: 'default'
+      })
+      const response = await onGenerateCandidates()
+      candidateGenTask.startTask((response as any).taskId)
+    } catch (error) {
+      toast({
+        title: '후보군 생성 시작 실패',
+        description: error instanceof Error ? error.message : '요청 중 오류가 발생했습니다.',
+        variant: 'destructive'
+      })
+    } finally {
+      setCandStarting(false)
+    }
   }
 
   const handleEvaluateLlm = async () => {
@@ -110,8 +146,24 @@ export function ActionButtons({
       return
     }
     
-    const response = await onEvaluateLlm()
-    llmEvalTask.startTask((response as any).taskId)
+    try {
+      setLlmStarting(true)
+      toast({
+        title: "자동평가 시작",
+        description: "LLM 자동평가를 시작했습니다. 진행률은 버튼에 표시됩니다.",
+        variant: "default"
+      })
+      const response = await onEvaluateLlm()
+      llmEvalTask.startTask((response as any).taskId)
+    } catch (error) {
+      toast({
+        title: "자동평가 시작 실패",
+        description: error instanceof Error ? error.message : '요청 중 오류가 발생했습니다.',
+        variant: "destructive"
+      })
+    } finally {
+      setLlmStarting(false)
+    }
   }
 
   const handleDeleteSelected = async () => {
@@ -135,8 +187,9 @@ export function ActionButtons({
         {/* 4. 정답셋 자동생성 - 맨 왼쪽, 파란색 */}
         <QueryGenerationDialog
           onGenerate={handleGenerateQueries}
-          isGenerating={false}
+          isGenerating={queryStarting}
           isTaskRunning={queryGenTask.isRunning}
+          progressText={queryGenTask.isRunning ? getTaskProgressText(queryGenTask.data, '정답셋 자동생성') : undefined}
         />
         {/* 1. 쿼리 추가 - 흰색 */}
         <QueryCreateDialog onCreate={onCreateQuery} />
@@ -147,9 +200,11 @@ export function ActionButtons({
           onClick={handleGenerateCandidates}
           disabled={candidateGenTask.isRunning || selectedQueryIds.length === 0}
         >
-          <RefreshCw className={`h-4 w-4 mr-1 ${candidateGenTask.isRunning ? 'animate-spin' : ''}`} />
-          {candidateGenTask.isRunning 
-            ? getTaskProgressText(candidateGenTask.data, '후보군 생성')
+          <RefreshCw className={`h-4 w-4 mr-1 ${(candStarting || candidateGenTask.isRunning) ? 'animate-spin' : ''}`} />
+          {candStarting
+            ? '시작중...'
+            : candidateGenTask.isRunning 
+              ? getTaskProgressText(candidateGenTask.data, '후보군 생성')
             : '후보군 생성'
           }
         </Button>
@@ -160,9 +215,11 @@ export function ActionButtons({
           onClick={handleEvaluateLlm}
           disabled={llmEvalTask.isRunning || selectedQueryIds.length === 0}
         >
-          <Zap className={`h-4 w-4 mr-1 ${llmEvalTask.isRunning ? 'animate-pulse' : ''}`} />
-          {llmEvalTask.isRunning 
-            ? getTaskProgressText(llmEvalTask.data, '후보군 자동평가')
+          <Zap className={`h-4 w-4 mr-1 ${(llmStarting || llmEvalTask.isRunning) ? 'animate-pulse' : ''}`} />
+          {llmStarting
+            ? '시작중...'
+            : llmEvalTask.isRunning 
+              ? getTaskProgressText(llmEvalTask.data, '후보군 자동평가')
             : '후보군 자동평가'
           }
         </Button>
@@ -187,8 +244,9 @@ export function ActionButtons({
         {/* 4. 정답셋 자동생성 - 맨 왼쪽, 파란색 */}
         <QueryGenerationDialog
           onGenerate={handleGenerateQueries}
-          isGenerating={false}
+          isGenerating={queryStarting}
           isTaskRunning={queryGenTask.isRunning}
+          progressText={queryGenTask.isRunning ? getTaskProgressText(queryGenTask.data, '정답셋 자동생성') : undefined}
         />
         {/* 1. 쿼리 추가 - 흰색 */}
         <QueryCreateDialog onCreate={onCreateQuery} />
@@ -212,9 +270,11 @@ export function ActionButtons({
           onClick={handleEvaluateLlm}
           disabled={llmEvalTask.isRunning || selectedQueryIds.length === 0}
         >
-          <Zap className={`h-4 w-4 mr-2 ${llmEvalTask.isRunning ? 'animate-pulse' : ''}`} />
-          {llmEvalTask.isRunning 
-            ? getTaskProgressText(llmEvalTask.data, '후보군 자동평가')
+          <Zap className={`h-4 w-4 mr-2 ${(llmStarting || llmEvalTask.isRunning) ? 'animate-pulse' : ''}`} />
+          {llmStarting
+            ? '시작중...'
+            : llmEvalTask.isRunning 
+              ? getTaskProgressText(llmEvalTask.data, '후보군 자동평가')
             : '후보군 자동평가'
           }
         </Button>

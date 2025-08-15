@@ -3,12 +3,15 @@
 export interface EvaluationQuery {
   id: number
   query: string
-  documentCount: number      // 실제 백엔드 필드명
-  correctCount: number       // 실제 백엔드 필드명
-  incorrectCount: number     // 실제 백엔드 필드명
-  unspecifiedCount: number   // 실제 백엔드 필드명
+  documentCount: number
+  score2Count: number
+  score1Count: number
+  score0Count: number
+  scoreMinus1Count: number
   createdAt: string
   updatedAt: string
+  // 사람 검수 완료 여부 (백엔드가 제공하는 경우 표시용)
+  reviewed?: boolean
 }
 
 export interface EvaluationQueryListResponse {
@@ -176,7 +179,12 @@ export interface EvaluationReport {
   reportName: string
   totalQueries: number
   averageNdcg: number
-  queryDetails: QueryEvaluationDetail[]
+  queryDetails: Array<
+    QueryEvaluationDetail & {
+      retrievedDocuments?: RetrievedDocument[]
+      groundTruthDocuments?: GroundTruthDocument[]
+    }
+  >
   totalRelevantDocuments: number
   totalRetrievedDocuments: number
   totalCorrectDocuments: number
@@ -229,4 +237,21 @@ export interface DocumentInfo {
   productId: string
   productName: string | null
   productSpecs: string | null
+}
+
+// 리포트 상세용 신규 타입
+export interface RetrievedDocument {
+  rank: number
+  productId: string
+  productName: string | null
+  productSpecs: string | null
+  gain: number // 2 | 1 | 0
+  isRelevant: boolean
+}
+
+export interface GroundTruthDocument {
+  productId: string
+  productName: string | null
+  productSpecs: string | null
+  score: number // 2 | 1 | 0 | -1 | -100
 }

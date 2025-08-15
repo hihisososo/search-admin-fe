@@ -32,7 +32,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
                 size="sm"
                 onClick={() => onPageChange(0)}
                 disabled={currentPage <= 0}
-                className="h-7 px-2 border-gray-300"
+                className="px-2 border-gray-300"
                 title="처음 페이지"
             >
                 <ChevronsLeft className="h-3 w-3" />
@@ -42,7 +42,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
                 size="sm" 
                 disabled={currentPage <= 0}
                 onClick={() => onPageChange(currentPage - 1)}
-                className="h-7 px-2 border-gray-300"
+                className="px-2 border-gray-300"
                 title="이전 페이지"
             >
                 <ChevronLeft className="h-3 w-3" />
@@ -54,7 +54,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
                     variant="outline"
                     size="sm"
                     onClick={() => onPageChange(pageNum - 1)}
-                    className={`h-7 px-2 min-w-[28px] border-gray-300 ${pageNum === displayPage ? 'bg-gray-900 text-white border-gray-900' : ''}`}
+                    className={`px-2 min-w-[28px] border-gray-300 ${pageNum === displayPage ? 'bg-gray-900 text-white border-gray-900' : ''}`}
                 >
                     {pageNum}
                 </Button>
@@ -65,7 +65,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
                 size="sm" 
                 disabled={currentPage >= totalPages - 1}
                 onClick={() => onPageChange(currentPage + 1)}
-                className="h-7 px-2 border-gray-300"
+                className="px-2 border-gray-300"
                 title="다음 페이지"
             >
                 <ChevronRight className="h-3 w-3" />
@@ -75,7 +75,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
                 size="sm"
                 onClick={() => onPageChange(totalPages - 1)}
                 disabled={currentPage >= totalPages - 1}
-                className="h-7 px-2 border-gray-300"
+                className="px-2 border-gray-300"
                 title="마지막 페이지"
             >
                 <ChevronsRight className="h-3 w-3" />

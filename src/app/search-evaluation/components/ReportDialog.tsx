@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart3, CheckCircle } from "lucide-react"
 import { useEvaluationReports } from "@/hooks/use-evaluation"
-import type { EvaluationReport } from "@/services"
+import type { EvaluationReport, EvaluationReportSummary } from "@/services/evaluation/types"
 
 interface ReportDialogProps {
   open: boolean
@@ -23,7 +23,7 @@ export function ReportDialog({
 }: ReportDialogProps) {
   const [reportName, setReportName] = useState("")
   const [latestReport, setLatestReport] = useState<EvaluationReport | null>(null)
-  const [selectedReport, setSelectedReport] = useState<EvaluationReport | null>(null)
+  const [selectedReport, setSelectedReport] = useState<EvaluationReportSummary | null>(null)
   
   // 기존 리포트 목록 조회
   const reportsQuery = useEvaluationReports()

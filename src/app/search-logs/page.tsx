@@ -15,7 +15,7 @@ import { SearchLogDetailDialog } from "./components/SearchLogDetailDialog"
 import { getSearchSessionId } from "@/lib/search-session"
 import { PaginationControls } from "@/components/common/PaginationControls"
 import { DataTableToolbar } from "@/components/common/DataTableToolbar"
-import { PAGINATION } from "@/constants/pagination"
+// import { PAGINATION } from "@/constants/pagination"
 
 export default function SearchLogs() {
   const MAX_TOTAL = 10000
