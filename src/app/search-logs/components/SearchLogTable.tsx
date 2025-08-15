@@ -33,9 +33,9 @@ export function SearchLogTable({
   const formatTimestamp = (timestamp: string) => {
     // 서버가 UTC 문자열을 타임존 없이 주는 경우가 있어 보정
     // 1) 소수점 자릿수를 ms(3자리)로 축약  2) 타임존 누락 시 'Z' 추가 → UTC 파싱
-    const hasTz = /[zZ]|[+\-]\d{2}:\d{2}$/.test(timestamp)
+    const hasTz = /[zZ]|[+-]\d{2}:\d{2}$/.test(timestamp)
     const withTz = hasTz ? timestamp : `${timestamp}Z`
-    const normalized = withTz.replace(/\.(\d{3})\d+(Z|[+\-]\d{2}:\d{2})$/, '.$1$2')
+    const normalized = withTz.replace(/\.(\d{3})\d+(Z|[+-]\d{2}:\d{2})$/, '.$1$2')
     const date = new Date(normalized)
     return date.toLocaleString('ko-KR', {
       year: 'numeric',
