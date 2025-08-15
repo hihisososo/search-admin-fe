@@ -143,9 +143,7 @@ export interface EvaluationRequest {
 
 export interface QueryEvaluationDetail {
   query: string
-  precision: number
-  recall: number
-  f1Score: number
+  ndcg: number
   relevantCount: number
   retrievedCount: number
   correctCount: number
@@ -157,23 +155,16 @@ export interface QueryEvaluationDetail {
 export interface EvaluationExecuteResponse {
   reportId: number
   reportName: string
-  precision: number
-  recall: number
   totalQueries: number
-  evaluatedQueries: number
   createdAt: string
-  averagePrecision: number
-  averageRecall: number
-  averageF1Score: number
+  averageNdcg: number
   totalRelevantDocuments: number
   totalRetrievedDocuments: number
   totalCorrectDocuments: number
   // 백엔드 예시 응답에 포함되는 쿼리별 상세 (선택적)
   queryDetails?: Array<{
     query: string
-    precision: number
-    recall: number
-    f1Score: number
+    ndcg: number
     relevantCount: number
     retrievedCount: number
     correctCount: number
@@ -187,9 +178,7 @@ export interface EvaluationReport {
   id: number
   reportName: string
   totalQueries: number
-  averagePrecision: number
-  averageRecall: number
-  averageF1Score: number
+  averageNdcg: number
   queryDetails: QueryEvaluationDetail[]
   totalRelevantDocuments: number
   totalRetrievedDocuments: number
@@ -201,9 +190,7 @@ export interface EvaluationReportSummary {
   id: number
   reportName: string
   totalQueries: number
-  averagePrecision: number
-  averageRecall: number
-  averageF1Score: number
+  averageNdcg: number
   totalRelevantDocuments: number
   totalRetrievedDocuments: number
   totalCorrectDocuments: number

@@ -15,31 +15,14 @@ export function EvaluationReportViewer({ report }: EvaluationReportViewerProps) 
   return (
     <div className="space-y-6">
       {/* 전체 성능 지표 */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="pt-6">
             <PerformanceScore 
-              score={report.averagePrecision} 
-              label="Precision"
+              score={report.averageNdcg} 
+              label="nDCG"
               size="lg"
-            />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <PerformanceScore 
-              score={report.averageRecall} 
-              label="Recall"
-              size="lg"
-            />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <PerformanceScore 
-              score={report.averageF1Score} 
-              label="F1 Score"
-              size="lg"
+              showPercentage={false}
             />
           </CardContent>
         </Card>
@@ -118,20 +101,12 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
               className="w-full flex items-center justify-between p-3 hover:bg-gray-50"
             >
               <div className="text-sm font-semibold text-gray-900 truncate pr-3">{detail.query}</div>
-              <div className="flex items-center gap-3">
-                <PerformanceScore 
-                  score={detail.precision} 
-                  label="P" 
-                  size="sm"
-                  showPercentage={true}
-                />
-                <PerformanceScore 
-                  score={detail.recall} 
-                  label="R" 
-                  size="sm"
-                  showPercentage={true}
-                />
-              </div>
+              <PerformanceScore 
+                score={detail.ndcg} 
+                label="nDCG" 
+                size="sm"
+                showPercentage={false}
+              />
             </button>
             {expanded && (
               <div className="p-3 border-t space-y-3">

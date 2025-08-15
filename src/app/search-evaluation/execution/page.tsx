@@ -60,9 +60,7 @@ export default function EvaluationExecutionPage() {
       
       // 성공 알림
       alert(`평가가 완료되었습니다!\n\n` +
-        `📊 Precision: ${(result.averagePrecision * 100).toFixed(1)}%\n` +
-        `📊 Recall: ${(result.averageRecall * 100).toFixed(1)}%\n` +
-        `📊 F1 Score: ${(result.averageF1Score * 100).toFixed(1)}%\n\n` +
+        `📊 nDCG: ${result.averageNdcg.toFixed(3)}\n\n` +
         `🔍 총 쿼리: ${result.totalQueries}개\n` +
         `📋 관련 문서: ${result.totalRelevantDocuments}개\n` +
         `🔍 검색된 문서: ${result.totalRetrievedDocuments}개\n` +
