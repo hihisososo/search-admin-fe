@@ -8,9 +8,7 @@ import { getDictionaryConfig } from '../configs/dictionaryConfigs'
 import type { DictionaryType } from '../types/dictionary.types'
 import type { DictionaryEnvironmentType } from '@/types/dashboard'
 import { PaginationControls } from '@/components/common/PaginationControls'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Search } from 'lucide-react'
+import { DataTableToolbar } from '@/components/common/DataTableToolbar'
 
 interface DictionaryPageProps {
   type: DictionaryType
@@ -52,34 +50,17 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
         onApplyChanges={config.features.realtimeSync ? actions.handleApplyChanges : undefined}
       />
 
-      {/* 검색 입력창 - 데이터 테이블 바로 위 배치 */}
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-1 w-full max-w-lg">
-          <Input
-            placeholder="검색어를 입력하세요"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                setSearch(searchInput)
-              }
-            }}
-            className="h-9 flex-1"
-          />
-          <Button
-            onClick={() => setSearch(searchInput)}
-            disabled={state.loading}
-            className={`${environment === 'PROD' ? 'bg-gray-800' : 'bg-blue-600'} px-4 h-9 hover:opacity-90`}
-          >
-            {state.loading ? (
-              <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <Search className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
-        <div className="flex items-center gap-2"></div>
-      </div>
+      <DataTableToolbar
+        showSearch
+        searchValue={searchInput}
+        onSearchChange={setSearchInput}
+        onSearch={() => setSearch(searchInput)}
+        totalCount={state.total}
+        currentPage={page}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        onPageSizeChange={(ps) => { setPageSize(ps); setPage(0) }}
+      />
 
       <DictionaryTable
         type={type}

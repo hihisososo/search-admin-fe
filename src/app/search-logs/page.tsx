@@ -14,6 +14,7 @@ import { SearchLogTable } from "./components/SearchLogTable"
 import { SearchLogDetailDialog } from "./components/SearchLogDetailDialog"
 import { getSearchSessionId } from "@/lib/search-session"
 import { PaginationControls } from "@/components/common/PaginationControls"
+import { DataTableToolbar } from "@/components/common/DataTableToolbar"
 import { PAGINATION } from "@/constants/pagination"
 
 export default function SearchLogs() {
@@ -162,6 +163,14 @@ export default function SearchLogs() {
           />
         </CardHeader>
         <CardContent className="px-3">
+          <DataTableToolbar
+            showSearch={false}
+            totalCount={total}
+            currentPage={page}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+          />
           {error && (
             <div className="text-red-700 text-xs mb-2 p-2 bg-red-50 rounded border border-red-200">
               {error}
