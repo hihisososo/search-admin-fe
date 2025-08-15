@@ -41,13 +41,13 @@ export function TrendingKeywords({ keywords, onKeywordClick }: TrendingKeywordsP
 	};
 
 	return (
-		<Card className="px-4 py-0.5 shadow-sm border border-gray-100 rounded-lg bg-white w-[240px] mt-2">
-			<div className="font-bold text-blue-700 mb-0 text-base leading-none">급등 검색어</div>
-			<ol className="list-decimal list-inside space-y-0.5">
+		<Card className="px-4 py-2 shadow-sm border border-gray-100 rounded-lg bg-white w-[240px] mt-3">
+			<div className="font-bold text-blue-700 mb-2 text-base leading-tight">급등 검색어</div>
+			<ol className="list-decimal list-inside space-y-0">
 				{keywords.slice(0, 10).map((k) => (
 					<li 
 						key={k.keyword} 
-						className="flex items-center justify-between text-gray-900 hover:text-gray-600 cursor-pointer transition-colors truncate max-w-full text-sm"
+						className="flex items-center justify-between text-gray-900 hover:text-gray-600 cursor-pointer transition-colors truncate max-w-full text-sm py-0.5"
 						onClick={() => onKeywordClick(k.keyword)}
 					>
 						<span className="font-bold text-gray-900 text-sm mr-3 flex-shrink-0 w-6 text-center">{k.rank}.</span>
