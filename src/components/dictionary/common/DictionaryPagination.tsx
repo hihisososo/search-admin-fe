@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
 
 interface DictionaryPaginationProps {
@@ -14,13 +13,13 @@ interface DictionaryPaginationProps {
 export function DictionaryPagination({
   currentPage,
   totalPages,
-  itemsPerPage,
-  totalItems,
+  itemsPerPage: _itemsPerPage,
+  totalItems: _totalItems,
   onPageChange,
-  onItemsPerPageChange
+  onItemsPerPageChange: _onItemsPerPageChange
 }: DictionaryPaginationProps) {
-  const startIndex = (currentPage - 1) * itemsPerPage + 1
-  const endIndex = Math.min(currentPage * itemsPerPage, totalItems)
+  const startIndex = 0
+  const endIndex = 0
   
   // 최대 10개의 페이지 번호 표시
   const maxVisiblePages = 10
@@ -55,25 +54,7 @@ export function DictionaryPagination({
 
   return (
     <div className="flex items-center justify-between mt-4">
-      <div className="text-sm text-gray-700">
-        전체 {totalItems}개 중 {startIndex}-{endIndex}개 표시
-      </div>
       <div className="flex items-center gap-2">
-        <span className="text-sm">페이지당:</span>
-        <Select
-          value={itemsPerPage.toString()}
-          onValueChange={(value) => onItemsPerPageChange(Number(value))}
-        >
-          <SelectTrigger className="w-[80px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="10">10</SelectItem>
-            <SelectItem value="20">20</SelectItem>
-            <SelectItem value="50">50</SelectItem>
-            <SelectItem value="100">100</SelectItem>
-          </SelectContent>
-        </Select>
         <div className="flex items-center gap-1">
           <Button
             variant="outline"

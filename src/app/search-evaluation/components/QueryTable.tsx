@@ -162,7 +162,7 @@ export function QueryTable({
         />
       </div>
 
-      {/* 검색 입력창 + 페이지 크기 선택 (사전 페이지와 동일 구도) */}
+      {/* 검색 입력창 (페이지 크기 선택 제거) */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-1 w-full max-w-lg">
           <Input
@@ -188,20 +188,7 @@ export function QueryTable({
             )}
           </Button>
         </div>
-        <div className="flex items-center gap-2">
-          <Select value={pageSize.toString()} onValueChange={(value) => onPageSizeChange(Number(value))}>
-            <SelectTrigger className="w-24 h-9 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="text-xs">
-              {EVALUATION_CONFIG.AVAILABLE_PAGE_SIZES.map(size => (
-                <SelectItem key={size} value={size.toString()} className="text-xs py-1">
-                  {size}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <div className="flex items-center gap-2"></div>
       </div>
 
       {/* 쿼리 테이블 */}
