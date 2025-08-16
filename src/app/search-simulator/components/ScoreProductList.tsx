@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Pagination } from "@/components/ui/pagination"
+import { PaginationControls } from "@/components/common/PaginationControls"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -124,7 +124,17 @@ export function ScoreProductList({
                         ))}
                     </div>
                 </div>
-                
+                {/* 사전 페이지와 동일한 위치/레이아웃의 페이징 */}
+                <div className="mt-2">
+                    <PaginationControls
+                        currentPage={Math.max(0, (page ?? 1) - 1)}
+                        totalPages={Math.max(1, totalPages ?? 1)}
+                        totalCount={totalResults ?? 0}
+                        pageSize={10}
+                        onPageChange={(p) => setPage(p + 1)}
+                        onPageSizeChange={() => {}}
+                    />
+                </div>
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -263,14 +273,7 @@ export function ScoreProductList({
                     </TableBody>
                 </Table>
                 
-                {totalPages > 1 && !loading && (
-                    <div className="space-y-2 mt-3">
-                        <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-                        <div className="text-center text-xs text-gray-500">
-                            {page} / {totalPages} 페이지 (총 {totalResults.toLocaleString()}개)
-                        </div>
-                    </div>
-                )}
+                
             </Card>
         </>
     )

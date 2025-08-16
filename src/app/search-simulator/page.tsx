@@ -87,7 +87,7 @@ const initialEnvironmentState: EnvironmentState = {
     brand: [],
     category: [],
     price: { from: '', to: '' },
-    page: 0,
+    page: 1,
     sort: 'score',
     showExplain: true,
     applyTypoCorrection: true,  // 🆕 기본값 true
@@ -179,7 +179,7 @@ export default function SearchSimulator() {
             // 필수 파라미터
             params.append('environmentType', envId)
             params.append('query', searchParams.query.trim())
-            params.append('page', searchParams.page.toString())
+            params.append('page', (searchParams.page - 1).toString())
             params.append('size', '10')
             
             // 선택적 파라미터
@@ -293,7 +293,7 @@ export default function SearchSimulator() {
             brand: [],
             category: [],
             price: { from: '', to: '' },
-            page: 0
+            page: 1
         })
         
         setTimeout(() => performSearch(envId, true), 100)
@@ -305,7 +305,7 @@ export default function SearchSimulator() {
             brand: [],
             category: [],
             price: { from: '', to: '' },
-            page: 0
+            page: 1
         }
         updateEnvironmentState(envId, resetParams)
         performSearch(envId, false, resetParams)
@@ -313,8 +313,8 @@ export default function SearchSimulator() {
 
     // 가격 검색
     const handlePriceSearch = (envId: string) => {
-        updateEnvironmentState(envId, { page: 0 })
-        performSearch(envId, false, { page: 0 })
+        updateEnvironmentState(envId, { page: 1 })
+        performSearch(envId, false, { page: 1 })
     }
 
     const currentEnvId = ENV_MAPPING[selectedEnv]
@@ -397,11 +397,11 @@ export default function SearchSimulator() {
                             setCategory={(category) => {
                                 if (typeof category === 'function') {
                                     const newCategory = category(envState.category)
-                                    updateEnvironmentState(currentEnvId, { category: newCategory, page: 0 })
-                                    performSearch(currentEnvId, false, { category: newCategory, page: 0 })
+                                    updateEnvironmentState(currentEnvId, { category: newCategory, page: 1 })
+                                    performSearch(currentEnvId, false, { category: newCategory, page: 1 })
                                 } else {
-                                    updateEnvironmentState(currentEnvId, { category, page: 0 })
-                                    performSearch(currentEnvId, false, { category, page: 0 })
+                                    updateEnvironmentState(currentEnvId, { category, page: 1 })
+                                    performSearch(currentEnvId, false, { category, page: 1 })
                                 }
                             }}
                             categorySub={[]}
@@ -410,11 +410,11 @@ export default function SearchSimulator() {
                             setBrand={(brand) => {
                                 if (typeof brand === 'function') {
                                     const newBrand = brand(envState.brand)
-                                    updateEnvironmentState(currentEnvId, { brand: newBrand, page: 0 })
-                                    performSearch(currentEnvId, false, { brand: newBrand, page: 0 })
+                                    updateEnvironmentState(currentEnvId, { brand: newBrand, page: 1 })
+                                    performSearch(currentEnvId, false, { brand: newBrand, page: 1 })
                                 } else {
-                                    updateEnvironmentState(currentEnvId, { brand, page: 0 })
-                                    performSearch(currentEnvId, false, { brand, page: 0 })
+                                    updateEnvironmentState(currentEnvId, { brand, page: 1 })
+                                    performSearch(currentEnvId, false, { brand, page: 1 })
                                 }
                             }}
                             price={envState.price}
@@ -447,8 +447,8 @@ export default function SearchSimulator() {
                         }}
                         sort={envState.sort}
                         onSortChange={(sort: string) => {
-                            updateEnvironmentState(currentEnvId, { sort, page: 0 })
-                            performSearch(currentEnvId, false, { sort, page: 0 })
+                            updateEnvironmentState(currentEnvId, { sort, page: 1 })
+                            performSearch(currentEnvId, false, { sort, page: 1 })
                         }}
                         searchQuery={envState.query}
                         showExplain={envState.showExplain}
