@@ -15,18 +15,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Drawer, DrawerContent } from "@/components/ui/drawer"
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Play, BarChart3, CheckCircle, RefreshCw, Plus, Trash2 } from "lucide-react"
+import { Play, RefreshCw, Plus, Trash2 } from "lucide-react"
 import { useEvaluationReports, useEvaluate, useDeleteEvaluationReport } from "@/hooks/use-evaluation"
 import { evaluationService } from "@/services/evaluation/api"
 import { formatDate } from "@/utils/evaluation-helpers"
-import { EVALUATION_CONFIG } from "@/constants/evaluation"
 import { PerformanceScore } from "../components/PerformanceScore"
 import { EvaluationReportViewer } from "../components/EvaluationReportViewer"
 import type { EvaluationReport } from "@/services/evaluation/types"
@@ -34,9 +26,9 @@ import type { EvaluationReport } from "@/services/evaluation/types"
 export default function EvaluationExecutionPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [reportTitle, setReportTitle] = useState("")
-  const [retrievalSize, setRetrievalSize] = useState<number>(EVALUATION_CONFIG.DEFAULT_RETRIEVAL_SIZE)
   const [selectedReport, setSelectedReport] = useState<EvaluationReport | null>(null)
   const [isReportDrawerOpen, setIsReportDrawerOpen] = useState(false)
+  const [isLoadingReport, setIsLoadingReport] = useState(false)
 
   // API 훅들
   const reportsQuery = useEvaluationReports()
@@ -49,14 +41,12 @@ export default function EvaluationExecutionPage() {
 
     try {
       const result = await evaluateMutation.mutateAsync({ 
-        reportName: reportTitle.trim(), 
-        retrievalSize 
+        reportName: reportTitle.trim()
       })
       
       // 성공 처리
       setIsDialogOpen(false)
       setReportTitle("")
-      setRetrievalSize(EVALUATION_CONFIG.DEFAULT_RETRIEVAL_SIZE)
       
       // 성공 알림
       alert(`평가가 완료되었습니다!\n\n` +
@@ -76,14 +66,20 @@ export default function EvaluationExecutionPage() {
 
   // 리포트 상세 보기  
   const viewReport = async (reportId: number) => {
+    setIsLoadingReport(true)
+    setIsReportDrawerOpen(true) // 드로어 먼저 열기
+    setSelectedReport(null) // 이전 데이터 초기화
+    
     try {
       // TODO: useEvaluationReport 훅으로 변경 고려
       const report = await evaluationService.getReport(reportId)
       setSelectedReport(report)
-      setIsReportDrawerOpen(true)
     } catch (error) {
       console.error('❌ 리포트 조회 실패:', error)
       alert('리포트 조회에 실패했습니다. 다시 시도해주세요.')
+      setIsReportDrawerOpen(false)
+    } finally {
+      setIsLoadingReport(false)
     }
   }
 
@@ -143,22 +139,6 @@ export default function EvaluationExecutionPage() {
                     placeholder="예: 2024년 1월 검색 성능 평가"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="retrievalSize">검색 결과 개수</Label>
-                  <Select value={retrievalSize.toString()} onValueChange={(value) => setRetrievalSize(Number(value))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {EVALUATION_CONFIG.AVAILABLE_RETRIEVAL_SIZES.map(size => (
-                        <SelectItem key={size} value={size.toString()}>
-                          {size}개{size === EVALUATION_CONFIG.DEFAULT_RETRIEVAL_SIZE ? ' (기본값)' : ''}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-sm text-gray-500">평가에 사용할 검색 결과의 개수를 설정하세요</p>
-                </div>
               </div>
               <DialogFooter>
                 <Button 
@@ -192,8 +172,7 @@ export default function EvaluationExecutionPage() {
 
         {/* 평가 히스토리 - 카드 제거, 테이블 컨테이너 스타일 통일 */}
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <BarChart3 className="h-5 w-5" />
+          <div className="mb-2">
             <h3 className="text-base font-semibold text-gray-900">평가 히스토리</h3>
           </div>
           <div className="border border-gray-200 rounded-md overflow-hidden bg-white">
@@ -208,7 +187,7 @@ export default function EvaluationExecutionPage() {
                     <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">상태</TableHead>
                     <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">nDCG</TableHead>
                     <TableHead className="w-44 py-2 text-xs font-semibold text-gray-700">실행 시간</TableHead>
-                    <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">삭제</TableHead>
+                    <TableHead className="text-center w-20 py-2 text-xs font-semibold text-gray-700">액션</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -224,36 +203,33 @@ export default function EvaluationExecutionPage() {
                   ) : (
                     reportsQuery.data.map((report) => (
                       <TableRow key={report.id} className="hover:bg-gray-50">
-                        <TableCell className="py-2 text-xs text-gray-700 font-medium">#{report.id}</TableCell>
+                        <TableCell className="py-2 text-xs text-gray-700 font-medium">{report.id}</TableCell>
                         <TableCell className="py-2">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                            <button
-                              onClick={() => viewReport(report.id)}
-                              className="text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline text-left transition-colors"
-                            >
-                              {report.reportName}
-                            </button>
-                          </div>
+                          <button
+                            onClick={() => viewReport(report.id)}
+                            className="text-xs font-medium text-gray-900 hover:text-blue-600 text-left transition-colors"
+                          >
+                            {report.reportName}
+                          </button>
                         </TableCell>
                         <TableCell className="py-2 text-center">
-                          <Badge className="bg-green-100 text-green-800 text-xs py-0.5 px-2">완료</Badge>
+                          <Badge className="bg-green-100 text-green-800 text-xs">완료</Badge>
                         </TableCell>
                         <TableCell className="py-2 text-center">
-                          <PerformanceScore score={report.averageNdcg} size="sm" showPercentage={false} label="nDCG" />
+                          <PerformanceScore score={report.averageNdcg} size="sm" showPercentage={false} />
                         </TableCell>
                         <TableCell className="py-2 text-xs text-gray-600">
                           {formatDate(report.createdAt)}
                         </TableCell>
                         <TableCell className="py-2 text-center">
                           <Button 
+                            size="sm"
                             variant="outline" 
-                            size="sm" 
                             onClick={(e) => {
                               e.stopPropagation()
                               deleteReport(report.id, report.reportName)
                             }}
-                            className="h-8 px-3 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            className="h-6 w-6 p-0 border-red-300 text-red-600 hover:bg-red-50"
                           >
                             <Trash2 className="h-3 w-3" />
                           </Button>
@@ -276,9 +252,16 @@ export default function EvaluationExecutionPage() {
                 <p className="text-xs text-gray-500 mt-1">{selectedReport?.reportName}</p>
               </div>
               <div className="flex-1 overflow-auto px-6 py-4 select-text touch-pan-y" data-vaul-no-drag>
-                {selectedReport && (
+                {isLoadingReport ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+                      <p className="text-sm text-gray-600">리포트를 불러오는 중...</p>
+                    </div>
+                  </div>
+                ) : selectedReport ? (
                   <EvaluationReportViewer report={selectedReport} />
-                )}
+                ) : null}
               </div>
             </div>
           </DrawerContent>

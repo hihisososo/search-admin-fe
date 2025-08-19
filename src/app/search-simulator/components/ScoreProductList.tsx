@@ -124,17 +124,6 @@ export function ScoreProductList({
                         ))}
                     </div>
                 </div>
-                {/* 사전 페이지와 동일한 위치/레이아웃의 페이징 */}
-                <div className="mt-2">
-                    <PaginationControls
-                        currentPage={Math.max(0, (page ?? 1) - 1)}
-                        totalPages={Math.max(1, totalPages ?? 1)}
-                        totalCount={totalResults ?? 0}
-                        pageSize={10}
-                        onPageChange={(p) => setPage(p + 1)}
-                        onPageSizeChange={() => {}}
-                    />
-                </div>
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -273,7 +262,17 @@ export function ScoreProductList({
                     </TableBody>
                 </Table>
                 
-                
+                {/* 페이지네이션 - 상품 리스트 아래로 이동 */}
+                <div className="mt-3">
+                    <PaginationControls
+                        currentPage={Math.max(0, (page ?? 1) - 1)}
+                        totalPages={Math.max(1, totalPages ?? 1)}
+                        totalCount={totalResults ?? 0}
+                        pageSize={10}
+                        onPageChange={(p) => setPage(p + 1)}
+                        onPageSizeChange={() => {}}
+                    />
+                </div>
             </Card>
         </>
     )

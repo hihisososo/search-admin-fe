@@ -202,7 +202,7 @@ export function QueryTable({
             <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-16 cursor-pointer" onClick={() => onSort?.('score0Count')}>관련없음</TableHead>
             <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-20 cursor-pointer" onClick={() => onSort?.('scoreMinus1Count')}>미평가</TableHead>
             <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-28">검수 필요수</TableHead>
-            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-24">액션</TableHead>
+            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-20">액션</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
