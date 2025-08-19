@@ -56,37 +56,37 @@ export function QueryTableRow({
         </button>
       </TableCell>
       <TableCell className="py-2 text-center">
-        <Badge variant={documentCount > 0 ? "default" : "secondary"} className="text-xs py-0.5 px-2">
+        <Badge variant={documentCount > 0 ? "default" : "secondary"} className="text-xs">
           {documentCount}
         </Badge>
       </TableCell>
       <TableCell className="py-2 text-center">
-        <Badge variant="outline" className="text-xs py-0.5 px-2 bg-green-50 text-green-700 border-green-200">{score2Count}</Badge>
+        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">{score2Count}</Badge>
       </TableCell>
       <TableCell className="py-2 text-center">
-        <Badge variant="outline" className="text-xs py-0.5 px-2 bg-yellow-50 text-yellow-700 border-yellow-200">{score1Count}</Badge>
+        <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200">{score1Count}</Badge>
       </TableCell>
       <TableCell className="py-2 text-center">
-        <Badge variant="outline" className="text-xs py-0.5 px-2 bg-red-50 text-red-700 border-red-200">{score0Count}</Badge>
+        <Badge variant="outline" className="text-xs bg-red-50 text-red-700 border-red-200">{score0Count}</Badge>
       </TableCell>
       <TableCell className="py-2 text-center">
-        <Badge variant="secondary" className="text-xs py-0.5 px-2">{scoreMinus1Count}</Badge>
+        <Badge variant="secondary" className="text-xs">{scoreMinus1Count}</Badge>
       </TableCell>
       <TableCell className="py-2 text-center">
         <Badge
           variant="outline"
-          className={`text-xs py-0.5 px-2 ${humanReviewCount > 0 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}
+          className={`text-xs ${humanReviewCount > 0 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}
         >
           {humanReviewCount}
         </Badge>
       </TableCell>
-      <TableCell className="py-2 text-center">
+      <TableCell className="py-2">
         <div className="flex gap-1 justify-center">
           <Button
             size="sm"
             variant="outline"
             onClick={() => onEdit(query.id, query.query)}
-            className="h-7 w-7 p-0"
+            className="h-6 w-6 p-0 border-gray-300 hover:bg-gray-100"
           >
             <Edit className="h-3 w-3" />
           </Button>
@@ -96,7 +96,7 @@ export function QueryTableRow({
             variant="outline"
             onClick={() => onDelete(query.id)}
             disabled={isDeleting}
-            className="h-7 w-7 p-0 text-red-600 border-red-300 hover:bg-red-50"
+            className="h-6 w-6 p-0 border-red-300 text-red-600 hover:bg-red-50"
           >
             <Trash2 className="h-3 w-3" />
           </Button>

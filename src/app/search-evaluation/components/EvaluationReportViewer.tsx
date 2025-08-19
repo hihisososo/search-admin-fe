@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ChevronDown, ChevronRight } from "lucide-react"
 import { formatDate } from "@/utils/evaluation-helpers"
 import { EVALUATION_CONFIG } from "@/constants/evaluation"
 import { PerformanceScore } from "./PerformanceScore"
@@ -144,18 +145,24 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
 
                 {/* 실제 검색 결과 (순위 유지) */}
                 {Array.isArray(detail.retrievedDocuments) && detail.retrievedDocuments.length > 0 && (
-                  <div>
-                    <div className="font-medium text-sm mb-1">검색 결과</div>
+                  <AccordionSection
+                    title="검색 결과"
+                    count={detail.retrievedDocuments.length}
+                    defaultExpanded={false}
+                  >
                     <RetrievedList documents={detail.retrievedDocuments as RetrievedDocument[]} />
-                  </div>
+                  </AccordionSection>
                 )}
 
                 {/* 정답셋 (score 내림차순) */}
                 {Array.isArray(detail.groundTruthDocuments) && detail.groundTruthDocuments.length > 0 && (
-                  <div>
-                    <div className="font-medium text-sm mb-1">정답셋</div>
+                  <AccordionSection
+                    title="정답셋"
+                    count={detail.groundTruthDocuments.length}
+                    defaultExpanded={false}
+                  >
                     <GroundTruthList documents={detail.groundTruthDocuments as GroundTruthDocument[]} />
-                  </div>
+                  </AccordionSection>
                 )}
 
                 {/* 누락/오답 영역 */}
@@ -365,6 +372,43 @@ function DocumentList({
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+// 아코디언 섹션 컴포넌트
+interface AccordionSectionProps {
+  title: string
+  count: number
+  defaultExpanded?: boolean
+  children: React.ReactNode
+}
+
+function AccordionSection({ title, count, defaultExpanded = false, children }: AccordionSectionProps) {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded)
+
+  return (
+    <div className="border rounded-lg overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full flex items-center justify-between p-2 hover:bg-gray-50 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          {isExpanded ? (
+            <ChevronDown className="h-4 w-4 text-gray-500" />
+          ) : (
+            <ChevronRight className="h-4 w-4 text-gray-500" />
+          )}
+          <span className="font-medium text-sm">{title}</span>
+          <span className="text-xs text-gray-500">({count}개)</span>
+        </div>
+      </button>
+      {isExpanded && (
+        <div className="border-t p-2">
+          {children}
+        </div>
+      )}
     </div>
   )
 }
