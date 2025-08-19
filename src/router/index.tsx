@@ -8,6 +8,7 @@ const UserDictionary = lazy(() => import("@/app/dictionary/user/page"))
 const SynonymDictionary = lazy(() => import("@/app/dictionary/synonym/page"))
 const StopwordDictionary = lazy(() => import("@/app/dictionary/stopword/page"))
 const TypoCorrectionDictionary = lazy(() => import("@/app/dictionary/typo/page"))
+const CategoryRankingDictionary = lazy(() => import("@/app/dictionary/category-ranking/page"))
 const SearchLogs = lazy(() => import("@/app/search-logs/page"))
 const SearchSimulator = lazy(() => import("@/app/search-simulator/page"))
 const SearchSimulatorAutocomplete = lazy(() => import("@/app/search-simulator/autocomplete/page"))
@@ -35,6 +36,7 @@ export function AdminRoutes() {
         <Route path="/dictionary/synonym" element={<SynonymDictionary />} />
         <Route path="/dictionary/stopword" element={<StopwordDictionary />} />
         <Route path="/dictionary/typo" element={<TypoCorrectionDictionary />} />
+        <Route path="/dictionary/category-ranking" element={<CategoryRankingDictionary />} />
         <Route path="/search-logs" element={<SearchLogs />} />
         <Route path="/deploy" element={<DeployManagement />} />
         <Route path="/search-simulator" element={<SearchSimulator />} />
