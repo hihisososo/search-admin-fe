@@ -4,7 +4,7 @@ import { ChevronDown, ChevronRight } from "lucide-react"
 import { formatDate } from "@/utils/evaluation-helpers"
 import { EVALUATION_CONFIG } from "@/constants/evaluation"
 import { PerformanceScore } from "./PerformanceScore"
-import type { EvaluationReport, RetrievedDocument, GroundTruthDocument } from "@/services/evaluation/types"
+import type { EvaluationReport, DocumentInfo } from "@/services/evaluation/types"
 
 interface EvaluationReportViewerProps {
   report: EvaluationReport
@@ -150,18 +150,18 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
                     count={detail.retrievedDocuments.length}
                     defaultExpanded={false}
                   >
-                    <RetrievedList documents={detail.retrievedDocuments as RetrievedDocument[]} />
+                    <RetrievedList documents={detail.retrievedDocuments} />
                   </AccordionSection>
                 )}
 
-                {/* 정답셋 (score 내림차순) */}
-                {Array.isArray(detail.groundTruthDocuments) && detail.groundTruthDocuments.length > 0 && (
+                {/* 정답셋 */}
+                {Array.isArray(detail.relevantDocuments) && detail.relevantDocuments.length > 0 && (
                   <AccordionSection
                     title="정답셋"
-                    count={detail.groundTruthDocuments.length}
+                    count={detail.relevantDocuments.length}
                     defaultExpanded={false}
                   >
-                    <GroundTruthList documents={detail.groundTruthDocuments as GroundTruthDocument[]} />
+                    <RelevantList documents={detail.relevantDocuments} />
                   </AccordionSection>
                 )}
 
@@ -209,28 +209,24 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
 
 type ReportDoc = string | { productId: string; productName: string | null; productSpecs: string | null }
 
-function RetrievedList({ documents }: { documents: RetrievedDocument[] }) {
+function RetrievedList({ documents }: { documents: DocumentInfo[] }) {
   return (
     <div className="text-xs border rounded">
-      <div className="grid grid-cols-12 gap-2 px-2 py-1 bg-gray-50 text-gray-600">
+      <div className="grid grid-cols-10 gap-2 px-2 py-1 bg-gray-50 text-gray-600">
         <div className="col-span-1">순위</div>
         <div className="col-span-2">상품ID</div>
-        <div className="col-span-5">상품명</div>
+        <div className="col-span-4">상품명</div>
         <div className="col-span-3">스펙</div>
-        <div className="col-span-1 text-center">gain</div>
       </div>
       <div>
         {documents.map((doc, i) => (
-          <div key={i} className="grid grid-cols-12 gap-2 px-2 py-1 border-t items-start">
-            <div className="col-span-1 font-mono">{doc.rank}</div>
+          <div key={i} className="grid grid-cols-10 gap-2 px-2 py-1 border-t items-start">
+            <div className="col-span-1 font-mono">{i + 1}</div>
             <div className="col-span-2">
               <span className="font-mono text-[11px] bg-white px-1 py-0.5 rounded border">{doc.productId}</span>
             </div>
-            <div className="col-span-5 truncate">{doc.productName || '-'}</div>
+            <div className="col-span-4 truncate">{doc.productName || '-'}</div>
             <div className="col-span-3 truncate">{doc.productSpecs || '-'}</div>
-            <div className="col-span-1 text-center">
-              <span className={`text-[11px] px-1 py-0.5 rounded border ${doc.gain >= 2 ? 'bg-green-50 text-green-700 border-green-200' : doc.gain === 1 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 'bg-red-50 text-red-700 border-red-200'}`}>{doc.gain}</span>
-            </div>
           </div>
         ))}
       </div>
@@ -238,26 +234,22 @@ function RetrievedList({ documents }: { documents: RetrievedDocument[] }) {
   )
 }
 
-function GroundTruthList({ documents }: { documents: GroundTruthDocument[] }) {
+function RelevantList({ documents }: { documents: DocumentInfo[] }) {
   return (
     <div className="text-xs border rounded">
-      <div className="grid grid-cols-12 gap-2 px-2 py-1 bg-gray-50 text-gray-600">
+      <div className="grid grid-cols-10 gap-2 px-2 py-1 bg-gray-50 text-gray-600">
         <div className="col-span-2">상품ID</div>
-        <div className="col-span-5">상품명</div>
+        <div className="col-span-4">상품명</div>
         <div className="col-span-4">스펙</div>
-        <div className="col-span-1 text-center">score</div>
       </div>
       <div>
         {documents.map((doc, i) => (
-          <div key={i} className="grid grid-cols-12 gap-2 px-2 py-1 border-t items-start">
+          <div key={i} className="grid grid-cols-10 gap-2 px-2 py-1 border-t items-start">
             <div className="col-span-2">
               <span className="font-mono text-[11px] bg-white px-1 py-0.5 rounded border">{doc.productId}</span>
             </div>
-            <div className="col-span-5 truncate">{doc.productName || '-'}</div>
+            <div className="col-span-4 truncate">{doc.productName || '-'}</div>
             <div className="col-span-4 truncate">{doc.productSpecs || '-'}</div>
-            <div className="col-span-1 text-center">
-              <span className={`text-[11px] px-1 py-0.5 rounded border ${doc.score >= 2 ? 'bg-green-50 text-green-700 border-green-200' : doc.score === 1 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : doc.score === 0 ? 'bg-red-50 text-red-700 border-red-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>{doc.score}</span>
-            </div>
           </div>
         ))}
       </div>
@@ -324,44 +316,44 @@ function DocumentList({
           const expanded = !!expandedRows[i]
           const hasStructured = productId || productName || productSpecs
           return (
-            <div key={i} className="grid grid-cols-12 gap-2 py-1 px-1 items-start">
+            <div key={i} className="py-1 px-1">
               {hasStructured ? (
                 <>
-                  <div className="col-span-2">
-                    {productId ? (
-                      <span className="font-mono text-[11px] bg-white/70 px-1 py-0.5 rounded border">{productId}</span>
-                    ) : (
-                      <span className="text-[11px] text-gray-400">-</span>
-                    )}
-                  </div>
-                  <div className="col-span-5">
-                    {productName ? (
-                      <div className="truncate">{productName}</div>
-                    ) : (
-                      <span className="text-gray-400">-</span>
-                    )}
-                  </div>
-                  <div className="col-span-5">
-                    {productSpecs ? (
-                      <>
+                  <div className="grid grid-cols-12 gap-2 items-start">
+                    <div className="col-span-2">
+                      {productId ? (
+                        <span className="font-mono text-[11px] bg-white/70 px-1 py-0.5 rounded border">{productId}</span>
+                      ) : (
+                        <span className="text-[11px] text-gray-400">-</span>
+                      )}
+                    </div>
+                    <div className="col-span-5">
+                      {productName ? (
+                        <div className={expanded ? "whitespace-pre-wrap break-all" : "truncate"}>{productName}</div>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
+                    </div>
+                    <div className="col-span-5">
+                      {productSpecs ? (
                         <div className={expanded ? "whitespace-pre-wrap break-all" : "truncate"}>{productSpecs}</div>
-                        {productSpecs.length > 0 && (
-                          <button
-                            type="button"
-                            onClick={() => toggleRow(i)}
-                            className="mt-0.5 text-[11px] underline text-gray-600 hover:text-gray-800"
-                          >
-                            {expanded ? '접기' : '펼치기'}
-                          </button>
-                        )}
-                      </>
-                    ) : (
-                      <span className="text-gray-400">-</span>
-                    )}
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
+                    </div>
                   </div>
+                  {(productName || productSpecs) && (
+                    <button
+                      type="button"
+                      onClick={() => toggleRow(i)}
+                      className="mt-0.5 text-[11px] underline text-gray-600 hover:text-gray-800"
+                    >
+                      {expanded ? '접기' : '펼치기'}
+                    </button>
+                  )}
                 </>
               ) : (
-                <div className="col-span-12 whitespace-pre-wrap break-all text-xs">{String(doc)}</div>
+                <div className="whitespace-pre-wrap break-all text-xs">{String(doc)}</div>
               )}
             </div>
           )
