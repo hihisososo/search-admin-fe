@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { BarChart3, CheckCircle } from "lucide-react"
+import { BarChart3, CheckCircle, ChevronDown, ChevronRight } from "lucide-react"
 import { useEvaluationReports } from "@/hooks/use-evaluation"
 import type { EvaluationReport, EvaluationReportSummary } from "@/services/evaluation/types"
 
@@ -24,6 +24,7 @@ export function ReportDialog({
   const [reportName, setReportName] = useState("")
   const [latestReport, setLatestReport] = useState<EvaluationReport | null>(null)
   const [selectedReport, setSelectedReport] = useState<EvaluationReportSummary | null>(null)
+  const [expandedWrongDocs, setExpandedWrongDocs] = useState<Set<string>>(new Set())
   
   // 기존 리포트 목록 조회
   const reportsQuery = useEvaluationReports()
@@ -47,6 +48,18 @@ export function ReportDialog({
     if (score >= 0.8) return "text-green-600"
     if (score >= 0.6) return "text-yellow-600"
     return "text-red-600"
+  }
+
+  const toggleWrongDocs = (key: string) => {
+    setExpandedWrongDocs(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(key)) {
+        newSet.delete(key)
+      } else {
+        newSet.add(key)
+      }
+      return newSet
+    })
   }
 
   return (
@@ -164,18 +177,41 @@ export function ReportDialog({
                                       <div className="text-xs">
                                         <span className="text-red-600 font-medium">누락 문서:</span>
                                         <span className="ml-1 text-gray-600">
-                                          {detail.missingDocuments.slice(0, 3).join(', ')}
+                                          {detail.missingDocuments.map((d: any) => typeof d === 'string' ? d : d.productId).slice(0, 3).join(', ')}
                                           {detail.missingDocuments.length > 3 && ` 외 ${detail.missingDocuments.length - 3}개`}
                                         </span>
                                       </div>
                                     )}
                                     {detail.wrongDocuments?.length > 0 && (
                                       <div className="text-xs">
-                                        <span className="text-orange-600 font-medium">오답 문서:</span>
-                                        <span className="ml-1 text-gray-600">
-                                          {detail.wrongDocuments.slice(0, 3).join(', ')}
-                                          {detail.wrongDocuments.length > 3 && ` 외 ${detail.wrongDocuments.length - 3}개`}
-                                        </span>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            toggleWrongDocs(`latest-${index}`)
+                                          }}
+                                          className="flex items-center gap-1 text-orange-600 font-medium hover:text-orange-700"
+                                        >
+                                          {expandedWrongDocs.has(`latest-${index}`) ? (
+                                            <ChevronDown className="h-3 w-3" />
+                                          ) : (
+                                            <ChevronRight className="h-3 w-3" />
+                                          )}
+                                          오답 문서 ({detail.wrongDocuments.length}개)
+                                        </button>
+                                        {expandedWrongDocs.has(`latest-${index}`) ? (
+                                          <div className="ml-4 mt-1 space-y-1">
+                                            {detail.wrongDocuments.map((doc: any, i: number) => (
+                                              <div key={i} className="text-gray-600 break-all">
+                                                {typeof doc === 'string' ? doc : `${doc.productId} ${doc.productName || ''}`}
+                                              </div>
+                                            ))}
+                                          </div>
+                                        ) : (
+                                          <span className="ml-1 text-gray-600">
+                                            {detail.wrongDocuments.map((d: any) => typeof d === 'string' ? d : d.productId).slice(0, 2).join(', ')}
+                                            {detail.wrongDocuments.length > 2 && ` 외 ${detail.wrongDocuments.length - 2}개`}
+                                          </span>
+                                        )}
                                       </div>
                                     )}
                                   </div>
@@ -291,18 +327,41 @@ export function ReportDialog({
                                       <div className="text-xs">
                                         <span className="text-red-600 font-medium">누락 문서 ({detail.missingDocuments.length}개):</span>
                                         <span className="ml-1 text-gray-600">
-                                          {detail.missingDocuments.slice(0, 5).join(', ')}
+                                          {detail.missingDocuments.map((d: any) => typeof d === 'string' ? d : d.productId).slice(0, 5).join(', ')}
                                           {detail.missingDocuments.length > 5 && ` 외 ${detail.missingDocuments.length - 5}개`}
                                         </span>
                                       </div>
                                     )}
                                     {detail.wrongDocuments?.length > 0 && (
                                       <div className="text-xs">
-                                        <span className="text-orange-600 font-medium">오답 문서 ({detail.wrongDocuments.length}개):</span>
-                                        <span className="ml-1 text-gray-600">
-                                          {detail.wrongDocuments.slice(0, 5).join(', ')}
-                                          {detail.wrongDocuments.length > 5 && ` 외 ${detail.wrongDocuments.length - 5}개`}
-                                        </span>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            toggleWrongDocs(`selected-${index}`)
+                                          }}
+                                          className="flex items-center gap-1 text-orange-600 font-medium hover:text-orange-700"
+                                        >
+                                          {expandedWrongDocs.has(`selected-${index}`) ? (
+                                            <ChevronDown className="h-3 w-3" />
+                                          ) : (
+                                            <ChevronRight className="h-3 w-3" />
+                                          )}
+                                          오답 문서 ({detail.wrongDocuments.length}개)
+                                        </button>
+                                        {expandedWrongDocs.has(`selected-${index}`) ? (
+                                          <div className="ml-4 mt-1 space-y-1">
+                                            {detail.wrongDocuments.map((doc: any, i: number) => (
+                                              <div key={i} className="text-gray-600 break-all">
+                                                {typeof doc === 'string' ? doc : `${doc.productId} ${doc.productName || ''}`}
+                                              </div>
+                                            ))}
+                                          </div>
+                                        ) : (
+                                          <span className="ml-1 text-gray-600">
+                                            {detail.wrongDocuments.map((d: any) => typeof d === 'string' ? d : d.productId).slice(0, 2).join(', ')}
+                                            {detail.wrongDocuments.length > 2 && ` 외 ${detail.wrongDocuments.length - 2}개`}
+                                          </span>
+                                        )}
                                       </div>
                                     )}
                                   </div>

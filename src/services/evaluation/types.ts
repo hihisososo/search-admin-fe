@@ -155,6 +155,8 @@ export interface QueryEvaluationDetail {
   correctCount: number
   missingDocuments: DocumentInfo[]
   wrongDocuments: DocumentInfo[]
+  relevantDocuments?: DocumentInfo[]  // 새로 추가: 정답셋 전체
+  retrievedDocuments?: DocumentInfo[]  // 새로 추가: 검색결과 전체 (순서대로)
 }
 
 // 평가 실행 응답 (evaluate API)
@@ -176,6 +178,8 @@ export interface EvaluationExecuteResponse {
     correctCount: number
     missingDocuments?: DocumentInfo[]
     wrongDocuments?: DocumentInfo[]
+    relevantDocuments?: DocumentInfo[]  // 새로 추가
+    retrievedDocuments?: DocumentInfo[]  // 새로 추가
   }>
 }
 
