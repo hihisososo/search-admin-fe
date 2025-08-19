@@ -47,6 +47,11 @@ export const MENU_ITEMS: MenuItem[] = [
         id: 'typo-dictionary',
         title: '오타교정사전',
         path: '/dictionary/typo'
+      },
+      {
+        id: 'category-ranking-dictionary',
+        title: '카테고리랭킹사전',
+        path: '/dictionary/category-ranking'
       }
     ]
   },
