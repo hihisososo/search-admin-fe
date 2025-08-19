@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { useToast } from '@/components/ui/use-toast'
 import { categoryRankingService } from '@/services/dictionary/category-ranking.service'
 import { CategoryRankingTable } from './CategoryRankingTable'
@@ -22,7 +22,6 @@ export function CategoryRankingDictionaryPage() {
   const [editingItem, setEditingItem] = useState<CategoryRankingDictionaryListItem | null>(null)
   const [isMappingDialogOpen, setIsMappingDialogOpen] = useState(false)
   const { toast } = useToast()
-  const queryClient = useQueryClient()
   
   // 카테고리랭킹은 실시간 반영이 있으므로 모든 환경에서 편집 가능
   const canEdit = true
@@ -85,7 +84,7 @@ export function CategoryRankingDictionaryPage() {
       for (const id of selectedItems) {
         await deleteMutation.mutateAsync(id)
       }
-    } catch (error) {
+    } catch (_error) {
       // 개별 에러는 mutation에서 처리
     }
   }

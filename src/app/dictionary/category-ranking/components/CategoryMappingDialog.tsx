@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/components/ui/use-toast'
-import { Plus, Trash2, X } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import { categoryRankingService } from '@/services/dictionary/category-ranking.service'
 import type { DictionaryEnvironmentType } from '@/types/dashboard'
 import type { 

@@ -87,37 +87,41 @@ class CategoryRankingService {
 
   // 상세 조회
   async getById(id: number, environment?: DictionaryEnvironmentType): Promise<CategoryRankingDictionaryDetail> {
-    return apiClient.get(`${this.baseUrl}/${id}`, { environment })
+    return apiClient.get(`${this.baseUrl}/${id}`, environment ? { environment } : undefined)
   }
 
   // 키워드로 조회
   async getByKeyword(keyword: string, environment?: DictionaryEnvironmentType): Promise<CategoryRankingDictionaryDetail> {
-    return apiClient.get(`${this.baseUrl}/by-keyword/${keyword}`, { environment })
+    return apiClient.get(`${this.baseUrl}/by-keyword/${keyword}`, environment ? { environment } : undefined)
   }
 
   // 생성
   async create(data: CategoryRankingDictionaryCreateRequest, environment: DictionaryEnvironmentType = 'CURRENT'): Promise<CategoryRankingDictionaryDetail> {
-    return apiClient.post(this.baseUrl, data, { environment })
+    const url = `${this.baseUrl}?environment=${environment}`
+    return apiClient.post(url, data)
   }
 
   // 수정
   async update(id: number, data: CategoryRankingDictionaryUpdateRequest, environment: DictionaryEnvironmentType = 'CURRENT'): Promise<CategoryRankingDictionaryDetail> {
-    return apiClient.put(`${this.baseUrl}/${id}`, data, { environment })
+    const url = `${this.baseUrl}/${id}?environment=${environment}`
+    return apiClient.put(url, data)
   }
 
   // 삭제
   async delete(id: number, environment: DictionaryEnvironmentType = 'CURRENT'): Promise<void> {
-    return apiClient.delete(`${this.baseUrl}/${id}`, { environment })
+    const url = `${this.baseUrl}/${id}?environment=${environment}`
+    return apiClient.delete(url)
   }
 
   // 카테고리 목록 조회
   async getCategories(environment?: DictionaryEnvironmentType): Promise<CategoriesResponse> {
-    return apiClient.get(`${this.baseUrl}/categories`, { environment })
+    return apiClient.get(`${this.baseUrl}/categories`, environment ? { environment } : undefined)
   }
 
   // 실시간 동기화
   async realtimeSync(environment: DictionaryEnvironmentType): Promise<RealtimeSyncResponse> {
-    return apiClient.post(`${this.baseUrl}/realtime-sync`, null, { environment })
+    const url = `${this.baseUrl}/realtime-sync?environment=${environment}`
+    return apiClient.post(url, null)
   }
 
   // 동기화 상태 조회

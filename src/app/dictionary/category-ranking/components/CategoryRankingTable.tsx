@@ -33,8 +33,7 @@ export function CategoryRankingTable({
   selectedItems,
   onSelectionChange,
   onEdit,
-  onDelete,
-  environment
+  onDelete
 }: CategoryRankingTableProps) {
   const canEdit = true // 카테고리랭킹은 실시간 반영이 있으므로 모든 환경에서 편집 가능
 
@@ -66,7 +65,6 @@ export function CategoryRankingTable({
               <TableHead className="w-12 py-2">
                 <Checkbox
                   checked={items.length > 0 && selectedItems.length === items.length}
-                  indeterminate={selectedItems.length > 0 && selectedItems.length < items.length}
                   onCheckedChange={handleSelectAll}
                 />
               </TableHead>
