@@ -59,22 +59,7 @@ class EvaluationService {
       sortDirection: params.order?.toUpperCase() || 'DESC' // order -> sortDirection (대문자로)
     }
     
-    const response = await apiClient.get<EvaluationDocumentListResponse>(`${this.baseEndpoint}/queries/${queryId}/documents`, apiParams)
-    
-    // 백엔드 응답 필드 매핑 (하위 호환성)
-    if (response.documents) {
-      response.documents = response.documents.map((doc: any) => ({
-        ...doc,
-        // relevanceScore를 score로 매핑 (백엔드가 아직 변경 안 됐을 경우)
-        score: doc.score !== undefined ? doc.score : (doc.relevanceScore !== undefined ? doc.relevanceScore : null),
-        // confidence 필드 확인
-        confidence: doc.confidence !== undefined ? doc.confidence : null,
-        // specs 필드 확인 (productSpecs일 수도 있음)
-        specs: doc.specs || doc.productSpecs || ''
-      }))
-    }
-    
-    return response
+    return apiClient.get<EvaluationDocumentListResponse>(`${this.baseEndpoint}/queries/${queryId}/documents`, apiParams)
   }
 
   // 상품 매핑 추가
@@ -83,8 +68,8 @@ class EvaluationService {
   }
 
   // 상품 후보군 수정
-  async updateCandidate(candidateId: number, data: UpdateCandidateRequest): Promise<void> {
-    return apiClient.put<void>(`${this.baseEndpoint}/candidates/${candidateId}`, data)
+  async updateCandidate(id: number, data: UpdateCandidateRequest): Promise<void> {
+    return apiClient.put<void>(`${this.baseEndpoint}/candidates/${id}`, data)
   }
 
   // 후보군 일괄 삭제
@@ -129,14 +114,19 @@ class EvaluationService {
 
   // 3. 평가 실행 (nDCG 계산)
 
-  // 평가 실행 (nDCG 계산)
+  // 평가 실행 (비동기)
+  async evaluateAsync(data: { reportName: string }): Promise<AsyncTaskResponse> {
+    return apiClient.post<AsyncTaskResponse>(`${this.baseEndpoint}/evaluate-async`, data)
+  }
+
+  // 평가 실행 (nDCG 계산) - 기존 API 유지
   async evaluate(data: EvaluationRequest): Promise<EvaluationExecuteResponse> {
-    return apiClient.post<EvaluationExecuteResponse>(`${this.baseEndpoint}/evaluate`, data)
+    return apiClient.post<EvaluationExecuteResponse>(`${this.baseEndpoint}/execute`, data)
   }
 
   // 리포트 리스트 조회
-  async getReports(): Promise<EvaluationReportSummary[]> {
-    return apiClient.get<EvaluationReportSummary[]>(`${this.baseEndpoint}/reports`)
+  async getReports(params?: { keyword?: string }): Promise<EvaluationReportSummary[]> {
+    return apiClient.get<EvaluationReportSummary[]>(`${this.baseEndpoint}/reports`, params)
   }
 
   // 리포트 상세 조회

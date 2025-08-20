@@ -1,10 +1,9 @@
 import { useState } from "react"
+import React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChevronDown, ChevronRight } from "lucide-react"
-import { formatDate } from "@/utils/evaluation-helpers"
 import { EVALUATION_CONFIG } from "@/constants/evaluation"
-import { PerformanceScore } from "./PerformanceScore"
-import type { EvaluationReport, DocumentInfo, GroundTruthDocument } from "@/services/evaluation/types"
+import type { EvaluationReport } from "@/services/evaluation/types"
 
 interface EvaluationReportViewerProps {
   report: EvaluationReport
@@ -12,46 +11,21 @@ interface EvaluationReportViewerProps {
 
 export function EvaluationReportViewer({ report }: EvaluationReportViewerProps) {
   const queryDetails = report.queryDetails || []
+  
+  console.log('[EvaluationReportViewer] 렌더링 시작', {
+    reportId: report.id,
+    queryDetailsCount: queryDetails.length,
+    totalQueries: report.totalQueries
+  })
+  
+  const renderStartTime = performance.now()
+  
+  React.useEffect(() => {
+    console.log(`[EvaluationReportViewer] 렌더링 완료: ${(performance.now() - renderStartTime).toFixed(2)}ms`)
+  })
 
   return (
     <div className="space-y-6">
-      {/* 전체 성능 지표 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <PerformanceScore 
-              score={report.averageNdcg} 
-              label="nDCG"
-              size="lg"
-              showPercentage={false}
-            />
-          </CardContent>
-        </Card>
-        {typeof (report as any).ndcgAt10 === 'number' && (
-          <Card>
-            <CardContent className="pt-6">
-              <PerformanceScore 
-                score={(report as any).ndcgAt10}
-                label="nDCG@10"
-                size="lg"
-                showPercentage={false}
-              />
-            </CardContent>
-          </Card>
-        )}
-        {typeof (report as any).mrrAt10 === 'number' && (
-          <Card>
-            <CardContent className="pt-6">
-              <PerformanceScore 
-                score={(report as any).mrrAt10}
-                label="MRR@10"
-                size="lg"
-                showPercentage={false}
-              />
-            </CardContent>
-          </Card>
-        )}
-      </div>
 
       {/* 통계 정보 */}
       <Card>
@@ -59,22 +33,18 @@ export function EvaluationReportViewer({ report }: EvaluationReportViewerProps) 
           <CardTitle className="text-lg">평가 통계</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">{report.totalQueries}</div>
               <div className="text-sm text-gray-600">총 쿼리</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{report.totalRelevantDocuments}</div>
-              <div className="text-sm text-gray-600">관련 문서</div>
+              <div className="text-2xl font-bold text-green-600">{(report.averageNdcg20 || report.averageNdcg || 0).toFixed(3)}</div>
+              <div className="text-sm text-gray-600">nDCG@20</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-600">{report.totalRetrievedDocuments}</div>
-              <div className="text-sm text-gray-600">검색된 문서</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{report.totalCorrectDocuments}</div>
-              <div className="text-sm text-gray-600">정답 문서</div>
+              <div className="text-2xl font-bold text-yellow-600">{(report.averageRecall300 || report.averageRecall || 0).toFixed(3)}</div>
+              <div className="text-sm text-gray-600">Recall@300</div>
             </div>
           </div>
         </CardContent>
@@ -96,28 +66,42 @@ export function EvaluationReportViewer({ report }: EvaluationReportViewerProps) 
         </CardContent>
       </Card>
 
-      {/* 생성 정보 */}
-      <div className="text-sm text-gray-600 border-t pt-4">
-        <div className="flex justify-between">
-          <span>생성 시간:</span>
-          <span>{formatDate(report.createdAt)}</span>
-        </div>
-      </div>
     </div>
   )
 }
 
 function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
   const [expandedMap, setExpandedMap] = useState<Record<number, boolean>>({})
+  
+  console.log('[QueryDetailsView] 렌더링 시작', {
+    queryDetailsCount: queryDetails.length,
+    firstQuery: queryDetails[0]?.query,
+    firstQueryMissingCount: queryDetails[0]?.missingDocuments?.length || 0,
+    firstQueryWrongCount: queryDetails[0]?.wrongDocuments?.length || 0
+  })
+  
+  const componentStartTime = performance.now()
 
   const toggleRow = (index: number) => {
+    console.log(`[QueryDetailsView] 토글 행: ${index}`)
     setExpandedMap((prev) => ({ ...prev, [index]: !prev[index] }))
   }
+
+  React.useEffect(() => {
+    console.log(`[QueryDetailsView] 렌더링 완료: ${(performance.now() - componentStartTime).toFixed(2)}ms`)
+  })
 
   return (
     <div className="space-y-2">
       {queryDetails.map((detail: any, index: number) => {
+        if (index === 0) {
+          console.log(`[QueryDetailsView] 첫 번째 쿼리 렌더링 시작: ${detail.query}`)
+        } else if (index === queryDetails.length - 1) {
+          console.log(`[QueryDetailsView] 마지막 쿼리 렌더링: ${detail.query}`)
+        }
         const expanded = !!expandedMap[index]
+        
+        
         return (
           <div key={index} className="border rounded-lg overflow-hidden">
             <button
@@ -125,13 +109,32 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
               onClick={() => toggleRow(index)}
               className="w-full flex items-center justify-between p-3 hover:bg-gray-50"
             >
-              <div className="text-sm font-semibold text-gray-900 truncate pr-3">{detail.query}</div>
-              <PerformanceScore 
-                score={detail.ndcg} 
-                label="nDCG" 
-                size="sm"
-                showPercentage={false}
-              />
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="text-sm font-semibold text-gray-900 truncate">{detail.query}</div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {detail.ndcgAt20 !== undefined && (
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      detail.ndcgAt20 >= 0.8 ? 'bg-green-100 text-green-700' :
+                      detail.ndcgAt20 >= 0.6 ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-red-100 text-red-700'
+                    }`}>
+                      nDCG: {detail.ndcgAt20.toFixed(3)}
+                    </span>
+                  )}
+                  {detail.recallAt300 !== undefined && (
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      detail.recallAt300 >= 0.8 ? 'bg-green-100 text-green-700' :
+                      detail.recallAt300 >= 0.6 ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-red-100 text-red-700'
+                    }`}>
+                      Recall: {(detail.recallAt300 * 100).toFixed(1)}%
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-2 ml-2">
+                {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              </div>
             </button>
             {expanded && (
               <div className="p-3 border-t space-y-4">
@@ -139,39 +142,8 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
                   <div>관련: {detail.relevantCount}</div>
                   <div>검색: {detail.retrievedCount}</div>
                   <div>정답: {detail.correctCount}</div>
-                  {typeof detail.ndcgAt10 === 'number' && (<div>nDCG@10: {Number(detail.ndcgAt10).toFixed(3)}</div>)}
-                  {typeof detail.mrrAt10 === 'number' && (<div>MRR@10: {Number(detail.mrrAt10).toFixed(3)}</div>)}
                 </div>
 
-                {/* 실제 검색 결과 (순위 유지) */}
-                {Array.isArray(detail.retrievedDocuments) && detail.retrievedDocuments.length > 0 && (
-                  <AccordionSection
-                    title="검색 결과"
-                    count={detail.retrievedDocuments.length}
-                    defaultExpanded={false}
-                  >
-                    <RetrievedList documents={detail.retrievedDocuments} />
-                  </AccordionSection>
-                )}
-
-                {/* 정답셋 */}
-                {(Array.isArray(detail.relevantDocuments) && detail.relevantDocuments.length > 0) ? (
-                  <AccordionSection
-                    title="정답셋"
-                    count={detail.relevantDocuments.length}
-                    defaultExpanded={false}
-                  >
-                    <RelevantList documents={detail.relevantDocuments} />
-                  </AccordionSection>
-                ) : (Array.isArray(detail.groundTruth) && detail.groundTruth.length > 0) ? (
-                  <AccordionSection
-                    title="정답셋"
-                    count={detail.groundTruth.length}
-                    defaultExpanded={false}
-                  >
-                    <GroundTruthList documents={detail.groundTruth} />
-                  </AccordionSection>
-                ) : null}
 
                 {/* 누락/오답 영역 */}
                 {(detail.missingDocuments?.length > 0 || detail.wrongDocuments?.length > 0) ? (
@@ -216,85 +188,6 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
 // removed old QueryDetailCard in favor of clickable rows with expand/collapse
 
 type ReportDoc = string | { productId: string; productName: string | null; productSpecs: string | null }
-
-function RetrievedList({ documents }: { documents: DocumentInfo[] }) {
-  return (
-    <div className="text-xs border rounded">
-      <div className="grid grid-cols-10 gap-2 px-2 py-1 bg-gray-50 text-gray-600">
-        <div className="col-span-1">순위</div>
-        <div className="col-span-2">상품ID</div>
-        <div className="col-span-4">상품명</div>
-        <div className="col-span-3">스펙</div>
-      </div>
-      <div>
-        {documents.map((doc, i) => (
-          <div key={i} className="grid grid-cols-10 gap-2 px-2 py-1 border-t items-start">
-            <div className="col-span-1 font-mono">{i + 1}</div>
-            <div className="col-span-2">
-              <span className="font-mono text-[11px] bg-white px-1 py-0.5 rounded border">{doc.productId}</span>
-            </div>
-            <div className="col-span-4 truncate">{doc.productName || '-'}</div>
-            <div className="col-span-3 truncate">{doc.productSpecs || '-'}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function RelevantList({ documents }: { documents: DocumentInfo[] }) {
-  return (
-    <div className="text-xs border rounded">
-      <div className="grid grid-cols-10 gap-2 px-2 py-1 bg-gray-50 text-gray-600">
-        <div className="col-span-2">상품ID</div>
-        <div className="col-span-4">상품명</div>
-        <div className="col-span-4">스펙</div>
-      </div>
-      <div>
-        {documents.map((doc, i) => (
-          <div key={i} className="grid grid-cols-10 gap-2 px-2 py-1 border-t items-start">
-            <div className="col-span-2">
-              <span className="font-mono text-[11px] bg-white px-1 py-0.5 rounded border">{doc.productId}</span>
-            </div>
-            <div className="col-span-4 truncate">{doc.productName || '-'}</div>
-            <div className="col-span-4 truncate">{doc.productSpecs || '-'}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function GroundTruthList({ documents }: { documents: GroundTruthDocument[] }) {
-  const getScoreDisplay = (score: number | null) => {
-    if (score === null) return '-'
-    if (score === -1) return '확인'
-    return score.toString()
-  }
-  
-  return (
-    <div className="text-xs border rounded">
-      <div className="grid grid-cols-12 gap-2 px-2 py-1 bg-gray-50 text-gray-600">
-        <div className="col-span-1">점수</div>
-        <div className="col-span-2">상품ID</div>
-        <div className="col-span-4">상품명</div>
-        <div className="col-span-5">스펙</div>
-      </div>
-      <div>
-        {documents.map((doc, i) => (
-          <div key={i} className="grid grid-cols-12 gap-2 px-2 py-1 border-t items-start">
-            <div className="col-span-1 font-mono">{getScoreDisplay(doc.score)}</div>
-            <div className="col-span-2">
-              <span className="font-mono text-[11px] bg-white px-1 py-0.5 rounded border">{doc.productId}</span>
-            </div>
-            <div className="col-span-4 truncate">{doc.productName || '-'}</div>
-            <div className="col-span-5 truncate">{doc.productSpecs || '-'}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
 
 function DocumentList({ 
   documents, 
@@ -346,7 +239,7 @@ function DocumentList({
         <div className="col-span-5">상품명</div>
         <div className="col-span-5">스펙</div>
       </div>
-      <div className={`${subTextColor} divide-y`}>
+      <div className={`${subTextColor} divide-y max-h-64 overflow-y-auto`}>
         {displayedDocs.map((doc: ReportDoc, i: number) => {
           const parsed = typeof doc === 'string' ? parseDocString(doc) : doc
           const productId = (parsed as any)?.productId
@@ -382,13 +275,15 @@ function DocumentList({
                     </div>
                   </div>
                   {(productName || productSpecs) && (
-                    <button
-                      type="button"
-                      onClick={() => toggleRow(i)}
-                      className="mt-0.5 text-[11px] underline text-gray-600 hover:text-gray-800"
-                    >
-                      {expanded ? '접기' : '펼치기'}
-                    </button>
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => toggleRow(i)}
+                        className="mt-0.5 text-[11px] underline text-gray-600 hover:text-gray-800"
+                      >
+                        {expanded ? '접기' : '펼치기'}
+                      </button>
+                    </div>
                   )}
                 </>
               ) : (
@@ -403,43 +298,6 @@ function DocumentList({
           </div>
         )}
       </div>
-    </div>
-  )
-}
-
-// 아코디언 섹션 컴포넌트
-interface AccordionSectionProps {
-  title: string
-  count: number
-  defaultExpanded?: boolean
-  children: React.ReactNode
-}
-
-function AccordionSection({ title, count, defaultExpanded = false, children }: AccordionSectionProps) {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded)
-
-  return (
-    <div className="border rounded-lg overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between p-2 hover:bg-gray-50 transition-colors"
-      >
-        <div className="flex items-center gap-2">
-          {isExpanded ? (
-            <ChevronDown className="h-4 w-4 text-gray-500" />
-          ) : (
-            <ChevronRight className="h-4 w-4 text-gray-500" />
-          )}
-          <span className="font-medium text-sm">{title}</span>
-          <span className="text-xs text-gray-500">({count}개)</span>
-        </div>
-      </button>
-      {isExpanded && (
-        <div className="border-t p-2">
-          {children}
-        </div>
-      )}
     </div>
   )
 }

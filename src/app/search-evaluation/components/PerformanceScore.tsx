@@ -19,13 +19,16 @@ export function PerformanceScore({
     lg: 'text-2xl font-bold'
   }
 
+  // score가 undefined나 null인 경우 0으로 처리
+  const safeScore = score ?? 0
+
   const formattedScore = showPercentage 
-    ? `${(score * 100).toFixed(1)}%`
-    : score.toFixed(3)
+    ? `${(safeScore * 100).toFixed(1)}%`
+    : safeScore.toFixed(3)
 
   return (
     <div className="text-center">
-      <div className={`${sizeClasses[size]} ${getPerformanceColor(score)}`}>
+      <div className={`${sizeClasses[size]} ${getPerformanceColor(safeScore)}`}>
         {formattedScore}
       </div>
       {label && (

@@ -31,7 +31,8 @@ export const RELEVANCE_STATUS_LABELS = {
 export const TASK_TYPE_LABELS = {
   QUERY_GENERATION: '쿼리 생성',
   CANDIDATE_GENERATION: '후보군 생성', 
-  LLM_EVALUATION: 'LLM 평가'
+  LLM_EVALUATION: 'LLM 평가',
+  EVALUATION_EXECUTION: '평가 실행'
 } as const
 
 export const TASK_STATUS_LABELS = {

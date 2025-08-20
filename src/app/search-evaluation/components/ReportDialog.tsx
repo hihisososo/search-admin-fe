@@ -120,8 +120,8 @@ export function ReportDialog({
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center">
-                    <div className={`text-2xl font-bold ${getScoreColor(latestReport.averageNdcg)}`}>
-                      {latestReport.averageNdcg.toFixed(3)}
+                    <div className={`text-2xl font-bold ${getScoreColor(latestReport.averageNdcg20 || latestReport.averageNdcg || 0)}`}>
+                      {(latestReport.averageNdcg20 || latestReport.averageNdcg || 0).toFixed(3)}
                     </div>
                     <div className="text-sm text-gray-600">평균 nDCG</div>
                   </div>
@@ -257,7 +257,7 @@ export function ReportDialog({
                         <div className="text-right">
                           <div className="flex gap-2">
                             <Badge variant="outline" className="text-xs">
-                              nDCG: {report.averageNdcg.toFixed(3)}
+                              nDCG: {(report.averageNdcg20 || report.averageNdcg || 0).toFixed(3)}
                             </Badge>
                           </div>
                           <div className="text-xs text-gray-500 mt-1">
@@ -290,8 +290,8 @@ export function ReportDialog({
                         <div className="space-y-3">
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded">
                             <div className="text-center">
-                              <div className={`text-xl font-bold ${getScoreColor(selectedReport.averageNdcg)}`}>
-                                {selectedReport.averageNdcg.toFixed(3)}
+                              <div className={`text-xl font-bold ${getScoreColor(selectedReport.averageNdcg20 || selectedReport.averageNdcg || 0)}`}>
+                                {(selectedReport.averageNdcg20 || selectedReport.averageNdcg || 0).toFixed(3)}
                               </div>
                               <div className="text-sm text-gray-600">평균 nDCG</div>
                             </div>
