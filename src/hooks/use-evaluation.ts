@@ -196,8 +196,8 @@ export function useUpdateCandidate() {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: ({ candidateId, data }: { candidateId: number, data: UpdateCandidateRequest }) =>
-      evaluationService.updateCandidate(candidateId, data),
+    mutationFn: ({ id, data }: { id: number, data: UpdateCandidateRequest }) =>
+      evaluationService.updateCandidate(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: evaluationKeys.documents.all })
     },
@@ -235,7 +235,7 @@ export function useEvaluateLlmAsync() {
   })
 }
 
-// 평가 실행
+// 평가 실행 (동기)
 export function useEvaluate() {
   const queryClient = useQueryClient()
   
@@ -243,6 +243,18 @@ export function useEvaluate() {
     mutationFn: (data: EvaluationRequest) => evaluationService.evaluate(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: evaluationKeys.reports.all })
+    },
+  })
+}
+
+// 평가 실행 (비동기)
+export function useEvaluateAsync() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: (data: { reportName: string }) => evaluationService.evaluateAsync(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: evaluationKeys.tasks.all })
     },
   })
 } 

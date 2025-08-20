@@ -66,11 +66,11 @@ export function DocumentTable({
   // 편집 상태 관리
   const [editingDocument, setEditingDocument] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<{
-    score: number | null // null | -1 | 0 | 1 | 2
+    relevanceScore: number | null // null | -1 | 0 | 1 | 2
     evaluationReason: string
     confidence?: number // 0.0 ~ 1.0
   }>({
-    score: null,
+    relevanceScore: null,
     evaluationReason: '',
     confidence: 1.0 // 수동 평가 시 기본값
   })
@@ -82,10 +82,10 @@ export function DocumentTable({
   // removed add-document mutation
   const updateCandidateMutation = useUpdateCandidate()
 
-  // 평가 상태 변환 함수 (score 기반)
-  const getEvaluationStatus = (score: number | null): EvaluationStatus => {
-    if (score === null || score === -1) return 'unspecified'
-    if (score >= 1) return 'correct'
+  // 평가 상태 변환 함수 (relevanceScore 기반)
+  const getEvaluationStatus = (relevanceScore: number | null): EvaluationStatus => {
+    if (relevanceScore === null || relevanceScore === -1) return 'unspecified'
+    if (relevanceScore >= 1) return 'correct'
     return 'incorrect'
   }
 
@@ -101,23 +101,23 @@ export function DocumentTable({
     return 'text-red-600'
   }
 
-  const getScoreBadge = (score: number | null) => {
-    if (score === null) {
+  const getScoreBadge = (relevanceScore: number | null) => {
+    if (relevanceScore === null) {
       return (
         <Badge variant="secondary" className="text-[10px] px-1.5 py-0">미평가</Badge>
       )
     }
-    if (score === -1) {
+    if (relevanceScore === -1) {
       return (
-        <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-orange-50 text-orange-700 border-orange-200">확인필요(-1)</Badge>
+        <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-orange-50 text-orange-700 border-orange-200">확인필요</Badge>
       )
     }
-    const colorClass = score >= 2
+    const colorClass = relevanceScore >= 2
       ? 'bg-green-50 text-green-700 border-green-200'
-      : score === 1
+      : relevanceScore === 1
         ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
         : 'bg-red-50 text-red-700 border-red-200'
-    const label = score >= 2 ? `매우관련(${score})` : (score === 1 ? '관련(1)' : '무관(0)')
+    const label = relevanceScore >= 2 ? `매우관련` : (relevanceScore === 1 ? '관련' : '무관')
     return (
       <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${colorClass}`}>
         {label}
@@ -132,7 +132,7 @@ export function DocumentTable({
   const handleStartEdit = (doc: EvaluationDocument) => {
     setEditingDocument(doc.productId)
     setEditForm({
-      score: doc.score ?? null,
+      relevanceScore: doc.relevanceScore ?? null,
       evaluationReason: doc.evaluationReason || '',
       confidence: doc.confidence || 1.0
     })
@@ -142,7 +142,7 @@ export function DocumentTable({
   const handleCancelEdit = () => {
     setEditingDocument(null)
     setEditForm({
-      score: null,
+      relevanceScore: null,
       evaluationReason: '',
       confidence: 1.0
     })
@@ -152,16 +152,16 @@ export function DocumentTable({
   const handleSaveEdit = async (doc: EvaluationDocument) => {
     try {
       await updateCandidateMutation.mutateAsync({
-        candidateId: doc.candidateId,
+        id: doc.id,
         data: {
-          relevanceScore: editForm.score,
+          relevanceScore: editForm.relevanceScore,
           evaluationReason: editForm.evaluationReason,
           confidence: editForm.confidence
         }
       })
       setEditingDocument(null)
       setEditForm({
-        score: null,
+        relevanceScore: null,
         evaluationReason: '',
         confidence: 1.0
       })
@@ -201,9 +201,9 @@ export function DocumentTable({
   const filteredDocuments = documents.filter(doc => {
     if (confidenceFilter === 'needsReview') {
       const confidence = doc.confidence
-      const score = doc.score
-      // confidence <= 0.8 또는 score가 -1인 경우 (사람 확인 필요)
-      return (confidence !== null && confidence <= 0.8) || score === -1
+      const relevanceScore = doc.relevanceScore
+      // confidence <= 0.8 또는 relevanceScore가 -1인 경우 (사람 확인 필요)
+      return (confidence !== null && confidence !== undefined && confidence <= 0.8) || relevanceScore === -1
     }
     return true
   })
@@ -215,12 +215,12 @@ export function DocumentTable({
   }
 
   // 인라인 score 선택 처리
-  const handleQuickSetScore = async (doc: EvaluationDocument, score: number) => {
+  const handleQuickSetScore = async (doc: EvaluationDocument, relevanceScore: number) => {
     try {
       await updateCandidateMutation.mutateAsync({
-        candidateId: doc.candidateId,
+        id: doc.id,
         data: {
-          relevanceScore: score,
+          relevanceScore: relevanceScore,
           evaluationReason: doc.evaluationReason || '',
           confidence: 1.0 // 수동 평가 시 기본값
         }
@@ -378,7 +378,7 @@ export function DocumentTable({
               </TableRow>
             ) : (
               filteredDocuments.map((doc, index) => {
-                const _status = getEvaluationStatus(doc.score)
+                const _status = getEvaluationStatus(doc.relevanceScore)
                 const isExpanded = expandedDocument === doc.productId
                 
                 return (
@@ -414,13 +414,13 @@ export function DocumentTable({
                       
                       <TableCell className="py-2 text-center">
                         <div className="flex justify-center items-center gap-1">
-                          {doc.score === null ? (
+                          {doc.relevanceScore === null ? (
                             <Badge variant="secondary" className="text-[10px] px-2 py-0">미평가</Badge>
                           ) : (
                             ([2,1,0,-1] as const).map((val) => {
-                              const current = doc.score
+                              const current = doc.relevanceScore
                               const isActive = current === val
-                              const label = val === 2 ? '매우관련(2)' : val === 1 ? '관련(1)' : val === 0 ? '무관(0)' : '확인필요(-1)'
+                              const label = val === 2 ? '매우관련' : val === 1 ? '관련' : val === 0 ? '무관' : '확인필요'
                             const colorClass = val === 2
                               ? 'bg-green-50 text-green-700 border-green-200'
                               : val === 1
@@ -457,8 +457,8 @@ export function DocumentTable({
                             {doc.confidence !== undefined && doc.confidence !== null ? 
                               doc.confidence.toFixed(2) : '-'}
                           </span>
-                          {(doc.confidence !== null && doc.confidence <= 0.8) && 
-                           doc.score === -1 && (
+                          {(doc.confidence !== null && doc.confidence !== undefined && doc.confidence <= 0.8) && 
+                           doc.relevanceScore === -1 && (
                             <Badge variant="destructive" className="text-[8px] px-1 py-0 h-3">
                               확인필요
                             </Badge>
@@ -482,7 +482,7 @@ export function DocumentTable({
                                   </label>
                                   <div className="bg-gray-50 border-l-4 border-gray-300 p-4 rounded-r">
                                     <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                                      {formatText(doc.specs) || '스펙 정보가 없습니다'}
+                                      {formatText(doc.productSpecs) || '스펙 정보가 없습니다'}
                                     </div>
                                   </div>
                                 </div>
@@ -507,8 +507,8 @@ export function DocumentTable({
                                   </label>
                                   <div className="flex gap-2">
                                     {([2,1,0,-1] as const).map((val) => {
-                                      const isActive = editForm.score === val
-                                      const label = val === 2 ? '매우관련(2)' : val === 1 ? '관련(1)' : val === 0 ? '무관(0)' : '확인필요(-1)'
+                                      const isActive = editForm.relevanceScore === val
+                                      const label = val === 2 ? '매우관련' : val === 1 ? '관련' : val === 0 ? '무관' : '확인필요'
                                       const colorClass = val === 2
                                         ? 'bg-green-50 text-green-700 border-green-200'
                                         : val === 1
@@ -527,7 +527,7 @@ export function DocumentTable({
                                           )}
                                           onClick={(e) => {
                                             e.stopPropagation()
-                                            setEditForm({ ...editForm, score: val })
+                                            setEditForm({ ...editForm, relevanceScore: val })
                                           }}
                                         >
                                           {label}
@@ -600,7 +600,7 @@ export function DocumentTable({
                                   </label>
                                   <div className="bg-gray-50 border-l-4 border-gray-300 p-4 rounded-r">
                                     <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                                      {formatText(doc.specs) || '스펙 정보가 없습니다'}
+                                      {formatText(doc.productSpecs) || '스펙 정보가 없습니다'}
                                     </div>
                                   </div>
                                 </div>
@@ -621,14 +621,14 @@ export function DocumentTable({
                                     🏷️ 평가
                                   </label>
                                   <div className="flex items-center gap-3">
-                                    {getScoreBadge(doc.score)}
+                                    {getScoreBadge(doc.relevanceScore)}
                                     {(doc.confidence !== undefined && doc.confidence !== null) && (
                                       <div className="flex items-center gap-1">
                                         <span className="text-xs text-gray-500">신뢰도:</span>
                                         <span className={`text-xs font-semibold ${getConfidenceColor(doc.confidence)}`}>
                                           {doc.confidence.toFixed(2)}
                                         </span>
-                                        {doc.confidence <= 0.8 && doc.score === -1 && (
+                                        {doc.confidence <= 0.8 && doc.relevanceScore === -1 && (
                                           <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
                                             확인필요
                                           </Badge>

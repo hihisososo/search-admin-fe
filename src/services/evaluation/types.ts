@@ -29,15 +29,13 @@ export type RelevanceStatus = 'UNSPECIFIED' | 'RELEVANT' | 'IRRELEVANT'
 
 // 문서 관련 타입 (백엔드 ProductDocumentDto 매핑)
 export interface EvaluationDocument {
-  candidateId: number
+  id: number
   productId: string
   productName: string
-  specs: string
-  score: number | null  // 2, 1, 0, -1, null
+  productSpecs: string
+  relevanceScore: number | null  // 2, 1, 0, -1, null
   evaluationReason: string
   confidence?: number | null // 0.0 ~ 1.0, NULL if not evaluated
-  // Legacy field - for backward compatibility
-  relevanceStatus?: RelevanceStatus
 }
 
 export interface EvaluationDocumentListResponse {
@@ -120,15 +118,24 @@ export interface AsyncTaskResponse {
 
 export interface AsyncTaskStatus {
   id: number
-  taskType: 'QUERY_GENERATION' | 'CANDIDATE_GENERATION' | 'LLM_EVALUATION'
-  status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED'
+  taskType: 'QUERY_GENERATION' | 'CANDIDATE_GENERATION' | 'LLM_EVALUATION' | 'EVALUATION_EXECUTION'
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED'
   progress: number
   message: string
   errorMessage?: string | null
-  result?: string | null
+  result?: any  // 평가 결과 객체 포함 가능
   createdAt: string
   startedAt?: string
   completedAt?: string
+}
+
+// 평가 실행 결과 타입
+export interface EvaluationExecutionResult {
+  reportName: string
+  reportId: number
+  totalQueries: number
+  recall300: number
+  ndcg20: number
 }
 
 export interface UpdateCandidateRequest {
@@ -147,79 +154,56 @@ export interface EvaluationRequest {
 
 export interface QueryEvaluationDetail {
   query: string
-  ndcg: number
-  ndcgAt10?: number
-  ndcgAt20?: number
-  mrrAt10?: number
-  recallAt50?: number
-  map?: number
-  recallAt300?: number
   relevantCount: number
   retrievedCount: number
   correctCount: number
+  ndcgAt20?: number  // 쿼리별 nDCG@20
+  recallAt300?: number  // 쿼리별 Recall@300
   missingDocuments: DocumentInfo[]
   wrongDocuments: DocumentInfo[]
-  relevantDocuments?: DocumentInfo[]  // 새로 추가: 정답셋 전체
-  retrievedDocuments?: DocumentInfo[]  // 새로 추가: 검색결과 전체 (순서대로)
 }
 
-// 평가 실행 응답 (evaluate API)
+// 평가 실행 응답 (execute API)
 export interface EvaluationExecuteResponse {
   reportId: number
   reportName: string
+  recall: number
+  precision: number
+  ndcg: number
   totalQueries: number
-  createdAt: string
-  averageNdcg: number
   totalRelevantDocuments: number
   totalRetrievedDocuments: number
   totalCorrectDocuments: number
-  // 백엔드 예시 응답에 포함되는 쿼리별 상세 (선택적)
-  queryDetails?: Array<{
-    query: string
-    ndcg: number
-    relevantCount: number
-    retrievedCount: number
-    correctCount: number
-    missingDocuments?: DocumentInfo[]
-    wrongDocuments?: DocumentInfo[]
-    relevantDocuments?: DocumentInfo[]  // 새로 추가
-    retrievedDocuments?: DocumentInfo[]  // 새로 추가
-  }>
+  queryDetails: QueryEvaluationDetail[]
 }
 
-// 리포트 상세 조회 응답 (리포트 리스트와 동일)
+// 리포트 상세 조회 응답
 export interface EvaluationReport {
   id: number
   reportName: string
   totalQueries: number
-  averageNdcg: number
-  ndcgAt10?: number
-  ndcgAt20?: number
-  mrrAt10?: number
-  recallAt50?: number
-  map?: number
-  recallAt300?: number
-  queryDetails: Array<
-    QueryEvaluationDetail & {
-      retrievedDocuments?: RetrievedDocument[]
-      groundTruthDocuments?: GroundTruthDocument[]
-      groundTruth?: GroundTruthDocument[]
-    }
-  >
-  totalRelevantDocuments: number
-  totalRetrievedDocuments: number
-  totalCorrectDocuments: number
+  averageRecall300: number  // Recall@300
+  averageNdcg20: number  // nDCG@20
+  averagePrecision?: number  // 기존 호환성
+  averageRecall?: number  // 기존 호환성
+  averageNdcg?: number  // 기존 호환성
+  totalRelevantDocuments?: number
+  totalRetrievedDocuments?: number
+  totalCorrectDocuments?: number
   createdAt: string
+  queryDetails: QueryEvaluationDetail[]
 }
 
 export interface EvaluationReportSummary {
   id: number
   reportName: string
   totalQueries: number
-  averageNdcg: number
-  totalRelevantDocuments: number
-  totalRetrievedDocuments: number
-  totalCorrectDocuments: number
+  averageNdcg20: number  // nDCG@20
+  averageRecall300: number  // Recall@300
+  averageNdcg?: number  // 기존 호환성
+  totalRelevantDocuments?: number
+  totalRetrievedDocuments?: number
+  totalCorrectDocuments?: number
   createdAt: string
 }
 
@@ -260,19 +244,19 @@ export interface DocumentInfo {
   productSpecs: string | null
 }
 
-// 리포트 상세용 신규 타입
-export interface RetrievedDocument {
-  rank: number
-  productId: string
-  productName: string | null
-  productSpecs: string | null
-  gain: number // 2 | 1 | 0
-  isRelevant: boolean
-}
+// 리포트 상세용 신규 타입 - API에서 제거됨
+// export interface RetrievedDocument {
+//   position: number // 0부터 시작
+//   productId: string
+//   productName: string | null
+//   productSpecs: string | null
+//   relevanceScore: number // 2 | 1 | 0
+//   isRelevant: boolean
+// }
 
-export interface GroundTruthDocument {
-  productId: string
-  productName: string | null
-  productSpecs: string | null
-  score: number | null // 2 | 1 | 0 | -1 | null (미평가)
-}
+// export interface GroundTruthDocument {
+//   productId: string
+//   productName: string | null
+//   productSpecs: string | null
+//   relevanceScore: number | null // 2 | 1 | 0 | -1 | null (미평가)
+// }
