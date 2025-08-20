@@ -24,17 +24,20 @@ export interface EvaluationQueryListResponse {
   hasPrevious: boolean
 }
 
-// 관련성 상태 enum (실제 백엔드에 맞게)
-export type RelevanceStatus = 'UNSPECIFIED' | 'RELEVANT' | 'IRRELEVANT'  // UNSPECIFIED가 맞음
+// 관련성 상태 enum (실제 백엔드에 맞게) - DEPRECATED: score로 대체됨
+export type RelevanceStatus = 'UNSPECIFIED' | 'RELEVANT' | 'IRRELEVANT'
 
-// 문서 관련 타입
+// 문서 관련 타입 (백엔드 ProductDocumentDto 매핑)
 export interface EvaluationDocument {
   candidateId: number
   productId: string
   productName: string
   specs: string
-  relevanceStatus: RelevanceStatus
+  score: number | null  // 2, 1, 0, -1, null
   evaluationReason: string
+  confidence?: number | null // 0.0 ~ 1.0, NULL if not evaluated
+  // Legacy field - for backward compatibility
+  relevanceStatus?: RelevanceStatus
 }
 
 export interface EvaluationDocumentListResponse {
@@ -129,8 +132,9 @@ export interface AsyncTaskStatus {
 }
 
 export interface UpdateCandidateRequest {
-  relevanceStatus: RelevanceStatus
+  relevanceScore: number | null  // -1 ~ 2
   evaluationReason: string
+  confidence?: number  // 0.0 ~ 1.0, 선택사항 (기본값 1.0)
 }
 
 // 평가 관련 타입
@@ -199,6 +203,7 @@ export interface EvaluationReport {
     QueryEvaluationDetail & {
       retrievedDocuments?: RetrievedDocument[]
       groundTruthDocuments?: GroundTruthDocument[]
+      groundTruth?: GroundTruthDocument[]
     }
   >
   totalRelevantDocuments: number
@@ -269,5 +274,5 @@ export interface GroundTruthDocument {
   productId: string
   productName: string | null
   productSpecs: string | null
-  score: number // 2 | 1 | 0 | -1 | -100
+  score: number | null // 2 | 1 | 0 | -1 | null (미평가)
 }

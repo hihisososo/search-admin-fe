@@ -4,7 +4,7 @@ import { ChevronDown, ChevronRight } from "lucide-react"
 import { formatDate } from "@/utils/evaluation-helpers"
 import { EVALUATION_CONFIG } from "@/constants/evaluation"
 import { PerformanceScore } from "./PerformanceScore"
-import type { EvaluationReport, DocumentInfo } from "@/services/evaluation/types"
+import type { EvaluationReport, DocumentInfo, GroundTruthDocument } from "@/services/evaluation/types"
 
 interface EvaluationReportViewerProps {
   report: EvaluationReport
@@ -155,7 +155,7 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
                 )}
 
                 {/* 정답셋 */}
-                {Array.isArray(detail.relevantDocuments) && detail.relevantDocuments.length > 0 && (
+                {(Array.isArray(detail.relevantDocuments) && detail.relevantDocuments.length > 0) ? (
                   <AccordionSection
                     title="정답셋"
                     count={detail.relevantDocuments.length}
@@ -163,7 +163,15 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
                   >
                     <RelevantList documents={detail.relevantDocuments} />
                   </AccordionSection>
-                )}
+                ) : (Array.isArray(detail.groundTruth) && detail.groundTruth.length > 0) ? (
+                  <AccordionSection
+                    title="정답셋"
+                    count={detail.groundTruth.length}
+                    defaultExpanded={false}
+                  >
+                    <GroundTruthList documents={detail.groundTruth} />
+                  </AccordionSection>
+                ) : null}
 
                 {/* 누락/오답 영역 */}
                 {(detail.missingDocuments?.length > 0 || detail.wrongDocuments?.length > 0) ? (
@@ -250,6 +258,37 @@ function RelevantList({ documents }: { documents: DocumentInfo[] }) {
             </div>
             <div className="col-span-4 truncate">{doc.productName || '-'}</div>
             <div className="col-span-4 truncate">{doc.productSpecs || '-'}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function GroundTruthList({ documents }: { documents: GroundTruthDocument[] }) {
+  const getScoreDisplay = (score: number | null) => {
+    if (score === null) return '-'
+    if (score === -1) return '확인'
+    return score.toString()
+  }
+  
+  return (
+    <div className="text-xs border rounded">
+      <div className="grid grid-cols-12 gap-2 px-2 py-1 bg-gray-50 text-gray-600">
+        <div className="col-span-1">점수</div>
+        <div className="col-span-2">상품ID</div>
+        <div className="col-span-4">상품명</div>
+        <div className="col-span-5">스펙</div>
+      </div>
+      <div>
+        {documents.map((doc, i) => (
+          <div key={i} className="grid grid-cols-12 gap-2 px-2 py-1 border-t items-start">
+            <div className="col-span-1 font-mono">{getScoreDisplay(doc.score)}</div>
+            <div className="col-span-2">
+              <span className="font-mono text-[11px] bg-white px-1 py-0.5 rounded border">{doc.productId}</span>
+            </div>
+            <div className="col-span-4 truncate">{doc.productName || '-'}</div>
+            <div className="col-span-5 truncate">{doc.productSpecs || '-'}</div>
           </div>
         ))}
       </div>

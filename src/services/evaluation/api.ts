@@ -51,7 +51,30 @@ class EvaluationService {
 
   // 쿼리별 문서 조회 (오른쪽 패널)
   async getQueryDocuments(queryId: number, params: PageParams = {}): Promise<EvaluationDocumentListResponse> {
-    return apiClient.get<EvaluationDocumentListResponse>(`${this.baseEndpoint}/queries/${queryId}/documents`, params)
+    // 백엔드 API 파라미터 매핑
+    const apiParams: any = {
+      page: params.page,
+      size: params.size,
+      sortBy: params.sort, // sort -> sortBy
+      sortDirection: params.order?.toUpperCase() || 'DESC' // order -> sortDirection (대문자로)
+    }
+    
+    const response = await apiClient.get<EvaluationDocumentListResponse>(`${this.baseEndpoint}/queries/${queryId}/documents`, apiParams)
+    
+    // 백엔드 응답 필드 매핑 (하위 호환성)
+    if (response.documents) {
+      response.documents = response.documents.map((doc: any) => ({
+        ...doc,
+        // relevanceScore를 score로 매핑 (백엔드가 아직 변경 안 됐을 경우)
+        score: doc.score !== undefined ? doc.score : (doc.relevanceScore !== undefined ? doc.relevanceScore : null),
+        // confidence 필드 확인
+        confidence: doc.confidence !== undefined ? doc.confidence : null,
+        // specs 필드 확인 (productSpecs일 수도 있음)
+        specs: doc.specs || doc.productSpecs || ''
+      }))
+    }
+    
+    return response
   }
 
   // 상품 매핑 추가

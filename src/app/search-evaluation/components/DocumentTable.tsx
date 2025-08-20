@@ -3,16 +3,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 // removed add-document dialog imports
 // select 제거: 버튼형 세그먼트로 대체
 import { cn } from "@/lib/utils"
-import { Edit, Trash2, ChevronDown, ChevronUp, X, Save, RotateCcw } from "lucide-react"
+import { Edit, Trash2, ChevronDown, ChevronUp, X, Save, RotateCcw, AlertCircle, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { 
   // useProductSearch, (removed add-document feature)
   // useAddDocumentMapping,
   useUpdateCandidate
 } from "@/hooks/use-evaluation"
-import type { EvaluationDocument, RelevanceStatus } from "@/services"
+import type { EvaluationDocument } from "@/services"
 import React from "react"
 import { useToast } from "@/components/ui/use-toast"
 // import { PAGINATION } from "@/constants/pagination"
@@ -36,6 +37,8 @@ interface DocumentTableProps {
   sortField?: string
   sortDirection?: 'asc' | 'desc'
   onSort?: (field: string) => void
+  confidenceFilter?: 'all' | 'needsReview'
+  onConfidenceFilterChange?: (filter: 'all' | 'needsReview') => void
 }
 
 export function DocumentTable({
@@ -50,9 +53,11 @@ export function DocumentTable({
   isLoading,
   pageSize,
   onPageSizeChange,
-  sortField: _sortField,
-  sortDirection: _sortDirection,
-  onSort
+  sortField,
+  sortDirection,
+  onSort,
+  confidenceFilter = 'all',
+  onConfidenceFilterChange
 }: DocumentTableProps) {
   // removed add-document dialog states
   const [expandedDocument, setExpandedDocument] = useState<string | null>(null)
@@ -61,13 +66,13 @@ export function DocumentTable({
   // 편집 상태 관리
   const [editingDocument, setEditingDocument] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<{
-    relevanceStatus: RelevanceStatus
+    score: number | null // null | -1 | 0 | 1 | 2
     evaluationReason: string
-    score: number // -1 | 0 | 1 | 2
+    confidence?: number // 0.0 ~ 1.0
   }>({
-    relevanceStatus: 'UNSPECIFIED',
+    score: null,
     evaluationReason: '',
-    score: -1
+    confidence: 1.0 // 수동 평가 시 기본값
   })
 
   // API 호출
@@ -77,31 +82,34 @@ export function DocumentTable({
   // removed add-document mutation
   const updateCandidateMutation = useUpdateCandidate()
 
-  // 평가 상태 변환 함수
-  const getEvaluationStatus = (relevanceStatus: RelevanceStatus): EvaluationStatus => {
-    switch (relevanceStatus) {
-      case 'RELEVANT': return 'correct'
-      case 'IRRELEVANT': return 'incorrect'
-      case 'UNSPECIFIED':
-      default: return 'unspecified'
-    }
+  // 평가 상태 변환 함수 (score 기반)
+  const getEvaluationStatus = (score: number | null): EvaluationStatus => {
+    if (score === null || score === -1) return 'unspecified'
+    if (score >= 1) return 'correct'
+    return 'incorrect'
   }
 
   // 상태 뱃지(정답/오답/미지정) 사용 중단 → 점수 뱃지로 대체
 
-  // evaluationReason 에 포함된 (score: n) 추출
-  const extractScore = (reason?: string | null): number | null => {
-    if (!reason) return null
-    const match = reason.match(/\(score:\s*(\d)\)/i)
-    if (!match) return null
-    const num = Number(match[1])
-    return Number.isFinite(num) ? num : null
+
+  // confidence 색상 가져오기
+  const getConfidenceColor = (confidence?: number | null) => {
+    if (!confidence && confidence !== 0) return 'text-gray-500'
+    if (confidence >= 0.9) return 'text-green-600'
+    if (confidence >= 0.8) return 'text-blue-600'
+    if (confidence >= 0.7) return 'text-orange-600'
+    return 'text-red-600'
   }
 
   const getScoreBadge = (score: number | null) => {
-    if (score === null || score === -1) {
+    if (score === null) {
       return (
         <Badge variant="secondary" className="text-[10px] px-1.5 py-0">미평가</Badge>
+      )
+    }
+    if (score === -1) {
+      return (
+        <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-orange-50 text-orange-700 border-orange-200">확인필요(-1)</Badge>
       )
     }
     const colorClass = score >= 2
@@ -109,7 +117,7 @@ export function DocumentTable({
       : score === 1
         ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
         : 'bg-red-50 text-red-700 border-red-200'
-    const label = score >= 2 ? '매우관련' : (score === 1 ? '관련' : '관련없음')
+    const label = score >= 2 ? `매우관련(${score})` : (score === 1 ? '관련(1)' : '무관(0)')
     return (
       <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${colorClass}`}>
         {label}
@@ -124,9 +132,9 @@ export function DocumentTable({
   const handleStartEdit = (doc: EvaluationDocument) => {
     setEditingDocument(doc.productId)
     setEditForm({
-      relevanceStatus: doc.relevanceStatus,
+      score: doc.score ?? null,
       evaluationReason: doc.evaluationReason || '',
-      score: extractScore(doc.evaluationReason) ?? -1
+      confidence: doc.confidence || 1.0
     })
   }
 
@@ -134,40 +142,28 @@ export function DocumentTable({
   const handleCancelEdit = () => {
     setEditingDocument(null)
     setEditForm({
-      relevanceStatus: 'UNSPECIFIED',
+      score: null,
       evaluationReason: '',
-      score: -1
+      confidence: 1.0
     })
   }
 
   // 편집 저장 핸들러
   const handleSaveEdit = async (doc: EvaluationDocument) => {
     try {
-      // score 기반으로 relevanceStatus 결정
-      const newStatus: RelevanceStatus = editForm.score >= 1
-        ? 'RELEVANT'
-        : (editForm.score === 0 ? 'IRRELEVANT' : 'UNSPECIFIED')
-
-      // evaluationReason에 (score: n) 반영
-      const upsertScore = (reason: string, score: number): string => {
-        const base = (reason || '').trim()
-        const replaced = base.replace(/\(score:\s*-?\d+\)/i, '').trim()
-        const suffix = `(score: ${score})`
-        return replaced.length > 0 ? `${replaced} ${suffix}` : suffix
-      }
-
       await updateCandidateMutation.mutateAsync({
         candidateId: doc.candidateId,
         data: {
-          relevanceStatus: newStatus,
-          evaluationReason: upsertScore(editForm.evaluationReason, editForm.score)
+          relevanceScore: editForm.score,
+          evaluationReason: editForm.evaluationReason,
+          confidence: editForm.confidence
         }
       })
       setEditingDocument(null)
       setEditForm({
-        relevanceStatus: 'UNSPECIFIED',
+        score: null,
         evaluationReason: '',
-        score: -1
+        confidence: 1.0
       })
       // 문서 데이터 새로고침을 위해 부모 컴포넌트에서 처리하도록 함
       toast({
@@ -201,22 +197,21 @@ export function DocumentTable({
     setExpandedDocument(expandedDocument === productId ? null : productId)
   }
 
+  // 필터링된 문서 목록
+  const filteredDocuments = documents.filter(doc => {
+    if (confidenceFilter === 'needsReview') {
+      const confidence = doc.confidence
+      const score = doc.score
+      // confidence <= 0.8 또는 score가 -1인 경우 (사람 확인 필요)
+      return (confidence !== null && confidence <= 0.8) || score === -1
+    }
+    return true
+  })
+
   // 텍스트 개행 처리 함수
   const formatText = (text: string | null) => {
     if (!text) return ''
     return text.replace(/\\n/g, '\n').replace(/\n/g, '\n')
-  }
-
-  // util: evaluationReason에 (score: n) 값을 갱신/삽입
-  const upsertScore = (reason: string, score: number): string => {
-    const base = (reason || '').trim()
-    const replaced = base.replace(/\(score:\s*-?\d+\)/i, '').trim()
-    const suffix = `(score: ${score})`
-    return replaced.length > 0 ? `${replaced} ${suffix}` : suffix
-  }
-
-  const mapScoreToStatus = (score: number): RelevanceStatus => {
-    return score >= 1 ? 'RELEVANT' : (score === 0 ? 'IRRELEVANT' : 'UNSPECIFIED')
   }
 
   // 인라인 score 선택 처리
@@ -225,11 +220,12 @@ export function DocumentTable({
       await updateCandidateMutation.mutateAsync({
         candidateId: doc.candidateId,
         data: {
-          relevanceStatus: mapScoreToStatus(score),
-          evaluationReason: upsertScore(doc.evaluationReason || '', score)
+          relevanceScore: score,
+          evaluationReason: doc.evaluationReason || '',
+          confidence: 1.0 // 수동 평가 시 기본값
         }
       })
-      toast({ title: 'score 변경', description: `score가 ${score}로 변경되었습니다.`, variant: 'success' })
+      toast({ title: '평가 변경', description: `평가가 변경되었습니다.`, variant: 'success' })
     } catch (error) {
       toast({ title: '변경 실패', description: (error as Error).message, variant: 'destructive' })
     }
@@ -284,6 +280,26 @@ export function DocumentTable({
         </div>
         
         <div className="flex items-center gap-2">
+          {onConfidenceFilterChange && (
+            <Select value={confidenceFilter} onValueChange={(value: 'all' | 'needsReview') => onConfidenceFilterChange(value)}>
+              <SelectTrigger className="w-36 h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="text-xs">
+                  <div className="flex items-center gap-1">
+                    전체 문서
+                  </div>
+                </SelectItem>
+                <SelectItem value="needsReview" className="text-xs">
+                  <div className="flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3 text-orange-500" />
+                    확인 필요
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          )}
           {onClose && (
             <Button variant="outline" size="sm" onClick={onClose} className="h-8 w-8 p-0">
               <X className="h-4 w-4" />
@@ -301,15 +317,51 @@ export function DocumentTable({
             <TableRow className="bg-gray-50 hover:bg-gray-50">
               <TableHead className="w-16 py-2 text-xs font-semibold text-gray-700 text-center">순번</TableHead>
               <TableHead
-                className="w-32 py-2 text-xs font-semibold text-gray-700 cursor-pointer"
-                onClick={() => onSort?.('productId')}
+                className="w-32 py-2 text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100"
+                onClick={() => onSort?.('candidateId')}
               >
-                상품 ID
+                <div className="flex items-center gap-1">
+                  <span>상품 ID</span>
+                  {sortField === 'candidateId' && (
+                    sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  )}
+                  {sortField !== 'candidateId' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+                </div>
               </TableHead>
-              <TableHead className="py-2 text-xs font-semibold text-gray-700 cursor-pointer" onClick={() => onSort?.('productName')}>상품명</TableHead>
-              <TableHead className="w-32 py-2 text-xs font-semibold text-gray-700 text-center cursor-pointer" onClick={() => onSort?.('relevanceScore')}>
+              <TableHead 
+                className="py-2 text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                onClick={() => onSort?.('productName')}
+              >
+                <div className="flex items-center gap-1">
+                  <span>상품명</span>
+                  {sortField === 'productName' && (
+                    sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  )}
+                  {sortField !== 'productName' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="w-32 py-2 text-xs font-semibold text-gray-700 text-center cursor-pointer hover:bg-gray-100" 
+                onClick={() => onSort?.('score')}
+              >
                 <div className="flex items-center justify-center gap-1">
                   <span>평가</span>
+                  {sortField === 'score' && (
+                    sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  )}
+                  {sortField !== 'score' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="w-24 py-2 text-xs font-semibold text-gray-700 text-center cursor-pointer hover:bg-gray-100" 
+                onClick={() => onSort?.('confidence')}
+              >
+                <div className="flex items-center justify-center gap-1">
+                  <span>신뢰도</span>
+                  {sortField === 'confidence' && (
+                    sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  )}
+                  {sortField !== 'confidence' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
                 </div>
               </TableHead>
             </TableRow>
@@ -317,7 +369,7 @@ export function DocumentTable({
           <TableBody>
             {documents.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-12 text-gray-500">
+                <TableCell colSpan={5} className="text-center py-12 text-gray-500">
                   <div className="space-y-2">
                     <p className="text-base font-medium">등록된 정답 문서가 없습니다</p>
                     <p className="text-sm text-gray-400">상품을 추가해서 정답 문서를 만들어보세요</p>
@@ -325,8 +377,8 @@ export function DocumentTable({
                 </TableCell>
               </TableRow>
             ) : (
-              documents.map((doc, index) => {
-                const _status = getEvaluationStatus(doc.relevanceStatus)
+              filteredDocuments.map((doc, index) => {
+                const _status = getEvaluationStatus(doc.score)
                 const isExpanded = expandedDocument === doc.productId
                 
                 return (
@@ -362,17 +414,20 @@ export function DocumentTable({
                       
                       <TableCell className="py-2 text-center">
                         <div className="flex justify-center items-center gap-1">
-                          {([2,1,0,-1] as const).map((val) => {
-                            const current = extractScore(doc.evaluationReason) ?? -1
-                            const isActive = current === val
-                            const label = val === 2 ? '매우관련' : val === 1 ? '관련' : val === 0 ? '관련없음' : '미평가'
+                          {doc.score === null ? (
+                            <Badge variant="secondary" className="text-[10px] px-2 py-0">미평가</Badge>
+                          ) : (
+                            ([2,1,0,-1] as const).map((val) => {
+                              const current = doc.score
+                              const isActive = current === val
+                              const label = val === 2 ? '매우관련(2)' : val === 1 ? '관련(1)' : val === 0 ? '무관(0)' : '확인필요(-1)'
                             const colorClass = val === 2
                               ? 'bg-green-50 text-green-700 border-green-200'
                               : val === 1
                                 ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
                                 : val === 0
                                   ? 'bg-red-50 text-red-700 border-red-200'
-                                  : 'bg-gray-50 text-gray-700 border-gray-200'
+                                  : 'bg-orange-50 text-orange-700 border-orange-200'
                             return (
                               <Button
                                 key={val}
@@ -391,7 +446,23 @@ export function DocumentTable({
                                 {label}
                               </Button>
                             )
-                          })}
+                          }))
+                          }
+                        </div>
+                      </TableCell>
+                      
+                      <TableCell className="py-2 text-center">
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span className={`text-xs font-semibold ${getConfidenceColor(doc.confidence)}`}>
+                            {doc.confidence !== undefined && doc.confidence !== null ? 
+                              doc.confidence.toFixed(2) : '-'}
+                          </span>
+                          {(doc.confidence !== null && doc.confidence <= 0.8) && 
+                           doc.score === -1 && (
+                            <Badge variant="destructive" className="text-[8px] px-1 py-0 h-3">
+                              확인필요
+                            </Badge>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -399,7 +470,7 @@ export function DocumentTable({
                     {/* 아코디언 상세 정보 */}
                     {isExpanded && (
                       <TableRow>
-                        <TableCell colSpan={4} className="p-0">
+                        <TableCell colSpan={5} className="p-0">
                           <div className="bg-gray-50 border-t p-6 space-y-6">
                             {editingDocument === doc.productId ? (
                               /* 편집 모드 */
@@ -437,14 +508,14 @@ export function DocumentTable({
                                   <div className="flex gap-2">
                                     {([2,1,0,-1] as const).map((val) => {
                                       const isActive = editForm.score === val
-                                      const label = val === 2 ? '매우관련' : val === 1 ? '관련' : val === 0 ? '관련없음' : '미평가'
+                                      const label = val === 2 ? '매우관련(2)' : val === 1 ? '관련(1)' : val === 0 ? '무관(0)' : '확인필요(-1)'
                                       const colorClass = val === 2
                                         ? 'bg-green-50 text-green-700 border-green-200'
                                         : val === 1
                                           ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
                                           : val === 0
                                             ? 'bg-red-50 text-red-700 border-red-200'
-                                            : 'bg-gray-50 text-gray-700 border-gray-200'
+                                            : 'bg-orange-50 text-orange-700 border-orange-200'
                                       return (
                                         <Button
                                           key={val}
@@ -464,6 +535,30 @@ export function DocumentTable({
                                       )
                                     })}
                                   </div>
+                                </div>
+
+                                {/* 신뢰도 입력 (선택사항) */}
+                                <div className="mb-6">
+                                  <label className="text-sm font-semibold text-gray-700 block mb-2">
+                                    📊 신뢰도 (선택)
+                                  </label>
+                                  <div className="flex items-center gap-3">
+                                    <input
+                                      type="range"
+                                      min="0"
+                                      max="1"
+                                      step="0.01"
+                                      value={editForm.confidence || 1}
+                                      onChange={(e) => setEditForm({ ...editForm, confidence: parseFloat(e.target.value) })}
+                                      className="flex-1"
+                                    />
+                                    <span className="text-sm font-mono min-w-[50px] text-right">
+                                      {(editForm.confidence || 1).toFixed(2)}
+                                    </span>
+                                  </div>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    수동 평가 시 기본값은 1.00입니다. 불확실한 경우 낮게 설정하세요.
+                                  </p>
                                 </div>
 
                                 {/* 편집 액션 버튼들 */}
@@ -525,8 +620,21 @@ export function DocumentTable({
                                   <label className="text-sm font-semibold text-gray-700 block mb-2">
                                     🏷️ 평가
                                   </label>
-                                  <div className="flex items-center">
-                                    {getScoreBadge(extractScore(doc.evaluationReason))}
+                                  <div className="flex items-center gap-3">
+                                    {getScoreBadge(doc.score)}
+                                    {(doc.confidence !== undefined && doc.confidence !== null) && (
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-xs text-gray-500">신뢰도:</span>
+                                        <span className={`text-xs font-semibold ${getConfidenceColor(doc.confidence)}`}>
+                                          {doc.confidence.toFixed(2)}
+                                        </span>
+                                        {doc.confidence <= 0.8 && doc.score === -1 && (
+                                          <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
+                                            확인필요
+                                          </Badge>
+                                        )}
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
 

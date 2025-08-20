@@ -30,13 +30,14 @@ export function QueryGenerationDialog({
   progressText
 }: QueryGenerationDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [queryCount, setQueryCount] = useState<number>(EVALUATION_CONFIG.DEFAULT_QUERY_COUNT)
+  const [queryCount, setQueryCount] = useState<string>(String(EVALUATION_CONFIG.DEFAULT_QUERY_COUNT))
  
 
   const handleGenerate = async () => {
     try {
+      const count = parseInt(queryCount) || EVALUATION_CONFIG.DEFAULT_QUERY_COUNT
       const payload: GenerateQueriesRequest = {
-        count: queryCount,
+        count: count,
       }
       setIsOpen(false)
       await onGenerate(payload)
@@ -74,13 +75,13 @@ export function QueryGenerationDialog({
               <Label htmlFor="queryCount" className="text-sm font-medium">생성 개수</Label>
               <Input
                 id="queryCount"
-                type="number"
+                type="text"
                 value={queryCount}
-                onChange={(e) => setQueryCount(Number(e.target.value))}
-                min={1}
-                max={EVALUATION_CONFIG.MAX_QUERY_COUNT}
+                onChange={(e) => setQueryCount(e.target.value)}
+                placeholder="생성할 개수 입력"
                 className="text-sm mt-1"
               />
+              <p className="text-xs text-gray-500 mt-1">1 ~ {EVALUATION_CONFIG.MAX_QUERY_COUNT} 사이의 숫자를 입력하세요</p>
             </div>
           </div>
           <div className="flex justify-end gap-2">
@@ -95,7 +96,7 @@ export function QueryGenerationDialog({
             <Button 
               size="sm"
               onClick={handleGenerate}
-              disabled={isGenerating || isTaskRunning}
+              disabled={isGenerating || isTaskRunning || !queryCount || parseInt(queryCount) < 1 || parseInt(queryCount) > EVALUATION_CONFIG.MAX_QUERY_COUNT}
             >
               {isGenerating ? '시작중...' : '생성'}
             </Button>

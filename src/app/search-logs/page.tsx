@@ -181,12 +181,14 @@ export default function SearchLogs() {
             totalPages={totalPages}
             pageSize={pageSize}
             onPageSizeChange={handlePageSizeChange}
+            leftMessage={
+              isCapped ? (
+                <div className="text-[11px] text-gray-500 bg-gray-50 border border-gray-200 rounded px-2 py-1">
+                  검색 결과는 상위 10,000개까지만 제공합니다. 더 깊은 데이터는 기간/필터를 좁혀 조회하세요.
+                </div>
+              ) : undefined
+            }
           />
-          {isCapped && (
-            <div className="mt-1 mb-2 text-[11px] text-gray-500 bg-gray-50 border border-gray-200 rounded px-2 py-1">
-              검색 결과는 상위 10,000개까지만 제공합니다. 더 깊은 데이터는 기간/필터를 좁혀 조회하세요.
-            </div>
-          )}
           {error && (
             <div className="text-red-700 text-xs mb-2 p-2 bg-red-50 rounded border border-red-200">
               {error}
