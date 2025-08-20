@@ -18,6 +18,7 @@ interface DataTableToolbarProps {
   pageSizeOptions?: ReadonlyArray<number>
   className?: string
   disabled?: boolean
+  leftMessage?: React.ReactNode
 }
 
 export function DataTableToolbar({
@@ -34,6 +35,7 @@ export function DataTableToolbar({
   pageSizeOptions = PAGINATION.AVAILABLE_PAGE_SIZES,
   className = "",
   disabled = false,
+  leftMessage,
 }: DataTableToolbarProps) {
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -44,6 +46,7 @@ export function DataTableToolbar({
   return (
     <div className={`flex items-center justify-between mb-2 ${className}`}>
       <div className="flex items-center gap-2 w-full max-w-lg">
+        {leftMessage}
         {showSearch && (
           <>
             <Input

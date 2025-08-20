@@ -15,6 +15,7 @@ export default function AnswerSetManagementPage() {
   const [selectedQueryIds, setSelectedQueryIds] = useState<number[]>([])
   const [selectedQueryForDocuments, setSelectedQueryForDocuments] = useState<{ id: number, query: string } | null>(null)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [confidenceFilter, setConfidenceFilter] = useState<'all' | 'needsReview'>('all')
   
   // 페이지네이션 상태
   const [queryPage, setQueryPage] = useState(0)
@@ -187,6 +188,8 @@ export default function AnswerSetManagementPage() {
                   sortField={docSortField}
                   sortDirection={docSortDirection}
                   onSort={handleDocumentSortChange}
+                  confidenceFilter={confidenceFilter}
+                  onConfidenceFilterChange={setConfidenceFilter}
                 />
               )}
             </div>
