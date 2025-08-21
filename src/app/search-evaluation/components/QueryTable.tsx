@@ -90,10 +90,16 @@ export function QueryTable({
   }
 
   const handleGenerateCandidates = async () => {
-    return await generateCandidatesAsyncMutation.mutateAsync({ 
+    console.log('[QueryTable.handleGenerateCandidates] 호출됨')
+    console.log('[QueryTable.handleGenerateCandidates] selectedQueryIds:', selectedQueryIds)
+    
+    const result = await generateCandidatesAsyncMutation.mutateAsync({ 
       generateForAllQueries: false, 
       queryIds: selectedQueryIds 
     })
+    
+    console.log('[QueryTable.handleGenerateCandidates] mutateAsync 결과:', result)
+    return result
   }
 
   const handleEvaluateLlm = async () => {

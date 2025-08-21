@@ -107,6 +107,8 @@ export function ActionButtons({
   }
 
   const handleGenerateCandidates = async () => {
+    console.log('[handleGenerateCandidates] 시작, selectedQueryIds:', selectedQueryIds)
+    
     if (selectedQueryIds.length === 0) {
       toast({
         title: "선택 필요",
@@ -118,21 +120,49 @@ export function ActionButtons({
     
     try {
       setCandStarting(true)
+      console.log('[handleGenerateCandidates] candStarting = true 설정')
+      
       toast({
         title: '후보군 생성 시작',
         description: '백그라운드에서 후보군을 생성합니다.',
         variant: 'default'
       })
+      
+      console.log('[handleGenerateCandidates] onGenerateCandidates 호출 전')
       const response = await onGenerateCandidates()
-      candidateGenTask.startTask((response as any).taskId)
+      console.log('[handleGenerateCandidates] onGenerateCandidates 응답:', response)
+      console.log('[handleGenerateCandidates] response 타입:', typeof response)
+      console.log('[handleGenerateCandidates] response.taskId 타입:', typeof response?.taskId)
+      
+      // response 검증 및 로깅
+      if (!response || typeof response.taskId !== 'number') {
+        console.error('[handleGenerateCandidates] Invalid response:', response)
+        throw new Error('유효하지 않은 응답입니다')
+      }
+      
+      console.log('[handleGenerateCandidates] startTask 호출 전, taskId:', response.taskId)
+      candidateGenTask.startTask(response.taskId)
+      console.log('[handleGenerateCandidates] startTask 호출 후')
+      console.log('[handleGenerateCandidates] candidateGenTask.isRunning:', candidateGenTask.isRunning)
+      console.log('[handleGenerateCandidates] candidateGenTask.taskId:', candidateGenTask.taskId)
+      
+      // startTask 호출 후 즉시 false로 변경하지 않고, 
+      // isRunning이 true가 될 때까지 약간 대기
+      setTimeout(() => {
+        console.log('[handleGenerateCandidates] setTimeout 실행 - candStarting = false 설정')
+        console.log('[handleGenerateCandidates] 현재 candidateGenTask.isRunning:', candidateGenTask.isRunning)
+        console.log('[handleGenerateCandidates] 현재 candidateGenTask.taskId:', candidateGenTask.taskId)
+        setCandStarting(false)
+      }, 500)
+      
     } catch (error) {
+      console.error('[handleGenerateCandidates] 에러 발생:', error)
+      setCandStarting(false) // 에러 시에만 즉시 false
       toast({
         title: '후보군 생성 시작 실패',
         description: error instanceof Error ? error.message : '요청 중 오류가 발생했습니다.',
         variant: 'destructive'
       })
-    } finally {
-      setCandStarting(false)
     }
   }
 
@@ -182,6 +212,18 @@ export function ActionButtons({
   }
 
   if (compact) {
+    // 버튼 렌더링 전 상태 로그
+    console.log('[Button Render - Compact] 상태:', {
+      candStarting,
+      isRunning: candidateGenTask.isRunning,
+      taskId: candidateGenTask.taskId,
+      data: candidateGenTask.data,
+      progress: candidateGenTask.data?.progress,
+      selectedQueryIds: selectedQueryIds,
+      selectedCount: selectedQueryIds.length,
+      buttonDisabled: candStarting || candidateGenTask.isRunning || selectedQueryIds.length === 0
+    })
+    
     return (
       <div className="flex w-full justify-end items-center gap-2">
         {/* 4. 정답셋 자동생성 - 맨 왼쪽 */}
@@ -197,12 +239,17 @@ export function ActionButtons({
         <Button 
           size="sm" 
           variant="outline"
-          onClick={handleGenerateCandidates}
-          disabled={candidateGenTask.isRunning || selectedQueryIds.length === 0}
+          onClick={() => {
+            console.log('[Button onClick] 후보군 생성 버튼 클릭됨!')
+            console.log('[Button onClick] disabled 상태:', candStarting || candidateGenTask.isRunning || selectedQueryIds.length === 0)
+            console.log('[Button onClick] selectedQueryIds:', selectedQueryIds)
+            handleGenerateCandidates()
+          }}
+          disabled={candStarting || candidateGenTask.isRunning || selectedQueryIds.length === 0}
           className={candidateGenTask.isRunning ? 'flash-amber' : ''}
         >
           <RefreshCw className={`h-4 w-4 mr-1 ${(candStarting || candidateGenTask.isRunning) ? 'animate-spin' : ''}`} />
-          {candStarting
+          {(candStarting || (!candidateGenTask.data && candidateGenTask.isRunning))
             ? '시작중...'
             : candidateGenTask.isRunning 
               ? getTaskProgressText(candidateGenTask.data, '후보군 생성')
@@ -257,11 +304,13 @@ export function ActionButtons({
           size="sm" 
           variant="outline"
           onClick={handleGenerateCandidates}
-          disabled={candidateGenTask.isRunning || selectedQueryIds.length === 0}
+          disabled={candStarting || candidateGenTask.isRunning || selectedQueryIds.length === 0}
         >
-          <RefreshCw className={`h-4 w-4 mr-2 ${candidateGenTask.isRunning ? 'animate-spin' : ''}`} />
-          {candidateGenTask.isRunning 
-            ? getTaskProgressText(candidateGenTask.data, '후보군 생성')
+          <RefreshCw className={`h-4 w-4 mr-2 ${(candStarting || candidateGenTask.isRunning) ? 'animate-spin' : ''}`} />
+          {(candStarting || (!candidateGenTask.data && candidateGenTask.isRunning))
+            ? '시작중...'
+            : candidateGenTask.isRunning 
+              ? getTaskProgressText(candidateGenTask.data, '후보군 생성')
             : '후보군 생성'
           }
         </Button>
