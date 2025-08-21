@@ -88,12 +88,9 @@ class EvaluationService {
     return apiClient.put<void>(`${this.baseEndpoint}/candidates/${id}`, data)
   }
 
-  // 후보군 일괄 삭제
-  async deleteCandidates(ids: number[]): Promise<void> {
-    return apiClient.request<void>(`${this.baseEndpoint}/candidates`, {
-      method: 'DELETE',
-      body: JSON.stringify({ ids })
-    })
+  // 후보군 단일 삭제
+  async deleteCandidate(candidateId: number): Promise<void> {
+    return apiClient.delete<void>(`${this.baseEndpoint}/candidates/${candidateId}`)
   }
 
   // 2. 자동화 기능 (모두 비동기로만 제공)

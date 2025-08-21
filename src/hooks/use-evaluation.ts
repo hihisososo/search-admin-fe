@@ -208,7 +208,10 @@ export function useDeleteCandidates() {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: (ids: number[]) => evaluationService.deleteCandidates(ids),
+    mutationFn: async (ids: number[]) => {
+      // 각 ID에 대해 단일 삭제 API 호출
+      await Promise.all(ids.map(id => evaluationService.deleteCandidate(id)))
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: evaluationKeys.documents.all })
       queryClient.invalidateQueries({ queryKey: evaluationKeys.queries.all })
