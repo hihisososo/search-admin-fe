@@ -21,7 +21,7 @@ interface EditingState<T extends BaseDictionaryItem> {
 
 export function useDictionaryActions<T extends BaseDictionaryItem>({
   type,
-  environment: _environment,
+  environment,
   refetch
 }: UseDictionaryActionsParams): DictionaryActions<T> & { editingState: EditingState<T>, setEditingState: React.Dispatch<React.SetStateAction<EditingState<T>>> } {
   const config = getDictionaryConfig(type)
@@ -91,7 +91,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
           }
         : editingState.newItem
 
-      const response = await (service as any).create(payload)
+      const response = await (service as any).create(payload, environment)
       
       setEditingState(prev => ({ 
         ...prev, 
@@ -117,7 +117,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         variant: 'destructive'
       })
     }
-  }, [editingState.newItem, config, refetch, toast, validateItem])
+  }, [editingState.newItem, config, refetch, toast, validateItem, environment, type])
 
   const handleEdit = useCallback((item: T) => {
     setEditingState(prev => ({ 
@@ -160,7 +160,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
           }
         : editingState.editingItem
 
-      await (service as any).update(item.id, payload)
+      await (service as any).update(item.id, payload, environment)
       
       setEditingState(prev => ({ 
         ...prev, 
@@ -185,7 +185,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         variant: 'destructive'
       })
     }
-  }, [editingState.editingItem, config, refetch, toast, validateItem])
+  }, [editingState.editingItem, config, refetch, toast, validateItem, environment, type])
 
   const handleDelete = useCallback(async (id: number) => {
     if (!confirm(config.messages.deleteConfirm || '이 항목을 삭제하시겠습니까?')) {
@@ -199,7 +199,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         type === 'synonym' ? synonymDictionaryService :
         typoCorrectionDictionaryService
 
-      await service.delete(id)
+      await service.delete(id, environment)
       
       toast({
         title: '삭제 완료',
@@ -214,7 +214,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         variant: 'destructive'
       })
     }
-  }, [config, refetch, toast])
+  }, [config, refetch, toast, environment, type])
 
   const handleDeleteSelected = useCallback(async () => {
     const selectedCount = editingState.selectedIds.size
@@ -231,7 +231,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         type === 'synonym' ? synonymDictionaryService :
         typoCorrectionDictionaryService
 
-      await service.bulkDelete(Array.from(editingState.selectedIds))
+      await service.bulkDelete(Array.from(editingState.selectedIds), environment)
       
       setEditingState(prev => ({ 
         ...prev, 

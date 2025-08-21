@@ -24,27 +24,31 @@ abstract class BaseDictionaryService<T, CreateReq, UpdateReq> {
     return apiClient.get<DictionaryPageResponse<T>>(this.endpoint, params)
   }
 
-  async getById(id: number): Promise<T> {
-    return apiClient.get<T>(`${this.endpoint}/${id}`)
+  async getById(id: number, environment?: Environment): Promise<T> {
+    const url = environment ? `${this.endpoint}/${id}?environment=${environment}` : `${this.endpoint}/${id}`
+    return apiClient.get<T>(url)
   }
 
-  async create(data: CreateReq): Promise<T> {
-    return apiClient.post<T>(this.endpoint, data)
+  async create(data: CreateReq, environment?: Environment): Promise<T> {
+    const url = environment ? `${this.endpoint}?environment=${environment}` : this.endpoint
+    return apiClient.post<T>(url, data)
   }
 
-  async update(id: number, data: UpdateReq): Promise<T> {
-    return apiClient.put<T>(`${this.endpoint}/${id}`, data)
+  async update(id: number, data: UpdateReq, environment?: Environment): Promise<T> {
+    const url = environment ? `${this.endpoint}/${id}?environment=${environment}` : `${this.endpoint}/${id}`
+    return apiClient.put<T>(url, data)
   }
 
-  async delete(id: number): Promise<void> {
-    return apiClient.delete<void>(`${this.endpoint}/${id}`)
+  async delete(id: number, environment?: Environment): Promise<void> {
+    const url = environment ? `${this.endpoint}/${id}?environment=${environment}` : `${this.endpoint}/${id}`
+    return apiClient.delete<void>(url)
   }
 
-  async bulkDelete(ids: number[]): Promise<void> {
+  async bulkDelete(ids: number[], environment?: Environment): Promise<void> {
     if (!ids || ids.length === 0) return
     // 백엔드에서 bulk 삭제 미지원: 개별 삭제 반복 수행
     for (const id of ids) {
-      await this.delete(id as number)
+      await this.delete(id as number, environment)
     }
   }
 
