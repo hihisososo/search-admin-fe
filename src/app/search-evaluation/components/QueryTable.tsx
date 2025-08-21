@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DataTableToolbar } from "@/components/common/DataTableToolbar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Checkbox } from "@/components/ui/checkbox"
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { 
   useGenerateQueriesAsync,
   useGenerateCandidatesAsync,
@@ -62,8 +63,8 @@ export function QueryTable({
   onSearch,
   onRefresh: _onRefresh,
   isLoading,
-  sortField: _sortField,
-  sortDirection: _sortDirection,
+  sortField,
+  sortDirection,
   onSort
 }: QueryTableProps) {
   const [editingQuery, setEditingQuery] = useState<{ id: number, text: string } | null>(null)
@@ -195,12 +196,78 @@ export function QueryTable({
                 }}
               />
             </TableHead>
-            <TableHead className="py-2 text-xs font-semibold text-gray-700 cursor-pointer" onClick={() => onSort?.('query')}>쿼리</TableHead>
-            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-24">문서수</TableHead>
-            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-16 cursor-pointer" onClick={() => onSort?.('score2Count')}>매우관련</TableHead>
-            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-16 cursor-pointer" onClick={() => onSort?.('score1Count')}>관련</TableHead>
-            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-16 cursor-pointer" onClick={() => onSort?.('score0Count')}>관련없음</TableHead>
-            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-20 cursor-pointer" onClick={() => onSort?.('scoreMinus1Count')}>미평가</TableHead>
+            <TableHead 
+              className="py-2 text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+              onClick={() => onSort?.('query')}
+            >
+              <div className="flex items-center gap-1">
+                <span>쿼리</span>
+                {sortField === 'query' && (
+                  sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                )}
+                {sortField !== 'query' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+              </div>
+            </TableHead>
+            <TableHead 
+              className="py-2 text-xs font-semibold text-gray-700 text-center w-24 cursor-pointer hover:bg-gray-100"
+              onClick={() => onSort?.('documentCount')}
+            >
+              <div className="flex items-center justify-center gap-1">
+                <span>문서수</span>
+                {sortField === 'documentCount' && (
+                  sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                )}
+                {sortField !== 'documentCount' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+              </div>
+            </TableHead>
+            <TableHead 
+              className="py-2 text-xs font-semibold text-gray-700 text-center w-16 cursor-pointer hover:bg-gray-100" 
+              onClick={() => onSort?.('score2Count')}
+            >
+              <div className="flex items-center justify-center gap-1">
+                <span>매우관련</span>
+                {sortField === 'score2Count' && (
+                  sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                )}
+                {sortField !== 'score2Count' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+              </div>
+            </TableHead>
+            <TableHead 
+              className="py-2 text-xs font-semibold text-gray-700 text-center w-16 cursor-pointer hover:bg-gray-100" 
+              onClick={() => onSort?.('score1Count')}
+            >
+              <div className="flex items-center justify-center gap-1">
+                <span>관련</span>
+                {sortField === 'score1Count' && (
+                  sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                )}
+                {sortField !== 'score1Count' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+              </div>
+            </TableHead>
+            <TableHead 
+              className="py-2 text-xs font-semibold text-gray-700 text-center w-16 cursor-pointer hover:bg-gray-100" 
+              onClick={() => onSort?.('score0Count')}
+            >
+              <div className="flex items-center justify-center gap-1">
+                <span>관련없음</span>
+                {sortField === 'score0Count' && (
+                  sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                )}
+                {sortField !== 'score0Count' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+              </div>
+            </TableHead>
+            <TableHead 
+              className="py-2 text-xs font-semibold text-gray-700 text-center w-20 cursor-pointer hover:bg-gray-100" 
+              onClick={() => onSort?.('unevaluatedCount')}
+            >
+              <div className="flex items-center justify-center gap-1">
+                <span>미평가</span>
+                {sortField === 'unevaluatedCount' && (
+                  sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                )}
+                {sortField !== 'unevaluatedCount' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+              </div>
+            </TableHead>
             <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-20">검수필요</TableHead>
             <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-20">액션</TableHead>
           </TableRow>

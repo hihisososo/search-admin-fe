@@ -75,7 +75,7 @@ export default function DeployManagement() {
     loadInitialData()
   }, [fetchEnvironments, fetchDeploymentHistory])
 
-  // 색인 실행 (개발환경만)
+  // 색인 실행
   const handleReindex = async (environment: Environment, description?: string) => {
     if (environment.environmentType !== 'DEV') return
     
@@ -114,6 +114,18 @@ export default function DeployManagement() {
 
   // 배포 실행
   const handleDeploy = async (description?: string) => {
+    // 배포 확인 alert
+    const isConfirmed = window.confirm(
+      '⚠️ 운영 환경으로 배포하시겠습니까?\n\n' +
+      '이 작업은 실제 서비스에 영향을 줄 수 있습니다.\n' + 
+      '배포 전 개발 환경에서 충분한 테스트를 완료했는지 확인해주세요.'
+    )
+    
+    if (!isConfirmed) {
+      logger.info('배포 취소됨')
+      return
+    }
+    
     setIsDeploying(true)
     try {
       const response = await deploymentService.executeDeploy({ description })

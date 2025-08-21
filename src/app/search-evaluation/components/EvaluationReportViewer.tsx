@@ -1,8 +1,12 @@
 import { useState } from "react"
 import React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChevronDown, ChevronRight } from "lucide-react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+import { ChevronDown, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { EVALUATION_CONFIG } from "@/constants/evaluation"
+import { PaginationControls } from "./PaginationControls"
 import type { EvaluationReport } from "@/services/evaluation/types"
 
 interface EvaluationReportViewerProps {
@@ -72,6 +76,10 @@ export function EvaluationReportViewer({ report }: EvaluationReportViewerProps) 
 
 function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
   const [expandedMap, setExpandedMap] = useState<Record<number, boolean>>({})
+  const [currentPage, setCurrentPage] = useState(0) // 0-based for consistency
+  const [pageSize, setPageSize] = useState(10)
+  const [sortField, setSortField] = useState<string>('')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   
   console.log('[QueryDetailsView] 렌더링 시작', {
     queryDetailsCount: queryDetails.length,
@@ -87,100 +95,339 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
     setExpandedMap((prev) => ({ ...prev, [index]: !prev[index] }))
   }
 
+  // 정렬 핸들러
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortField(field)
+      setSortDirection('asc')
+    }
+    setCurrentPage(0) // 정렬 시 첫 페이지로
+  }
+
+  // 정렬된 데이터
+  const sortedDetails = React.useMemo(() => {
+    if (!sortField) return queryDetails
+    
+    return [...queryDetails].sort((a, b) => {
+      let aValue: any
+      let bValue: any
+      
+      switch(sortField) {
+        case 'query':
+          aValue = a.query || ''
+          bValue = b.query || ''
+          break
+        case 'ndcgAt20':
+          aValue = a.ndcgAt20 || 0
+          bValue = b.ndcgAt20 || 0
+          break
+        case 'recallAt300':
+          aValue = a.recallAt300 || 0
+          bValue = b.recallAt300 || 0
+          break
+        case 'relevantCount':
+          aValue = a.relevantCount || 0
+          bValue = b.relevantCount || 0
+          break
+        case 'retrievedCount':
+          aValue = a.retrievedCount || 0
+          bValue = b.retrievedCount || 0
+          break
+        case 'correctCount':
+          aValue = a.correctCount || 0
+          bValue = b.correctCount || 0
+          break
+        case 'missingCount':
+          aValue = a.missingDocuments?.length || 0
+          bValue = b.missingDocuments?.length || 0
+          break
+        case 'wrongCount':
+          aValue = a.wrongDocuments?.length || 0
+          bValue = b.wrongDocuments?.length || 0
+          break
+        default:
+          return 0
+      }
+      
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortDirection === 'asc' 
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue)
+      }
+      
+      return sortDirection === 'asc' 
+        ? aValue - bValue
+        : bValue - aValue
+    })
+  }, [queryDetails, sortField, sortDirection])
+
+  // 페이지네이션 계산
+  const totalPages = Math.ceil(sortedDetails.length / pageSize)
+  const startIndex = currentPage * pageSize
+  const endIndex = startIndex + pageSize
+  const currentItems = sortedDetails.slice(startIndex, endIndex)
+  const totalCount = sortedDetails.length
+
   React.useEffect(() => {
     console.log(`[QueryDetailsView] 렌더링 완료: ${(performance.now() - componentStartTime).toFixed(2)}ms`)
   })
 
   return (
-    <div className="space-y-2">
-      {queryDetails.map((detail: any, index: number) => {
-        if (index === 0) {
-          console.log(`[QueryDetailsView] 첫 번째 쿼리 렌더링 시작: ${detail.query}`)
-        } else if (index === queryDetails.length - 1) {
-          console.log(`[QueryDetailsView] 마지막 쿼리 렌더링: ${detail.query}`)
-        }
-        const expanded = !!expandedMap[index]
-        
-        
-        return (
-          <div key={index} className="border rounded-lg overflow-hidden">
-            <button
-              type="button"
-              onClick={() => toggleRow(index)}
-              className="w-full flex items-center justify-between p-3 hover:bg-gray-50"
-            >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="text-sm font-semibold text-gray-900 truncate">{detail.query}</div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {detail.ndcgAt20 !== undefined && (
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      detail.ndcgAt20 >= 0.8 ? 'bg-green-100 text-green-700' :
-                      detail.ndcgAt20 >= 0.6 ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      nDCG: {detail.ndcgAt20.toFixed(3)}
-                    </span>
-                  )}
-                  {detail.recallAt300 !== undefined && (
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      detail.recallAt300 >= 0.8 ? 'bg-green-100 text-green-700' :
-                      detail.recallAt300 >= 0.6 ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      Recall: {(detail.recallAt300 * 100).toFixed(1)}%
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center gap-2 ml-2">
-                {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-              </div>
-            </button>
-            {expanded && (
-              <div className="p-3 border-t space-y-4">
-                <div className="flex flex-wrap items-center justify-end gap-3 text-[11px] text-gray-600">
-                  <div>관련: {detail.relevantCount}</div>
-                  <div>검색: {detail.retrievedCount}</div>
-                  <div>정답: {detail.correctCount}</div>
-                </div>
-
-
-                {/* 누락/오답 영역 */}
-                {(detail.missingDocuments?.length > 0 || detail.wrongDocuments?.length > 0) ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                    {detail.missingDocuments?.length > 0 && (
-                      <DocumentList 
-                        documents={detail.missingDocuments}
-                        title="정답 누락"
-                        subtitle="실제 정답인데 검색 결과에 없음"
-                        bgColor="bg-red-50"
-                        textColor="text-red-800"
-                        subTextColor="text-red-600"
-                        moreTextColor="text-red-500"
-                        showAllDocs={true}
-                      />
-                    )}
-                    {detail.wrongDocuments?.length > 0 && (
-                      <DocumentList 
-                        documents={detail.wrongDocuments}
-                        title="오답 포함"
-                        subtitle="검색 결과에 포함되었으나 정답이 아님"
-                        bgColor="bg-yellow-50"
-                        textColor="text-yellow-800"
-                        subTextColor="text-yellow-600"
-                        moreTextColor="text-yellow-500"
-                        showAllDocs={true}
-                      />
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-xs text-gray-500">이슈 문서가 없습니다.</div>
-                )}
-              </div>
-            )}
+    <div className="space-y-3">
+      {/* 페이지 정보 및 크기 선택 */}
+      <div className="flex justify-between items-center">
+        <div className="flex-1"></div>
+        <div className="flex items-center gap-2">
+          <div className="text-xs text-gray-500">
+            전체 {Number(totalCount || 0).toLocaleString()}건 (페이지 {currentPage + 1}/{Math.max(totalPages || 1, 1)})
           </div>
-        )
-      })}
+          <Select
+            value={String(pageSize)}
+            onValueChange={(value) => {
+              setPageSize(Number(value))
+              setCurrentPage(0) // Reset to first page
+            }}
+          >
+            <SelectTrigger className="w-24 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="text-xs">
+              <SelectItem value="10" className="text-xs py-1">10</SelectItem>
+              <SelectItem value="20" className="text-xs py-1">20</SelectItem>
+              <SelectItem value="50" className="text-xs py-1">50</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* 데이터 테이블 */}
+      <div className="border border-gray-200 rounded-md overflow-hidden bg-white">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50 hover:bg-gray-50">
+              <TableHead 
+                className="py-2 text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort('query')}
+              >
+                <div className="flex items-center gap-1">
+                  <span>쿼리</span>
+                  {sortField === 'query' && (
+                    sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  )}
+                  {sortField !== 'query' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="py-2 text-xs font-semibold text-gray-700 text-center w-24 cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort('ndcgAt20')}
+              >
+                <div className="flex items-center justify-center gap-1">
+                  <span>nDCG@20</span>
+                  {sortField === 'ndcgAt20' && (
+                    sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  )}
+                  {sortField !== 'ndcgAt20' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="py-2 text-xs font-semibold text-gray-700 text-center w-24 cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort('recallAt300')}
+              >
+                <div className="flex items-center justify-center gap-1">
+                  <span>Recall@300</span>
+                  {sortField === 'recallAt300' && (
+                    sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  )}
+                  {sortField !== 'recallAt300' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="py-2 text-xs font-semibold text-gray-700 text-center w-20 cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort('relevantCount')}
+              >
+                <div className="flex items-center justify-center gap-1">
+                  <span>관련</span>
+                  {sortField === 'relevantCount' && (
+                    sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  )}
+                  {sortField !== 'relevantCount' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="py-2 text-xs font-semibold text-gray-700 text-center w-20 cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort('retrievedCount')}
+              >
+                <div className="flex items-center justify-center gap-1">
+                  <span>검색</span>
+                  {sortField === 'retrievedCount' && (
+                    sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  )}
+                  {sortField !== 'retrievedCount' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="py-2 text-xs font-semibold text-gray-700 text-center w-20 cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort('correctCount')}
+              >
+                <div className="flex items-center justify-center gap-1">
+                  <span>정답</span>
+                  {sortField === 'correctCount' && (
+                    sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  )}
+                  {sortField !== 'correctCount' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="py-2 text-xs font-semibold text-gray-700 text-center w-24 cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort('missingCount')}
+              >
+                <div className="flex items-center justify-center gap-1">
+                  <span>누락</span>
+                  {sortField === 'missingCount' && (
+                    sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  )}
+                  {sortField !== 'missingCount' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="py-2 text-xs font-semibold text-gray-700 text-center w-24 cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort('wrongCount')}
+              >
+                <div className="flex items-center justify-center gap-1">
+                  <span>오답</span>
+                  {sortField === 'wrongCount' && (
+                    sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  )}
+                  {sortField !== 'wrongCount' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+                </div>
+              </TableHead>
+              <TableHead className="w-10"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currentItems.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={9} className="text-center py-8 text-gray-500">
+                  <p className="text-sm">쿼리별 상세 데이터가 없습니다.</p>
+                </TableCell>
+              </TableRow>
+            ) : (
+              currentItems.map((detail: any, idx: number) => {
+                const actualIndex = startIndex + idx
+                const expanded = !!expandedMap[actualIndex]
+                
+                return (
+                  <React.Fragment key={actualIndex}>
+                    <TableRow 
+                      className={`hover:bg-gray-50 cursor-pointer ${expanded ? 'bg-blue-50' : ''}`}
+                      onClick={() => toggleRow(actualIndex)}
+                    >
+                      <TableCell className="py-2 text-xs font-medium">{detail.query}</TableCell>
+                      <TableCell className="py-2 text-center">
+                        <Badge 
+                          variant="outline"
+                          className={`text-xs ${
+                            detail.ndcgAt20 >= 0.8 ? 'bg-green-50 text-green-700 border-green-200' :
+                            detail.ndcgAt20 >= 0.6 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                            'bg-red-50 text-red-700 border-red-200'
+                          }`}
+                        >
+                          {detail.ndcgAt20?.toFixed(3) || '-'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="py-2 text-center">
+                        <Badge 
+                          variant="outline"
+                          className={`text-xs ${
+                            detail.recallAt300 >= 0.8 ? 'bg-green-50 text-green-700 border-green-200' :
+                            detail.recallAt300 >= 0.6 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                            'bg-red-50 text-red-700 border-red-200'
+                          }`}
+                        >
+                          {detail.recallAt300 ? `${(detail.recallAt300 * 100).toFixed(1)}%` : '-'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="py-2 text-center text-xs">{detail.relevantCount || 0}</TableCell>
+                      <TableCell className="py-2 text-center text-xs">{detail.retrievedCount || 0}</TableCell>
+                      <TableCell className="py-2 text-center text-xs">{detail.correctCount || 0}</TableCell>
+                      <TableCell className="py-2 text-center">
+                        <Badge variant="secondary" className="text-xs">
+                          {detail.missingDocuments?.length || 0}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="py-2 text-center">
+                        <Badge variant="secondary" className="text-xs">
+                          {detail.wrongDocuments?.length || 0}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="py-2 text-center">
+                        {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                      </TableCell>
+                    </TableRow>
+                    
+                    {expanded && (
+                      <TableRow>
+                        <TableCell colSpan={9} className="p-0">
+                          <div className="bg-gray-50 border-t p-4 space-y-4">
+                            {/* 누락/오답 영역 */}
+                            {(detail.missingDocuments?.length > 0 || detail.wrongDocuments?.length > 0) ? (
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                {detail.missingDocuments?.length > 0 && (
+                                  <DocumentList 
+                                    documents={detail.missingDocuments}
+                                    title="정답 누락"
+                                    subtitle="실제 정답인데 검색 결과에 없음"
+                                    bgColor="bg-red-50"
+                                    textColor="text-red-800"
+                                    subTextColor="text-red-600"
+                                    moreTextColor="text-red-500"
+                                    showAllDocs={true}
+                                  />
+                                )}
+                                {detail.wrongDocuments?.length > 0 && (
+                                  <DocumentList 
+                                    documents={detail.wrongDocuments}
+                                    title="오답 포함"
+                                    subtitle="검색 결과에 포함되었으나 정답이 아님"
+                                    bgColor="bg-yellow-50"
+                                    textColor="text-yellow-800"
+                                    subTextColor="text-yellow-600"
+                                    moreTextColor="text-yellow-500"
+                                    showAllDocs={true}
+                                  />
+                                )}
+                              </div>
+                            ) : (
+                              <div className="text-xs text-gray-500">이슈 문서가 없습니다.</div>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
+                )
+              })
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* 페이지네이션 */}
+      {totalPages > 1 && (
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalCount={totalCount}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(newSize: number) => {
+            setPageSize(newSize)
+            setCurrentPage(0)
+          }}
+        />
+      )}
     </div>
   )
 }

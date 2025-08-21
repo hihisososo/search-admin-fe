@@ -33,11 +33,11 @@ export const ENVIRONMENT_LABELS = {
     color: 'bg-blue-500'
   },
   DEV: {
-    label: '개발환경',
+    label: '개발',
     color: 'bg-green-500'
   },
   PROD: {
-    label: '운영환경',
+    label: '운영',
     color: 'bg-gray-800'
   }
 } as const 
