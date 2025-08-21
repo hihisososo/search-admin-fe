@@ -31,9 +31,9 @@ export function QueryTableRow({
   const score2Count = query.score2Count ?? 0
   const score1Count = query.score1Count ?? 0
   const score0Count = query.score0Count ?? 0
-  const scoreMinus1Count = query.scoreMinus1Count ?? 0
+  const unevaluatedCount = query.unevaluatedCount ?? 0
   const reviewed = query.reviewed === true
-  const humanReviewCount = reviewed ? 0 : scoreMinus1Count
+  const humanReviewCount = reviewed ? 0 : unevaluatedCount
 
   return (
     <TableRow 
@@ -70,7 +70,7 @@ export function QueryTableRow({
         <Badge variant="outline" className="text-xs bg-red-50 text-red-700 border-red-200">{score0Count}</Badge>
       </TableCell>
       <TableCell className="py-2 text-center">
-        <Badge variant="secondary" className="text-xs">{scoreMinus1Count}</Badge>
+        <Badge variant="secondary" className="text-xs">{unevaluatedCount}</Badge>
       </TableCell>
       <TableCell className="py-2 text-center">
         <Badge

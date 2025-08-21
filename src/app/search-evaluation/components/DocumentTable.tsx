@@ -271,35 +271,14 @@ export function DocumentTable({
   return (
       <div className="p-6 space-y-6">
       {/* 헤더 */}
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-start mb-3">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">
             "{query}"
           </h3>
-          {/* 상단 총 건수/페이지 문구 제거 */}
         </div>
         
         <div className="flex items-center gap-2">
-          {onConfidenceFilterChange && (
-            <Select value={confidenceFilter} onValueChange={(value: 'all' | 'needsReview') => onConfidenceFilterChange(value)}>
-              <SelectTrigger className="w-36 h-8 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all" className="text-xs">
-                  <div className="flex items-center gap-1">
-                    전체 문서
-                  </div>
-                </SelectItem>
-                <SelectItem value="needsReview" className="text-xs">
-                  <div className="flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3 text-orange-500" />
-                    확인 필요
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          )}
           {onClose && (
             <Button variant="outline" size="sm" onClick={onClose} className="h-8 w-8 p-0">
               <X className="h-4 w-4" />
@@ -307,8 +286,32 @@ export function DocumentTable({
           )}
         </div>
       </div>
-
-      {/* 페이지 크기 선택 제거 */}
+      
+      {/* 페이지 정보 및 크기 선택 */}
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex-1"></div>
+        <div className="flex items-center gap-2">
+          <div className="text-xs text-gray-500">
+            전체 {Number(totalCount || 0).toLocaleString()}건 (페이지 {currentPage + 1}/{Math.max(totalPages || 1, 1)})
+          </div>
+          {onPageSizeChange && (
+            <Select
+              value={String(pageSize ?? 20)}
+              onValueChange={(value) => onPageSizeChange(Number(value))}
+            >
+              <SelectTrigger className="w-24 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="text-xs">
+                <SelectItem value="10" className="text-xs py-1">10</SelectItem>
+                <SelectItem value="20" className="text-xs py-1">20</SelectItem>
+                <SelectItem value="50" className="text-xs py-1">50</SelectItem>
+                <SelectItem value="100" className="text-xs py-1">100</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        </div>
+      </div>
 
       {/* 데이터 테이블 */}
       <div className="border border-gray-200 rounded-md overflow-hidden bg-white">

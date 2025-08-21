@@ -16,19 +16,26 @@ export default function AnswerSetManagementPage() {
   const [selectedQueryForDocuments, setSelectedQueryForDocuments] = useState<{ id: number, query: string } | null>(null)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [confidenceFilter, setConfidenceFilter] = useState<'all' | 'needsReview'>('all')
+  const [searchQuery, setSearchQuery] = useState<string>('')
   
   // 페이지네이션 상태
   const [queryPage, setQueryPage] = useState(0)
   const [documentPage, setDocumentPage] = useState(0)
-  const [queryPageSize, setQueryPageSize] = useState(20)
-  const [documentPageSize, setDocumentPageSize] = useState(20)
+  const [queryPageSize, setQueryPageSize] = useState(10)
+  const [documentPageSize, setDocumentPageSize] = useState(10)
   const [querySortField, setQuerySortField] = useState<string>('updatedAt')
   const [querySortDirection, setQuerySortDirection] = useState<'asc' | 'desc'>('desc')
   const [docSortField, setDocSortField] = useState<string>('relevanceScore')
   const [docSortDirection, setDocSortDirection] = useState<'asc' | 'desc'>('desc')
 
   // API 호출
-  const queriesQuery = useEvaluationQueries({ page: queryPage, size: queryPageSize, sort: querySortField, order: querySortDirection })
+  const queriesQuery = useEvaluationQueries({ 
+    page: queryPage, 
+    size: queryPageSize, 
+    sort: querySortField, 
+    order: querySortDirection,
+    query: searchQuery 
+  })
   const documentsQuery = useEvaluationDocuments(
     selectedQueryForDocuments?.id || null, 
     { page: documentPage, size: documentPageSize, sort: docSortField, order: docSortDirection }
@@ -136,6 +143,13 @@ export default function AnswerSetManagementPage() {
     queriesQuery.refetch()
   }
 
+  // 검색 핸들러
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    setQueryPage(0) // 검색 시 첫 페이지로 이동
+    setSelectedQueryIds([]) // 선택 초기화
+  }
+
   return (
     <div className="p-6">
       <div className="max-w-7xl mx-auto space-y-4">
@@ -157,7 +171,7 @@ export default function AnswerSetManagementPage() {
             onPageSizeChange={handleQueryPageSizeChange}
             onRefresh={handleRefresh}
             isLoading={queriesQuery.isLoading}
-            onSearch={() => { /* TODO: API 지원 시 검색 연동 */ }}
+            onSearch={handleSearch}
             sortField={querySortField}
             sortDirection={querySortDirection}
             onSort={handleQuerySortChange}

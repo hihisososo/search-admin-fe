@@ -8,6 +8,7 @@ export interface EvaluationQuery {
   score1Count: number
   score0Count: number
   scoreMinus1Count: number
+  unevaluatedCount: number
   createdAt: string
   updatedAt: string
   // 사람 검수 완료 여부 (백엔드가 제공하는 경우 표시용)

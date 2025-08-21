@@ -28,7 +28,23 @@ class EvaluationService {
   
   // 쿼리 리스트 조회 (왼쪽 패널)
   async getQueries(params: PageParams = {}): Promise<EvaluationQueryListResponse> {
-    return apiClient.get<EvaluationQueryListResponse>(`${this.baseEndpoint}/queries`, params)
+    // 백엔드 API 파라미터 매핑
+    const apiParams: any = {
+      page: params.page,
+      size: params.size,
+      sortBy: params.sort, // sort -> sortBy
+      sortDirection: params.order?.toUpperCase() || 'DESC', // order -> sortDirection (대문자로)
+      query: params.query // 검색어 추가
+    }
+    
+    // undefined 값 제거
+    Object.keys(apiParams).forEach(key => {
+      if (apiParams[key] === undefined || apiParams[key] === '') {
+        delete apiParams[key]
+      }
+    })
+    
+    return apiClient.get<EvaluationQueryListResponse>(`${this.baseEndpoint}/queries`, apiParams)
   }
 
   // 쿼리 생성
