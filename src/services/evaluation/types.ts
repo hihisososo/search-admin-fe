@@ -37,6 +37,7 @@ export interface EvaluationDocument {
   relevanceScore: number | null  // 2, 1, 0, -1, null
   evaluationReason: string
   confidence?: number | null // 0.0 ~ 1.0, NULL if not evaluated
+  expandedSynonyms?: string[] // 동의어 확장 결과
 }
 
 export interface EvaluationDocumentListResponse {
@@ -141,7 +142,7 @@ export interface EvaluationExecutionResult {
 
 export interface UpdateCandidateRequest {
   relevanceScore: number | null  // -1 ~ 2
-  evaluationReason: string
+  evaluationReason?: string  // 선택사항
   confidence?: number  // 0.0 ~ 1.0, 선택사항 (기본값 1.0)
 }
 

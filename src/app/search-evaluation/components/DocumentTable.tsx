@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 // removed add-document dialog imports
 // select 제거: 버튼형 세그먼트로 대체
 import { cn } from "@/lib/utils"
-import { Edit, Trash2, ChevronDown, ChevronUp, X, Save, RotateCcw, AlertCircle, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
+import { Edit, Trash2, ChevronDown, ChevronUp, X, Save, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { 
   // useProductSearch, (removed add-document feature)
   // useAddDocumentMapping,
@@ -57,7 +57,7 @@ export function DocumentTable({
   sortDirection,
   onSort,
   confidenceFilter = 'all',
-  onConfidenceFilterChange
+  onConfidenceFilterChange: _onConfidenceFilterChange
 }: DocumentTableProps) {
   // removed add-document dialog states
   const [expandedDocument, setExpandedDocument] = useState<string | null>(null)
@@ -221,7 +221,7 @@ export function DocumentTable({
         id: doc.id,
         data: {
           relevanceScore: relevanceScore,
-          evaluationReason: doc.evaluationReason || '',
+          evaluationReason: doc.evaluationReason || undefined, // 선택적으로 처리
           confidence: 1.0 // 수동 평가 시 기본값
         }
       })
@@ -640,6 +640,22 @@ export function DocumentTable({
                                     )}
                                   </div>
                                 </div>
+
+                                {/* 동의어 확장 결과 */}
+                                {doc.expandedSynonyms && doc.expandedSynonyms.length > 0 && (
+                                  <div className="mb-6">
+                                    <label className="text-sm font-semibold text-gray-700 block mb-2">
+                                      🔤 동의어 확장
+                                    </label>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {doc.expandedSynonyms.map((synonym, idx) => (
+                                        <Badge key={idx} variant="secondary" className="text-xs">
+                                          {synonym}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
 
                                 {/* 읽기 모드 액션 버튼들 */}
                                 <div className="flex gap-2 pt-2 border-t">
