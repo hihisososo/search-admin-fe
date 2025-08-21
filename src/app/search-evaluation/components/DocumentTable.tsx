@@ -605,20 +605,6 @@ export function DocumentTable({
                                     <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
                                       {formatText(doc.productSpecs) || '스펙 정보가 없습니다'}
                                     </div>
-                                    
-                                    {/* 동의어 확장 결과 */}
-                                    {doc.expandedSynonyms && doc.expandedSynonyms.length > 0 && (
-                                      <div className="mt-3 pt-3 border-t border-gray-200">
-                                        <div className="text-xs text-gray-600 mb-2">🔤 동의어 확장:</div>
-                                        <div className="flex flex-wrap gap-1.5">
-                                          {doc.expandedSynonyms.map((synonym, idx) => (
-                                            <Badge key={idx} variant="secondary" className="text-xs">
-                                              {synonym}
-                                            </Badge>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
                                   </div>
                                 </div>
 
@@ -653,7 +639,23 @@ export function DocumentTable({
                                       </div>
                                     )}
                                   </div>
-                                }
+                                </div>
+
+                                {/* 동의어 확장 결과 */}
+                                {doc.expandedSynonyms && doc.expandedSynonyms.length > 0 && (
+                                  <div className="mb-6">
+                                    <label className="text-sm font-semibold text-gray-700 block mb-2">
+                                      🔤 동의어 확장
+                                    </label>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {doc.expandedSynonyms.map((synonym, idx) => (
+                                        <Badge key={idx} variant="secondary" className="text-xs">
+                                          {synonym}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
 
                                 {/* 읽기 모드 액션 버튼들 */}
                                 <div className="flex gap-2 pt-2 border-t">
