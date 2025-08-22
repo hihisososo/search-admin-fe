@@ -10,7 +10,7 @@ interface AsyncTaskHookOptions {
 }
 
 export function useAsyncTask(
-  taskType: 'QUERY_GENERATION' | 'CANDIDATE_GENERATION' | 'LLM_EVALUATION',
+  taskType: 'QUERY_GENERATION' | 'CANDIDATE_GENERATION' | 'LLM_EVALUATION' | 'EVALUATION',
   options: AsyncTaskHookOptions = {}
 ) {
   const [taskId, setTaskId] = useState<number | null>(null)

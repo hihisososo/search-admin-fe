@@ -345,14 +345,14 @@ export function DocumentTable({
               </TableHead>
               <TableHead 
                 className="w-32 py-2 text-xs font-semibold text-gray-700 text-center cursor-pointer hover:bg-gray-100" 
-                onClick={() => onSort?.('score')}
+                onClick={() => onSort?.('relevanceScore')}
               >
                 <div className="flex items-center justify-center gap-1">
                   <span>평가</span>
-                  {sortField === 'score' && (
+                  {sortField === 'relevanceScore' && (
                     sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                   )}
-                  {sortField !== 'score' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+                  {sortField !== 'relevanceScore' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
                 </div>
               </TableHead>
               <TableHead 
@@ -478,6 +478,18 @@ export function DocumentTable({
                             {editingDocument === doc.productId ? (
                               /* 편집 모드 */
                               <>
+                                {/* 카테고리 정보 */}
+                                <div className="mb-6">
+                                  <label className="text-sm font-semibold text-gray-700 block mb-3">
+                                    📂 카테고리
+                                  </label>
+                                  <div className="bg-blue-50 border-l-4 border-blue-300 p-4 rounded-r">
+                                    <div className="text-sm text-gray-700 leading-relaxed">
+                                      {doc.productCategory || '카테고리 정보가 없습니다'}
+                                    </div>
+                                  </div>
+                                </div>
+
                                 {/* 상품 스펙 (별도 줄, 읽기 전용) */}
                                 <div className="mb-6">
                                   <label className="text-sm font-semibold text-gray-700 block mb-3">
@@ -596,6 +608,18 @@ export function DocumentTable({
                             ) : (
                               /* 읽기 모드 */
                               <>
+                                {/* 카테고리 정보 */}
+                                <div className="mb-6">
+                                  <label className="text-sm font-semibold text-gray-700 block mb-3">
+                                    📂 카테고리
+                                  </label>
+                                  <div className="bg-blue-50 border-l-4 border-blue-300 p-4 rounded-r">
+                                    <div className="text-sm text-gray-700 leading-relaxed">
+                                      {doc.productCategory || '카테고리 정보가 없습니다'}
+                                    </div>
+                                  </div>
+                                </div>
+
                                 {/* 상품 스펙 (별도 줄, 읽기 전용) */}
                                 <div className="mb-6">
                                   <label className="text-sm font-semibold text-gray-700 block mb-3">

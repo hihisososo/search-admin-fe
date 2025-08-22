@@ -17,9 +17,11 @@ import {
 } from "@/components/ui/dialog"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer"
 import { Play, RefreshCw, Plus, Trash2 } from "lucide-react"
-import { useEvaluationReports, useEvaluateAsync, useDeleteEvaluationReport, useTaskStatus } from "@/hooks/use-evaluation"
+import { useEvaluationReports, useEvaluateAsync, useDeleteEvaluationReport } from "@/hooks/use-evaluation"
+import { useAsyncTask } from "@/hooks/use-async-task"
 import { evaluationService } from "@/services/evaluation/api"
-import { formatDate } from "@/utils/evaluation-helpers"
+import { formatDate, getTaskProgressText } from "@/utils/evaluation-helpers"
+import { useToast } from "@/components/ui/use-toast"
 import { PerformanceScore } from "../components/PerformanceScore"
 import { EvaluationReportViewer } from "../components/EvaluationReportViewer"
 import type { EvaluationReport } from "@/services/evaluation/types"
@@ -30,72 +32,81 @@ export default function EvaluationExecutionPage() {
   const [selectedReport, setSelectedReport] = useState<EvaluationReport | null>(null)
   const [isReportDrawerOpen, setIsReportDrawerOpen] = useState(false)
   const [isLoadingReport, setIsLoadingReport] = useState(false)
-  const [currentTaskId, setCurrentTaskId] = useState<number | null>(null)
-  const [isTaskRunning, setIsTaskRunning] = useState(false)
+  const [isStarting, setIsStarting] = useState(false)
+  const { toast } = useToast()
 
   // API 훅들
   const reportsQuery = useEvaluationReports()
   const evaluateMutation = useEvaluateAsync()
   const deleteReportMutation = useDeleteEvaluationReport()
-  const taskStatusQuery = useTaskStatus(currentTaskId)
+  
+  // 비동기 작업 관리
+  const evaluationTask = useAsyncTask('EVALUATION', {
+    onComplete: (result) => {
+      // 리포트 목록 새로고침
+      reportsQuery.refetch()
+      
+      // 평가 결과 확인
+      const evalResult = result ? JSON.parse(result) : null
+      if (evalResult?.reportId) {
+        toast({
+          title: "평가 완료",
+          description: `리포트 ID: ${evalResult.reportId}, nDCG@20: ${evalResult.ndcg20?.toFixed(3) || 'N/A'}`,
+          variant: "success"
+        })
+      } else {
+        toast({
+          title: "평가 완료",
+          description: "리포트를 확인해주세요.",
+          variant: "success"
+        })
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "평가 실패",
+        description: error,
+        variant: "destructive"
+      })
+    }
+  })
 
   // 평가 실행 (비동기)
   const executeEvaluation = async () => {
     if (!reportTitle.trim()) return
 
     try {
+      setIsStarting(true)
       const result = await evaluateMutation.mutateAsync({ 
         reportName: reportTitle.trim()
       })
       
-      // 작업 ID 저장 및 상태 추적 시작
-      setCurrentTaskId(result.taskId)
-      setIsTaskRunning(true)
+      // 작업 추적 시작
+      evaluationTask.startTask(result.taskId)
       
       // 다이얼로그 닫기
       setIsDialogOpen(false)
       setReportTitle("")
       
-      // 진행중 알림
-      alert(`평가가 시작되었습니다!\n\n작업 ID: ${result.taskId}\n진행 상태를 확인하세요.`)
+      // 성공 토스트
+      toast({
+        title: "평가 시작",
+        description: `작업 ID: ${result.taskId}로 평가를 시작했습니다.`,
+        variant: "default"
+      })
+      
+      setIsStarting(false)
     } catch (error) {
+      setIsStarting(false)
       console.error('❌ 평가 실행 실패:', error)
-      alert('평가 실행에 실패했습니다. 다시 시도해주세요.')
+      toast({
+        title: "평가 실행 실패",
+        description: error instanceof Error ? error.message : '평가 실행에 실패했습니다.',
+        variant: "destructive"
+      })
     }
   }
 
-  // 비동기 작업 상태 확인
-  React.useEffect(() => {
-    if (taskStatusQuery.data) {
-      const status = taskStatusQuery.data
-      
-      if (status.status === 'COMPLETED') {
-        setIsTaskRunning(false)
-        setCurrentTaskId(null)
-        
-        // 리포트 목록 새로고침
-        reportsQuery.refetch()
-        
-        // 평가 결과 확인
-        const evalResult = status.result as any
-        if (evalResult?.reportId) {
-          alert(`평가가 완료되었습니다!\n\n` +
-            `리포트 ID: ${evalResult.reportId}\n` +
-            `총 쿼리: ${evalResult.totalQueries}개\n` +
-            `nDCG@20: ${evalResult.ndcg20?.toFixed(3) || 'N/A'}\n` +
-            `Recall@300: ${evalResult.recall300?.toFixed(3) || 'N/A'}`)
-        } else {
-          alert(`평가가 완료되었습니다!\n\n리포트를 확인해주세요.`)
-        }
-      } else if (status.status === 'FAILED') {
-        setIsTaskRunning(false)
-        setCurrentTaskId(null)
-        
-        // 실패 알림
-        alert(`평가 실행에 실패했습니다.\n\n오류: ${status.errorMessage || '알 수 없는 오류'}`)
-      }
-    }
-  }, [taskStatusQuery.data, reportsQuery])
 
   // 리포트 상세 보기  
   const viewReport = async (reportId: number) => {
@@ -130,7 +141,11 @@ export default function EvaluationExecutionPage() {
       
     } catch (error) {
       console.error('❌ 리포트 조회 실패:', error)
-      alert('리포트 조회에 실패했습니다. 다시 시도해주세요.')
+      toast({
+        title: "리포트 조회 실패",
+        description: "리포트 조회에 실패했습니다. 다시 시도해주세요.",
+        variant: "destructive"
+      })
       setIsReportDrawerOpen(false)
     } finally {
       setIsLoadingReport(false)
@@ -153,10 +168,18 @@ export default function EvaluationExecutionPage() {
         setSelectedReport(null)
       }
 
-      alert('리포트가 삭제되었습니다.')
+      toast({
+        title: "리포트 삭제 완료",
+        description: "리포트가 삭제되었습니다.",
+        variant: "success"
+      })
     } catch (error) {
       console.error('❌ 리포트 삭제 실패:', error)
-      alert('리포트 삭제에 실패했습니다. 다시 시도해주세요.')
+      toast({
+        title: "리포트 삭제 실패",
+        description: "리포트 삭제에 실패했습니다. 다시 시도해주세요.",
+        variant: "destructive"
+      })
     }
   }
 
@@ -205,13 +228,18 @@ export default function EvaluationExecutionPage() {
                 </Button>
                 <Button 
                   onClick={executeEvaluation}
-                  disabled={!reportTitle.trim() || evaluateMutation.isPending}
+                  disabled={!reportTitle.trim() || isStarting || evaluationTask.isRunning}
                   className="flex items-center gap-2"
                 >
-                  {evaluateMutation.isPending ? (
+                  {isStarting ? (
                     <>
                       <RefreshCw className="h-4 w-4 animate-spin" />
-                      실행중...
+                      시작중...
+                    </>
+                  ) : evaluationTask.isRunning ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      {getTaskProgressText(evaluationTask.data, '평가 진행중')}
                     </>
                   ) : (
                     <>
@@ -226,29 +254,29 @@ export default function EvaluationExecutionPage() {
         </div>
 
         {/* 진행 중인 작업 표시 */}
-        {isTaskRunning && taskStatusQuery.data && (
+        {evaluationTask.isRunning && evaluationTask.data && (
           <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <RefreshCw className="h-4 w-4 animate-spin text-blue-600" />
                 <span className="text-sm font-medium text-blue-900">
-                  평가 진행 중... (작업 ID: {currentTaskId})
+                  {getTaskProgressText(evaluationTask.data, '평가 진행 중')}
                 </span>
               </div>
               <Badge className="bg-blue-100 text-blue-800 text-xs">
-                {taskStatusQuery.data.status}
+                {evaluationTask.data.status}
               </Badge>
             </div>
-            {taskStatusQuery.data.progress && (
+            {evaluationTask.data.progress && (
               <div className="mt-2">
                 <div className="w-full bg-blue-100 rounded-full h-2">
                   <div 
                     className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${taskStatusQuery.data.progress}%` }}
+                    style={{ width: `${evaluationTask.data.progress}%` }}
                   />
                 </div>
                 <p className="text-xs text-blue-700 mt-1">
-                  {taskStatusQuery.data.progress}% 완료
+                  {evaluationTask.data.progress}% 완료
                 </p>
               </div>
             )}
