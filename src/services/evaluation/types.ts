@@ -34,6 +34,7 @@ export interface EvaluationDocument {
   productId: string
   productName: string
   productSpecs: string
+  productCategory?: string // 상품 카테고리
   relevanceScore: number | null  // 2, 1, 0, -1, null
   evaluationReason: string
   confidence?: number | null // 0.0 ~ 1.0, NULL if not evaluated

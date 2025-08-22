@@ -95,14 +95,15 @@ export function ActionButtons({
       })
       const response = await onGenerateQueries(data)
       queryGenTask.startTask(response.taskId)
+      // 작업이 성공적으로 시작되면 queryStarting을 false로 설정
+      setQueryStarting(false)
     } catch (error) {
+      setQueryStarting(false) // 에러 시에도 false로 설정
       toast({
         title: '정답셋 자동생성 시작 실패',
         description: error instanceof Error ? error.message : '요청 중 오류가 발생했습니다.',
         variant: 'destructive'
       })
-    } finally {
-      setQueryStarting(false)
     }
   }
 
@@ -146,18 +147,14 @@ export function ActionButtons({
       console.log('[handleGenerateCandidates] candidateGenTask.isRunning:', candidateGenTask.isRunning)
       console.log('[handleGenerateCandidates] candidateGenTask.taskId:', candidateGenTask.taskId)
       
-      // startTask 호출 후 즉시 false로 변경하지 않고, 
-      // isRunning이 true가 될 때까지 약간 대기
-      setTimeout(() => {
-        console.log('[handleGenerateCandidates] setTimeout 실행 - candStarting = false 설정')
-        console.log('[handleGenerateCandidates] 현재 candidateGenTask.isRunning:', candidateGenTask.isRunning)
-        console.log('[handleGenerateCandidates] 현재 candidateGenTask.taskId:', candidateGenTask.taskId)
-        setCandStarting(false)
-      }, 500)
+      // 작업이 성공적으로 시작되면 candStarting을 false로 설정
+      // isRunning은 다음 렌더링에서 true가 됨
+      setCandStarting(false)
+      console.log('[handleGenerateCandidates] candStarting = false 설정 완료')
       
     } catch (error) {
       console.error('[handleGenerateCandidates] 에러 발생:', error)
-      setCandStarting(false) // 에러 시에만 즉시 false
+      setCandStarting(false) // 에러 시에도 false로 설정
       toast({
         title: '후보군 생성 시작 실패',
         description: error instanceof Error ? error.message : '요청 중 오류가 발생했습니다.',
@@ -185,14 +182,15 @@ export function ActionButtons({
       })
       const response = await onEvaluateLlm()
       llmEvalTask.startTask((response as any).taskId)
+      // 작업이 성공적으로 시작되면 llmStarting을 false로 설정
+      setLlmStarting(false)
     } catch (error) {
+      setLlmStarting(false) // 에러 시에도 false로 설정
       toast({
         title: "자동평가 시작 실패",
         description: error instanceof Error ? error.message : '요청 중 오류가 발생했습니다.',
         variant: "destructive"
       })
-    } finally {
-      setLlmStarting(false)
     }
   }
 
