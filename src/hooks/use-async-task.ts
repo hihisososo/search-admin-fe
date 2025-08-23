@@ -79,23 +79,12 @@ export function useAsyncTask(
   }, [taskId, taskStatus.data?.status, taskType, queryClient, completedTaskIds, onComplete, onError, shouldRefreshData])
 
   const startTask = (newTaskId: number) => {
-    console.log(`[useAsyncTask.startTask] 호출됨 - taskType: ${taskType}, newTaskId:`, newTaskId)
-    console.log(`[useAsyncTask.startTask] 현재 taskId:`, taskId)
-    
     if (!newTaskId || typeof newTaskId !== 'number') {
       console.error('[useAsyncTask.startTask] Invalid taskId:', newTaskId)
       return
     }
-    
-    console.log(`[useAsyncTask.startTask] taskId 설정 전 - 현재 isRunning:`, !!taskId)
     setTaskId(newTaskId)
-    console.log(`[useAsyncTask.startTask] taskId 설정 후 (다음 렌더링에 반영됨)`)
   }
-
-  // taskId 변경 감지 로그
-  useEffect(() => {
-    console.log(`[useAsyncTask] taskId 변경됨:`, taskId, `isRunning:`, !!taskId, `taskType:`, taskType)
-  }, [taskId, taskType])
 
   const isRunning = !!taskId
   const progress = taskStatus.data?.progress || 0

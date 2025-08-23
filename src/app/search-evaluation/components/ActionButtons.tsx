@@ -108,8 +108,6 @@ export function ActionButtons({
   }
 
   const handleGenerateCandidates = async () => {
-    console.log('[handleGenerateCandidates] 시작, selectedQueryIds:', selectedQueryIds)
-    
     if (selectedQueryIds.length === 0) {
       toast({
         title: "선택 필요",
@@ -121,42 +119,18 @@ export function ActionButtons({
     
     try {
       setCandStarting(true)
-      console.log('[handleGenerateCandidates] candStarting = true 설정')
-      
       toast({
         title: '후보군 생성 시작',
         description: '백그라운드에서 후보군을 생성합니다.',
         variant: 'default'
       })
-      
-      console.log('[handleGenerateCandidates] onGenerateCandidates 호출 전')
       const response = await onGenerateCandidates()
-      console.log('[handleGenerateCandidates] onGenerateCandidates 응답:', response)
-      console.log('[handleGenerateCandidates] response 타입:', typeof response)
-      console.log('[handleGenerateCandidates] response.taskId 타입:', typeof response?.taskId)
-      
-      // response 검증 및 로깅
-      if (!response || typeof response.taskId !== 'number') {
-        console.error('[handleGenerateCandidates] Invalid response:', response)
-        throw new Error('유효하지 않은 응답입니다')
-      }
-      
-      console.log('[handleGenerateCandidates] startTask 호출 전, taskId:', response.taskId)
       candidateGenTask.startTask(response.taskId)
-      console.log('[handleGenerateCandidates] startTask 호출 후')
-      console.log('[handleGenerateCandidates] candidateGenTask.isRunning:', candidateGenTask.isRunning)
-      console.log('[handleGenerateCandidates] candidateGenTask.taskId:', candidateGenTask.taskId)
-      
-      // 작업이 성공적으로 시작되면 candStarting을 false로 설정
-      // isRunning은 다음 렌더링에서 true가 됨
       setCandStarting(false)
-      console.log('[handleGenerateCandidates] candStarting = false 설정 완료')
-      
     } catch (error) {
-      console.error('[handleGenerateCandidates] 에러 발생:', error)
-      setCandStarting(false) // 에러 시에도 false로 설정
+      setCandStarting(false)
       toast({
-        title: '후보군 생성 시작 실패',
+        title: '후보군 생성 시양 실패',
         description: error instanceof Error ? error.message : '요청 중 오류가 발생했습니다.',
         variant: 'destructive'
       })
@@ -182,10 +156,9 @@ export function ActionButtons({
       })
       const response = await onEvaluateLlm()
       llmEvalTask.startTask((response as any).taskId)
-      // 작업이 성공적으로 시작되면 llmStarting을 false로 설정
       setLlmStarting(false)
     } catch (error) {
-      setLlmStarting(false) // 에러 시에도 false로 설정
+      setLlmStarting(false)
       toast({
         title: "자동평가 시작 실패",
         description: error instanceof Error ? error.message : '요청 중 오류가 발생했습니다.',
@@ -210,17 +183,6 @@ export function ActionButtons({
   }
 
   if (compact) {
-    // 버튼 렌더링 전 상태 로그
-    console.log('[Button Render - Compact] 상태:', {
-      candStarting,
-      isRunning: candidateGenTask.isRunning,
-      taskId: candidateGenTask.taskId,
-      data: candidateGenTask.data,
-      progress: candidateGenTask.data?.progress,
-      selectedQueryIds: selectedQueryIds,
-      selectedCount: selectedQueryIds.length,
-      buttonDisabled: candStarting || candidateGenTask.isRunning || selectedQueryIds.length === 0
-    })
     
     return (
       <div className="flex w-full justify-end items-center gap-2">
@@ -237,12 +199,7 @@ export function ActionButtons({
         <Button 
           size="sm" 
           variant="outline"
-          onClick={() => {
-            console.log('[Button onClick] 후보군 생성 버튼 클릭됨!')
-            console.log('[Button onClick] disabled 상태:', candStarting || candidateGenTask.isRunning || selectedQueryIds.length === 0)
-            console.log('[Button onClick] selectedQueryIds:', selectedQueryIds)
-            handleGenerateCandidates()
-          }}
+          onClick={handleGenerateCandidates}
           disabled={candStarting || candidateGenTask.isRunning || selectedQueryIds.length === 0}
           className={candidateGenTask.isRunning ? 'flash-amber' : ''}
         >
