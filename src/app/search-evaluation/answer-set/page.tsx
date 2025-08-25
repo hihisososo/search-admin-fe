@@ -185,7 +185,7 @@ export default function AnswerSetManagementPage() {
             style={{ width: '70vw', maxWidth: 'none' }}
             data-vaul-no-drag
           >
-            <div className="flex-1 overflow-auto bg-white select-text touch-pan-y" data-vaul-no-drag>
+            <div className="flex-1 overflow-auto bg-white" data-vaul-no-drag>
               {selectedQueryForDocuments && (
                 <DocumentTable
                   queryId={selectedQueryForDocuments.id}

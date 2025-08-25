@@ -364,7 +364,7 @@ export default function EvaluationExecutionPage() {
                 <DrawerTitle className="text-base font-semibold text-gray-900">평가 리포트 상세</DrawerTitle>
                 <DrawerDescription className="text-xs text-gray-500 mt-1">{selectedReport?.reportName || '리포트를 불러오는 중...'}</DrawerDescription>
               </DrawerHeader>
-              <div className="flex-1 overflow-auto px-6 py-4 select-text touch-pan-y" data-vaul-no-drag>
+              <div className="flex-1 overflow-auto px-6 py-4" data-vaul-no-drag>
                 {isLoadingReport ? (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center">
