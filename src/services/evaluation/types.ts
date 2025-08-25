@@ -13,6 +13,9 @@ export interface EvaluationQuery {
   updatedAt: string
   // 사람 검수 완료 여부 (백엔드가 제공하는 경우 표시용)
   reviewed?: boolean
+  // 토큰 및 동의어 확장 정보
+  expandedTokens?: string // 토큰 확장 결과 (쉼표로 구분된 문자열)
+  expandedSynonymsMap?: string // 토큰별 동의어 매핑 (JSON 문자열)
 }
 
 export interface EvaluationQueryListResponse {
@@ -38,11 +41,12 @@ export interface EvaluationDocument {
   relevanceScore: number | null  // 2, 1, 0, -1, null
   evaluationReason: string
   confidence?: number | null // 0.0 ~ 1.0, NULL if not evaluated
-  expandedSynonyms?: string[] // 동의어 확장 결과
 }
 
 export interface EvaluationDocumentListResponse {
   query: string
+  expandedTokens?: string // 토큰 확장 결과 (쉼표로 구분된 문자열)
+  expandedSynonymsMap?: string // 토큰별 동의어 매핑 (JSON 문자열)
   documents: EvaluationDocument[]
   totalCount: number
   totalPages: number

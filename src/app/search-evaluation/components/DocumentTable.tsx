@@ -26,6 +26,8 @@ interface DocumentTableProps {
   queryId: number
   query: string
   documents: EvaluationDocument[]
+  expandedTokens?: string // 토큰 확장 결과 (쉼표로 구분된 문자열)
+  expandedSynonymsMap?: string // 토큰별 동의어 매핑 (JSON 문자열)
   currentPage: number
   totalPages: number
   totalCount: number
@@ -45,6 +47,8 @@ export function DocumentTable({
   queryId: _queryId,
   query,
   documents,
+  expandedTokens,
+  expandedSynonymsMap,
   currentPage,
   totalPages,
   totalCount,
@@ -272,10 +276,57 @@ export function DocumentTable({
       <div className="p-6 space-y-6">
       {/* 헤더 */}
       <div className="flex justify-between items-start mb-3">
-        <div>
+        <div className="flex-1">
           <h3 className="text-lg font-semibold text-gray-900">
             "{query}"
           </h3>
+          {/* 확장 정보 표시 */}
+          {(expandedTokens || expandedSynonymsMap) && (
+            <div className="mt-2 space-y-2">
+              {expandedTokens && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-gray-600">토큰:</span>
+                  <div className="flex flex-wrap gap-1">
+                    {expandedTokens.split(',').map((token, idx) => (
+                      <Badge key={idx} variant="outline" className="text-xs">
+                        {token.trim()}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {expandedSynonymsMap && (() => {
+                try {
+                  const synonymsMap = JSON.parse(expandedSynonymsMap) as Record<string, string[]>
+                  return (
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs font-medium text-gray-600">동의어:</span>
+                      <div className="space-y-1">
+                        {Object.entries(synonymsMap).map(([token, synonyms]) => (
+                          <div key={token} className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-xs">
+                              {token}
+                            </Badge>
+                            <span className="text-xs text-gray-500">→</span>
+                            <div className="flex flex-wrap gap-1">
+                              {synonyms.map((synonym, idx) => (
+                                <Badge key={idx} variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                  {synonym}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                } catch (e) {
+                  console.error('Failed to parse expandedSynonymsMap:', e)
+                  return null
+                }
+              })()}
+            </div>
+          )}
         </div>
         
         <div className="flex items-center gap-2">
@@ -664,22 +715,6 @@ export function DocumentTable({
                                     )}
                                   </div>
                                 </div>
-
-                                {/* 동의어 확장 결과 */}
-                                {doc.expandedSynonyms && doc.expandedSynonyms.length > 0 && (
-                                  <div className="mb-6">
-                                    <label className="text-sm font-semibold text-gray-700 block mb-2">
-                                      🔤 동의어 확장
-                                    </label>
-                                    <div className="flex flex-wrap gap-1.5">
-                                      {doc.expandedSynonyms.map((synonym, idx) => (
-                                        <Badge key={idx} variant="secondary" className="text-xs">
-                                          {synonym}
-                                        </Badge>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
 
                                 {/* 읽기 모드 액션 버튼들 */}
                                 <div className="flex gap-2 pt-2 border-t">
