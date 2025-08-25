@@ -191,6 +191,8 @@ export default function AnswerSetManagementPage() {
                   queryId={selectedQueryForDocuments.id}
                   query={selectedQueryForDocuments.query}
                   documents={documentsQuery.data?.documents || []}
+                  expandedTokens={documentsQuery.data?.expandedTokens}
+                  expandedSynonymsMap={documentsQuery.data?.expandedSynonymsMap}
                   currentPage={documentsQuery.data?.currentPage || 0}
                   totalPages={documentsQuery.data?.totalPages || 1}
                   totalCount={documentsQuery.data?.totalCount || 0}

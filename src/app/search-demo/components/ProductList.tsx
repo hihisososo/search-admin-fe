@@ -115,7 +115,13 @@ export function ProductList({
               variant={sort === opt.value ? "default" : "outline"} 
               size="sm" 
               onClick={() => onSortChange(opt.value)} 
-              className="rounded-full shadow-sm transition-colors duration-150 hover:scale-105 text-xs"
+              className={`
+                rounded-full shadow-sm transition-all duration-150 hover:scale-105 text-xs
+                ${sort === opt.value 
+                  ? 'bg-black text-white hover:bg-gray-800 font-medium' 
+                  : ''
+                }
+              `}
               disabled={loading}
             >
               {opt.label}
