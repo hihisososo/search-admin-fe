@@ -161,7 +161,7 @@ export function ReportDialog({
                             {queryDetails.slice(0, 5).map((detail: any, index: number) => (
                               <div key={index} className="p-3 border rounded text-sm">
                                 <div className="flex justify-between items-center mb-2">
-                                  <span className="font-medium">{detail.query}</span>
+                                  <span className="font-medium select-text">{detail.query}</span>
                                   <Badge>
                                     nDCG: {Number(detail.ndcg).toFixed(3)}
                                   </Badge>
@@ -176,7 +176,7 @@ export function ReportDialog({
                                     {detail.missingDocuments?.length > 0 && (
                                       <div className="text-xs">
                                         <span className="text-red-600 font-medium">누락 문서:</span>
-                                        <span className="ml-1 text-gray-600">
+                                        <span className="ml-1 text-gray-600 select-text">
                                           {detail.missingDocuments.map((d: any) => typeof d === 'string' ? d : d.productId).slice(0, 3).join(', ')}
                                           {detail.missingDocuments.length > 3 && ` 외 ${detail.missingDocuments.length - 3}개`}
                                         </span>
@@ -201,13 +201,13 @@ export function ReportDialog({
                                         {expandedWrongDocs.has(`latest-${index}`) ? (
                                           <div className="ml-4 mt-1 space-y-1">
                                             {detail.wrongDocuments.map((doc: any, i: number) => (
-                                              <div key={i} className="text-gray-600 break-all">
+                                              <div key={i} className="text-gray-600 break-all select-text">
                                                 {typeof doc === 'string' ? doc : `${doc.productId} ${doc.productName || ''}`}
                                               </div>
                                             ))}
                                           </div>
                                         ) : (
-                                          <span className="ml-1 text-gray-600">
+                                          <span className="ml-1 text-gray-600 select-text">
                                             {detail.wrongDocuments.map((d: any) => typeof d === 'string' ? d : d.productId).slice(0, 2).join(', ')}
                                             {detail.wrongDocuments.length > 2 && ` 외 ${detail.wrongDocuments.length - 2}개`}
                                           </span>
@@ -308,7 +308,7 @@ export function ReportDialog({
                             {queryDetails.map((detail: any, index: number) => (
                               <div key={index} className="p-3 border rounded text-sm bg-white">
                                 <div className="flex justify-between items-center mb-2">
-                                  <span className="font-medium">{detail.query}</span>
+                                  <span className="font-medium select-text">{detail.query}</span>
                                   <div className="flex gap-2">
                                     <Badge variant="outline" className="text-xs">
                                       nDCG: {Number(detail.ndcg).toFixed(3)}
@@ -326,7 +326,7 @@ export function ReportDialog({
                                     {detail.missingDocuments?.length > 0 && (
                                       <div className="text-xs">
                                         <span className="text-red-600 font-medium">누락 문서 ({detail.missingDocuments.length}개):</span>
-                                        <span className="ml-1 text-gray-600">
+                                        <span className="ml-1 text-gray-600 select-text">
                                           {detail.missingDocuments.map((d: any) => typeof d === 'string' ? d : d.productId).slice(0, 5).join(', ')}
                                           {detail.missingDocuments.length > 5 && ` 외 ${detail.missingDocuments.length - 5}개`}
                                         </span>
@@ -351,13 +351,13 @@ export function ReportDialog({
                                         {expandedWrongDocs.has(`selected-${index}`) ? (
                                           <div className="ml-4 mt-1 space-y-1">
                                             {detail.wrongDocuments.map((doc: any, i: number) => (
-                                              <div key={i} className="text-gray-600 break-all">
+                                              <div key={i} className="text-gray-600 break-all select-text">
                                                 {typeof doc === 'string' ? doc : `${doc.productId} ${doc.productName || ''}`}
                                               </div>
                                             ))}
                                           </div>
                                         ) : (
-                                          <span className="ml-1 text-gray-600">
+                                          <span className="ml-1 text-gray-600 select-text">
                                             {detail.wrongDocuments.map((d: any) => typeof d === 'string' ? d : d.productId).slice(0, 2).join(', ')}
                                             {detail.wrongDocuments.length > 2 && ` 외 ${detail.wrongDocuments.length - 2}개`}
                                           </span>

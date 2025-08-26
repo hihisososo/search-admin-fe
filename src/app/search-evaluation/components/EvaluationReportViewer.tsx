@@ -324,7 +324,7 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
                       className={`hover:bg-gray-50 cursor-pointer ${expanded ? 'bg-blue-50' : ''}`}
                       onClick={() => toggleRow(actualIndex)}
                     >
-                      <TableCell className="py-2 text-xs font-medium">{detail.query}</TableCell>
+                      <TableCell className="py-2 text-xs font-medium select-text">{detail.query}</TableCell>
                       <TableCell className="py-2 text-center">
                         <Badge 
                           variant="outline"
@@ -501,21 +501,21 @@ function DocumentList({
                   <div className="grid grid-cols-12 gap-2 items-start">
                     <div className="col-span-2">
                       {productId ? (
-                        <span className="font-mono text-[11px] bg-white/70 px-1 py-0.5 rounded border">{productId}</span>
+                        <span className="font-mono text-[11px] bg-white/70 px-1 py-0.5 rounded border select-text">{productId}</span>
                       ) : (
                         <span className="text-[11px] text-gray-400">-</span>
                       )}
                     </div>
                     <div className="col-span-5">
                       {productName ? (
-                        <div className={expanded ? "whitespace-pre-wrap break-all" : "truncate"}>{productName}</div>
+                        <div className={expanded ? "whitespace-pre-wrap break-all select-text" : "truncate select-text"}>{productName}</div>
                       ) : (
                         <span className="text-gray-400">-</span>
                       )}
                     </div>
                     <div className="col-span-5">
                       {productSpecs ? (
-                        <div className={expanded ? "whitespace-pre-wrap break-all" : "truncate"}>{productSpecs}</div>
+                        <div className={expanded ? "whitespace-pre-wrap break-all select-text" : "truncate select-text"}>{productSpecs}</div>
                       ) : (
                         <span className="text-gray-400">-</span>
                       )}
@@ -534,7 +534,7 @@ function DocumentList({
                   )}
                 </>
               ) : (
-                <div className="whitespace-pre-wrap break-all text-xs">{String(doc)}</div>
+                <div className="whitespace-pre-wrap break-all text-xs select-text">{String(doc)}</div>
               )}
             </div>
           )
