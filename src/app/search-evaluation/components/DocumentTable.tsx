@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 // removed add-document dialog imports
 // select 제거: 버튼형 세그먼트로 대체
 import { cn } from "@/lib/utils"
-import { Edit, Trash2, ChevronDown, ChevronUp, X, Save, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
+import { Edit, Trash2, X, Save, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { 
   // useProductSearch, (removed add-document feature)
   // useAddDocumentMapping,
@@ -111,11 +111,6 @@ export function DocumentTable({
         <Badge variant="secondary" className="text-[10px] px-1.5 py-0">미평가</Badge>
       )
     }
-    if (relevanceScore === -1) {
-      return (
-        <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-orange-50 text-orange-700 border-orange-200">확인필요</Badge>
-      )
-    }
     const colorClass = relevanceScore >= 2
       ? 'bg-green-50 text-green-700 border-green-200'
       : relevanceScore === 1
@@ -205,9 +200,8 @@ export function DocumentTable({
   const filteredDocuments = documents.filter(doc => {
     if (confidenceFilter === 'needsReview') {
       const confidence = doc.confidence
-      const relevanceScore = doc.relevanceScore
-      // confidence <= 0.8 또는 relevanceScore가 -1인 경우 (사람 확인 필요)
-      return (confidence !== null && confidence !== undefined && confidence <= 0.8) || relevanceScore === -1
+      // confidence <= 0.8인 경우 (사람 확인 필요)
+      return (confidence !== null && confidence !== undefined && confidence <= 0.8)
     }
     return true
   })
@@ -365,7 +359,7 @@ export function DocumentTable({
       </div>
 
       {/* 데이터 테이블 */}
-      <div className="border border-gray-200 rounded-md overflow-hidden bg-white">
+      <div className="border border-gray-200 rounded-md overflow-hidden bg-white" style={{ userSelect: 'text' }}>
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50 hover:bg-gray-50">
@@ -441,28 +435,19 @@ export function DocumentTable({
                       className={`hover:bg-gray-50 cursor-pointer ${isExpanded ? 'bg-amber-50' : ''}`}
                       onClick={() => toggleExpand(doc.productId)}
                     >
-                      <TableCell className="py-2 text-center font-medium text-gray-600">
+                      <TableCell className="py-2 text-center font-medium text-gray-600" style={{ userSelect: 'text' }}>
                         {(currentPage * (pageSize ?? 20)) + index + 1}
                       </TableCell>
                       
-                      <TableCell className="py-2 text-xs">
-                        <Badge variant="outline" className="font-mono text-xs">
+                      <TableCell className="py-2 text-xs" style={{ userSelect: 'text' }}>
+                        <Badge variant="outline" className="font-mono text-xs" style={{ userSelect: 'text' }}>
                           {doc.productId}
                         </Badge>
                       </TableCell>
                       
                       <TableCell className="py-2">
-                        <div className="flex items-center justify-between">
-                          <div className="font-medium text-xs text-gray-900">
-                            {doc.productName}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {isExpanded ? (
-                              <ChevronUp className="h-4 w-4 text-gray-400" />
-                            ) : (
-                              <ChevronDown className="h-4 w-4 text-gray-400" />
-                            )}
-                          </div>
+                        <div className="font-medium text-xs text-gray-900" style={{ userSelect: 'text' }}>
+                          {doc.productName}
                         </div>
                       </TableCell>
                       
@@ -471,17 +456,15 @@ export function DocumentTable({
                           {doc.relevanceScore === null ? (
                             <Badge variant="secondary" className="text-[10px] px-2 py-0">미평가</Badge>
                           ) : (
-                            ([2,1,0,-1] as const).map((val) => {
+                            ([2,1,0] as const).map((val) => {
                               const current = doc.relevanceScore
                               const isActive = current === val
-                              const label = val === 2 ? '매우관련' : val === 1 ? '관련' : val === 0 ? '무관' : '확인필요'
+                              const label = val === 2 ? '매우관련' : val === 1 ? '관련' : '무관'
                             const colorClass = val === 2
                               ? 'bg-green-50 text-green-700 border-green-200'
                               : val === 1
                                 ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
-                                : val === 0
-                                  ? 'bg-red-50 text-red-700 border-red-200'
-                                  : 'bg-orange-50 text-orange-700 border-orange-200'
+                                : 'bg-red-50 text-red-700 border-red-200'
                             return (
                               <Button
                                 key={val}
@@ -511,12 +494,6 @@ export function DocumentTable({
                             {doc.confidence !== undefined && doc.confidence !== null ? 
                               doc.confidence.toFixed(2) : '-'}
                           </span>
-                          {(doc.confidence !== null && doc.confidence !== undefined && doc.confidence <= 0.8) && 
-                           doc.relevanceScore === -1 && (
-                            <Badge variant="destructive" className="text-[8px] px-1 py-0 h-3">
-                              확인필요
-                            </Badge>
-                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -535,7 +512,7 @@ export function DocumentTable({
                                     📂 카테고리
                                   </label>
                                   <div className="bg-blue-50 border-l-4 border-blue-300 p-4 rounded-r">
-                                    <div className="text-sm text-gray-700 leading-relaxed">
+                                    <div className="text-sm text-gray-700 leading-relaxed" style={{ userSelect: 'text' }}>
                                       {doc.productCategory || '카테고리 정보가 없습니다'}
                                     </div>
                                   </div>
@@ -547,7 +524,7 @@ export function DocumentTable({
                                     📋 상품 스펙
                                   </label>
                                   <div className="bg-gray-50 border-l-4 border-gray-300 p-4 rounded-r">
-                                    <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                                    <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap" style={{ userSelect: 'text' }}>
                                       {formatText(doc.productSpecs) || '스펙 정보가 없습니다'}
                                     </div>
                                   </div>
@@ -572,16 +549,14 @@ export function DocumentTable({
                                     🏷️ 평가 *
                                   </label>
                                   <div className="flex gap-2">
-                                    {([2,1,0,-1] as const).map((val) => {
+                                    {([2,1,0] as const).map((val) => {
                                       const isActive = editForm.relevanceScore === val
-                                      const label = val === 2 ? '매우관련' : val === 1 ? '관련' : val === 0 ? '무관' : '확인필요'
+                                      const label = val === 2 ? '매우관련' : val === 1 ? '관련' : '무관'
                                       const colorClass = val === 2
                                         ? 'bg-green-50 text-green-700 border-green-200'
                                         : val === 1
                                           ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
-                                          : val === 0
-                                            ? 'bg-red-50 text-red-700 border-red-200'
-                                            : 'bg-orange-50 text-orange-700 border-orange-200'
+                                          : 'bg-red-50 text-red-700 border-red-200'
                                       return (
                                         <Button
                                           key={val}
@@ -591,10 +566,7 @@ export function DocumentTable({
                                             'h-7 text-xs px-2',
                                             isActive ? colorClass : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
                                           )}
-                                          onClick={(e) => {
-                                            e.stopPropagation()
-                                            setEditForm({ ...editForm, relevanceScore: val })
-                                          }}
+                                          onClick={() => setEditForm({ ...editForm, relevanceScore: val })}
                                         >
                                           {label}
                                         </Button>
@@ -631,10 +603,7 @@ export function DocumentTable({
                                 <div className="flex gap-2 pt-2 border-t">
                                   <Button
                                     size="sm"
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      handleSaveEdit(doc)
-                                    }}
+                                    onClick={() => handleSaveEdit(doc)}
                                     disabled={updateCandidateMutation.isPending}
                                     className="bg-blue-600 hover:bg-blue-700"
                                   >
@@ -645,10 +614,7 @@ export function DocumentTable({
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      handleCancelEdit()
-                                    }}
+                                    onClick={() => handleCancelEdit()}
                                     disabled={updateCandidateMutation.isPending}
                                   >
                                     <RotateCcw className="h-4 w-4 mr-2" />
@@ -665,7 +631,7 @@ export function DocumentTable({
                                     📂 카테고리
                                   </label>
                                   <div className="bg-blue-50 border-l-4 border-blue-300 p-4 rounded-r">
-                                    <div className="text-sm text-gray-700 leading-relaxed">
+                                    <div className="text-sm text-gray-700 leading-relaxed" style={{ userSelect: 'text' }}>
                                       {doc.productCategory || '카테고리 정보가 없습니다'}
                                     </div>
                                   </div>
@@ -677,7 +643,7 @@ export function DocumentTable({
                                     📋 상품 스펙
                                   </label>
                                   <div className="bg-gray-50 border-l-4 border-gray-300 p-4 rounded-r">
-                                    <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                                    <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap" style={{ userSelect: 'text' }}>
                                       {formatText(doc.productSpecs) || '스펙 정보가 없습니다'}
                                     </div>
                                   </div>
@@ -688,7 +654,7 @@ export function DocumentTable({
                                   <label className="text-sm font-semibold text-gray-700 block mb-2">
                                     💭 평가 이유
                                   </label>
-                                  <div className="bg-white border p-3 rounded leading-relaxed whitespace-pre-wrap text-sm text-gray-600">
+                                  <div className="bg-white border p-3 rounded leading-relaxed whitespace-pre-wrap text-sm text-gray-600" style={{ userSelect: 'text' }}>
                                     {formatText(doc.evaluationReason) || '평가 이유가 없습니다'}
                                   </div>
                                 </div>
@@ -706,11 +672,6 @@ export function DocumentTable({
                                         <span className={`text-xs font-semibold ${getConfidenceColor(doc.confidence)}`}>
                                           {doc.confidence.toFixed(2)}
                                         </span>
-                                        {doc.confidence <= 0.8 && doc.relevanceScore === -1 && (
-                                          <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
-                                            확인필요
-                                          </Badge>
-                                        )}
                                       </div>
                                     )}
                                   </div>
@@ -721,10 +682,7 @@ export function DocumentTable({
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      handleStartEdit(doc)
-                                    }}
+                                    onClick={() => handleStartEdit(doc)}
                                   >
                                     <Edit className="h-4 w-4 mr-2" />
                                     편집
@@ -733,10 +691,7 @@ export function DocumentTable({
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      handleDeleteDocument(doc.productId)
-                                    }}
+                                    onClick={() => handleDeleteDocument(doc.productId)}
                                   >
                                     <Trash2 className="h-4 w-4 mr-2" />
                                     삭제
