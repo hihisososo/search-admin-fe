@@ -128,6 +128,20 @@ export function CategoryRankingDictionaryPage() {
 
   // 실시간 반영
   const handleApplyChanges = () => {
+    // 현재 환경에서는 실시간 반영 불가
+    if (environment === 'CURRENT') {
+      toast({
+        title: '실시간 반영 불가',
+        description: '현재 환경에서는 실시간 반영을 할 수 없습니다. 개발 또는 운영 환경을 선택해주세요.',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    if (!confirm('변경사항을 실시간으로 반영하시겠습니까?')) {
+      return
+    }
+
     syncMutation.mutate()
   }
 
