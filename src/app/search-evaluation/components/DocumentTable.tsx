@@ -89,7 +89,7 @@ export function DocumentTable({
   // 평가 상태 변환 함수 (relevanceScore 기반)
   const getEvaluationStatus = (relevanceScore: number | null): EvaluationStatus => {
     if (relevanceScore === null || relevanceScore === -1) return 'unspecified'
-    if (relevanceScore >= 1) return 'correct'
+    if (relevanceScore === 1) return 'correct'
     return 'incorrect'
   }
 
@@ -111,12 +111,10 @@ export function DocumentTable({
         <Badge variant="secondary" className="text-[10px] px-1.5 py-0">미평가</Badge>
       )
     }
-    const colorClass = relevanceScore >= 2
-      ? 'bg-green-50 text-green-700 border-green-200'
-      : relevanceScore === 1
+    const colorClass = relevanceScore === 1
         ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
         : 'bg-red-50 text-red-700 border-red-200'
-    const label = relevanceScore >= 2 ? `매우관련` : (relevanceScore === 1 ? '관련' : '무관')
+    const label = relevanceScore === 1 ? '관련' : '무관'
     return (
       <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${colorClass}`}>
         {label}
@@ -456,13 +454,11 @@ export function DocumentTable({
                           {doc.relevanceScore === null ? (
                             <Badge variant="secondary" className="text-[10px] px-2 py-0">미평가</Badge>
                           ) : (
-                            ([2,1,0] as const).map((val) => {
+                            ([1,0] as const).map((val) => {
                               const current = doc.relevanceScore
                               const isActive = current === val
-                              const label = val === 2 ? '매우관련' : val === 1 ? '관련' : '무관'
-                            const colorClass = val === 2
-                              ? 'bg-green-50 text-green-700 border-green-200'
-                              : val === 1
+                              const label = val === 1 ? '관련' : '무관'
+                            const colorClass = val === 1
                                 ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
                                 : 'bg-red-50 text-red-700 border-red-200'
                             return (
@@ -549,12 +545,10 @@ export function DocumentTable({
                                     🏷️ 평가 *
                                   </label>
                                   <div className="flex gap-2">
-                                    {([2,1,0] as const).map((val) => {
+                                    {([1,0] as const).map((val) => {
                                       const isActive = editForm.relevanceScore === val
-                                      const label = val === 2 ? '매우관련' : val === 1 ? '관련' : '무관'
-                                      const colorClass = val === 2
-                                        ? 'bg-green-50 text-green-700 border-green-200'
-                                        : val === 1
+                                      const label = val === 1 ? '관련' : '무관'
+                                      const colorClass = val === 1
                                           ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
                                           : 'bg-red-50 text-red-700 border-red-200'
                                       return (

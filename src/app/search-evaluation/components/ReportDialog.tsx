@@ -120,10 +120,10 @@ export function ReportDialog({
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center">
-                    <div className={`text-2xl font-bold ${getScoreColor(latestReport.averageNdcg20 || latestReport.averageNdcg || 0)}`}>
-                      {(latestReport.averageNdcg20 || latestReport.averageNdcg || 0).toFixed(3)}
+                    <div className={`text-2xl font-bold ${getScoreColor(latestReport.averagePrecision20 || latestReport.averagePrecision || 0)}`}>
+                      {(latestReport.averagePrecision20 || latestReport.averagePrecision || 0).toFixed(3)}
                     </div>
-                    <div className="text-sm text-gray-600">평균 nDCG</div>
+                    <div className="text-sm text-gray-600">정확도</div>
                   </div>
                   
                   <div className="text-center">
@@ -163,11 +163,11 @@ export function ReportDialog({
                                 <div className="flex justify-between items-center mb-2">
                                   <span className="font-medium select-text">{detail.query}</span>
                                   <Badge>
-                                    nDCG: {Number(detail.ndcg).toFixed(3)}
+                                    Precision: {Number(detail.precision).toFixed(3)}
                                   </Badge>
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 text-xs text-gray-600">
-                                  <span>nDCG: {Number(detail.ndcg).toFixed(3)}</span>
+                                  <span>Precision: {Number(detail.precision).toFixed(3)}</span>
                                   <span>정확: {detail.correctCount}/{detail.retrievedCount}</span>
                                 </div>
                                 {/* 누락/오답 문서 표시 */}
@@ -257,7 +257,7 @@ export function ReportDialog({
                         <div className="text-right">
                           <div className="flex gap-2">
                             <Badge variant="outline" className="text-xs">
-                              nDCG: {(report.averageNdcg20 || report.averageNdcg || 0).toFixed(3)}
+                              Precision: {(report.averagePrecision20 || 0).toFixed(3)}
                             </Badge>
                           </div>
                           <div className="text-xs text-gray-500 mt-1">
@@ -290,10 +290,10 @@ export function ReportDialog({
                         <div className="space-y-3">
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded">
                             <div className="text-center">
-                              <div className={`text-xl font-bold ${getScoreColor(selectedReport.averageNdcg20 || selectedReport.averageNdcg || 0)}`}>
-                                {(selectedReport.averageNdcg20 || selectedReport.averageNdcg || 0).toFixed(3)}
+                              <div className={`text-xl font-bold ${getScoreColor(selectedReport.averagePrecision20 || 0)}`}>
+                                {(selectedReport.averagePrecision20 || 0).toFixed(3)}
                               </div>
-                              <div className="text-sm text-gray-600">평균 nDCG</div>
+                              <div className="text-sm text-gray-600">정확도</div>
                             </div>
                             <div className="text-center">
                               <div className="text-xl font-bold text-blue-600">
@@ -311,7 +311,7 @@ export function ReportDialog({
                                   <span className="font-medium select-text">{detail.query}</span>
                                   <div className="flex gap-2">
                                     <Badge variant="outline" className="text-xs">
-                                      nDCG: {Number(detail.ndcg).toFixed(3)}
+                                      Precision: {Number(detail.precision).toFixed(3)}
                                     </Badge>
                                   </div>
                                 </div>

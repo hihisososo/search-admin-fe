@@ -58,7 +58,8 @@ export function CategoryRankingTable({
   }
 
   return (
-    <Table>
+    <div className="border border-gray-200 rounded-md overflow-hidden">
+      <Table>
         <TableHeader>
           <TableRow className="bg-gray-50 hover:bg-gray-50">
             {canEdit && (
@@ -70,11 +71,10 @@ export function CategoryRankingTable({
               </TableHead>
             )}
             <TableHead className="py-2 text-xs font-semibold text-gray-700">키워드</TableHead>
-            <TableHead className="py-2 text-xs font-semibold text-gray-700">설명</TableHead>
-            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center">카테고리 수</TableHead>
-            <TableHead className="py-2 text-xs font-semibold text-gray-700">수정일</TableHead>
+            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-24">카테고리 수</TableHead>
+            <TableHead className="py-2 text-xs font-semibold text-gray-700 w-32">수정일</TableHead>
             {canEdit && (
-              <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center">액션</TableHead>
+              <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-20">액션</TableHead>
             )}
           </TableRow>
         </TableHeader>
@@ -82,7 +82,7 @@ export function CategoryRankingTable({
           {items.length === 0 ? (
             <TableRow>
               <TableCell 
-                colSpan={canEdit ? 6 : 5} 
+                colSpan={canEdit ? 5 : 4} 
                 className="text-center py-8 text-gray-500"
               >
                 데이터가 없습니다.
@@ -101,11 +101,6 @@ export function CategoryRankingTable({
                 )}
                 <TableCell className="py-2">
                   <span className="text-xs">{item.keyword}</span>
-                </TableCell>
-                <TableCell className="py-2">
-                  <span className="text-xs text-gray-600">
-                    {item.description || '-'}
-                  </span>
                 </TableCell>
                 <TableCell className="py-2 text-center">
                   <Badge 
@@ -130,22 +125,22 @@ export function CategoryRankingTable({
                     <div className="flex justify-center gap-1">
                       <Button
                         size="sm"
-                        variant="ghost"
+                        variant="outline"
                         onClick={() => onEdit(item)}
-                        className="h-6 px-2"
+                        className="h-6 px-2 border-gray-300 hover:bg-gray-100"
                         title="카테고리 매핑 편집"
                       >
                         <Edit className="h-3.5 w-3.5" />
                       </Button>
                       <Button
                         size="sm"
-                        variant="ghost"
+                        variant="outline"
                         onClick={() => {
                           if (confirm(`"${item.keyword}" 항목을 삭제하시겠습니까?`)) {
                             onDelete(item.id)
                           }
                         }}
-                        className="h-6 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        className="h-6 px-2 border-red-300 text-red-600 hover:bg-red-50"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
@@ -157,5 +152,6 @@ export function CategoryRankingTable({
           )}
         </TableBody>
       </Table>
+    </div>
   )
 }

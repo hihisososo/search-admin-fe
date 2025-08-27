@@ -43,8 +43,8 @@ export function EvaluationReportViewer({ report }: EvaluationReportViewerProps) 
               <div className="text-sm text-gray-600">총 쿼리</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{(report.averageNdcg20 || report.averageNdcg || 0).toFixed(3)}</div>
-              <div className="text-sm text-gray-600">nDCG@20</div>
+              <div className="text-2xl font-bold text-green-600">{(report.averagePrecision20 || report.averagePrecision || 0).toFixed(3)}</div>
+              <div className="text-sm text-gray-600">정확도</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-yellow-600">{(report.averageRecall300 || report.averageRecall || 0).toFixed(3)}</div>
@@ -119,9 +119,9 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
           aValue = a.query || ''
           bValue = b.query || ''
           break
-        case 'ndcgAt20':
-          aValue = a.ndcgAt20 || 0
-          bValue = b.ndcgAt20 || 0
+        case 'precisionAt20':
+          aValue = a.precisionAt20 || 0
+          bValue = b.precisionAt20 || 0
           break
         case 'recallAt300':
           aValue = a.recallAt300 || 0
@@ -221,14 +221,14 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
               </TableHead>
               <TableHead 
                 className="py-2 text-xs font-semibold text-gray-700 text-center w-24 cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort('ndcgAt20')}
+                onClick={() => handleSort('precisionAt20')}
               >
                 <div className="flex items-center justify-center gap-1">
-                  <span>nDCG@20</span>
-                  {sortField === 'ndcgAt20' && (
+                  <span>Precision@20</span>
+                  {sortField === 'precisionAt20' && (
                     sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                   )}
-                  {sortField !== 'ndcgAt20' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+                  {sortField !== 'precisionAt20' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
                 </div>
               </TableHead>
               <TableHead 
@@ -329,12 +329,12 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
                         <Badge 
                           variant="outline"
                           className={`text-xs ${
-                            detail.ndcgAt20 >= 0.8 ? 'bg-green-50 text-green-700 border-green-200' :
-                            detail.ndcgAt20 >= 0.6 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                            detail.precisionAt20 >= 0.8 ? 'bg-green-50 text-green-700 border-green-200' :
+                            detail.precisionAt20 >= 0.6 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
                             'bg-red-50 text-red-700 border-red-200'
                           }`}
                         >
-                          {detail.ndcgAt20?.toFixed(3) || '-'}
+                          {detail.precisionAt20?.toFixed(3) || '-'}
                         </Badge>
                       </TableCell>
                       <TableCell className="py-2 text-center">

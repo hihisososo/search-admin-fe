@@ -27,10 +27,12 @@ export default function DashboardPage() {
     
     if (dateRange.to) {
       const toDate = new Date(dateRange.to)
+      // 다음날로 설정
+      toDate.setDate(toDate.getDate() + 1)
       const year = toDate.getFullYear()
       const month = String(toDate.getMonth() + 1).padStart(2, '0')
       const day = String(toDate.getDate()).padStart(2, '0')
-      params.to = `${year}-${month}-${day}T23:59:59`
+      params.to = `${year}-${month}-${day}T00:00:00`
     }
     
     return params
