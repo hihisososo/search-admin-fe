@@ -4,10 +4,8 @@ export interface EvaluationQuery {
   id: number
   query: string
   documentCount: number
-  score2Count: number
   score1Count: number
   score0Count: number
-  scoreMinus1Count: number
   unevaluatedCount: number
   createdAt: string
   updatedAt: string
@@ -142,7 +140,7 @@ export interface EvaluationExecutionResult {
   reportId: number
   totalQueries: number
   recall300: number
-  ndcg20: number
+  precision20: number
 }
 
 export interface UpdateCandidateRequest {
@@ -164,7 +162,7 @@ export interface QueryEvaluationDetail {
   relevantCount: number
   retrievedCount: number
   correctCount: number
-  ndcgAt20?: number  // 쿼리별 nDCG@20
+  precisionAt20?: number  // 쿼리별 Precision@20
   recallAt300?: number  // 쿼리별 Recall@300
   missingDocuments: DocumentInfo[]
   wrongDocuments: DocumentInfo[]
@@ -176,7 +174,6 @@ export interface EvaluationExecuteResponse {
   reportName: string
   recall: number
   precision: number
-  ndcg: number
   totalQueries: number
   totalRelevantDocuments: number
   totalRetrievedDocuments: number
@@ -190,10 +187,9 @@ export interface EvaluationReport {
   reportName: string
   totalQueries: number
   averageRecall300: number  // Recall@300
-  averageNdcg20: number  // nDCG@20
+  averagePrecision20: number  // Precision@20
   averagePrecision?: number  // 기존 호환성
   averageRecall?: number  // 기존 호환성
-  averageNdcg?: number  // 기존 호환성
   totalRelevantDocuments?: number
   totalRetrievedDocuments?: number
   totalCorrectDocuments?: number
@@ -205,9 +201,8 @@ export interface EvaluationReportSummary {
   id: number
   reportName: string
   totalQueries: number
-  averageNdcg20: number  // nDCG@20
+  averagePrecision20: number  // Precision@20
   averageRecall300: number  // Recall@300
-  averageNdcg?: number  // 기존 호환성
   totalRelevantDocuments?: number
   totalRetrievedDocuments?: number
   totalCorrectDocuments?: number

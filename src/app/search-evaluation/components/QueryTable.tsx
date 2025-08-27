@@ -222,18 +222,6 @@ export function QueryTable({
             </TableHead>
             <TableHead 
               className="py-2 text-xs font-semibold text-gray-700 text-center w-16 cursor-pointer hover:bg-gray-100" 
-              onClick={() => onSort?.('score2Count')}
-            >
-              <div className="flex items-center justify-center gap-1">
-                <span>매우관련</span>
-                {sortField === 'score2Count' && (
-                  sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
-                )}
-                {sortField !== 'score2Count' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
-              </div>
-            </TableHead>
-            <TableHead 
-              className="py-2 text-xs font-semibold text-gray-700 text-center w-16 cursor-pointer hover:bg-gray-100" 
               onClick={() => onSort?.('score1Count')}
             >
               <div className="flex items-center justify-center gap-1">
@@ -268,14 +256,13 @@ export function QueryTable({
                 {sortField !== 'unevaluatedCount' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
               </div>
             </TableHead>
-            <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-20">검수필요</TableHead>
             <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-20">액션</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {queries.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={9} className="text-center py-8 text-gray-500">
+              <TableCell colSpan={8} className="text-center py-8 text-gray-500">
                 <p className="text-sm">등록된 쿼리가 없습니다</p>
                 <p className="text-xs text-gray-400 mt-1">새 쿼리를 추가하거나 LLM으로 생성해보세요</p>
               </TableCell>
@@ -342,7 +329,6 @@ function QueryTableSkeleton() {
             <TableHead className="text-center w-16">정답</TableHead>
             <TableHead className="text-center w-16">오답</TableHead>
             <TableHead className="text-center w-20">미지정</TableHead>
-            <TableHead className="text-center w-20">검수필요</TableHead>
             <TableHead className="text-center w-24">액션</TableHead>
           </TableRow>
         </TableHeader>

@@ -211,9 +211,14 @@ export default function SearchDemo() {
     const m = String(yesterday.getMonth() + 1).padStart(2, '0');
     const d = String(yesterday.getDate()).padStart(2, '0');
 
+    // 오늘 날짜로 설정 (어제 끝 = 오늘 시작)
+    const ty = today.getFullYear();
+    const tm = String(today.getMonth() + 1).padStart(2, '0');
+    const td = String(today.getDate()).padStart(2, '0');
+
     return {
       from: `${y}-${m}-${d}T00:00:00`,
-      to: `${y}-${m}-${d}T23:59:59`
+      to: `${ty}-${tm}-${td}T00:00:00`
     };
   };
 

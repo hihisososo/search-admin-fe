@@ -39,7 +39,6 @@ export function CategoryMappingDialog({
   onSaved
 }: CategoryMappingDialogProps) {
   const [keyword, setKeyword] = useState('')
-  const [description, setDescription] = useState('')
   const [mappings, setMappings] = useState<CategoryMapping[]>([])
   const [newCategory, setNewCategory] = useState('')
   const [newWeight, setNewWeight] = useState(1000)
@@ -56,7 +55,6 @@ export function CategoryMappingDialog({
   useEffect(() => {
     if (item && open) {
       setKeyword(item.keyword)
-      setDescription(item.description || '')
       // 상세 정보 조회
       categoryRankingService.getById(item.id, environment).then(data => {
         setMappings(data.categoryMappings || [])
@@ -67,7 +65,6 @@ export function CategoryMappingDialog({
     } else if (!item && open) {
       // 새 항목
       setKeyword('')
-      setDescription('')
       setMappings([])
     }
   }, [item, open, environment])
@@ -85,7 +82,6 @@ export function CategoryMappingDialog({
 
       const data = {
         keyword: keyword.trim(),
-        description: description.trim() || undefined,
         categoryMappings: mappings
       }
 
@@ -179,17 +175,6 @@ export function CategoryMappingDialog({
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="예: 아이폰"
               disabled={!!item}
-            />
-          </div>
-
-          {/* 설명 입력 */}
-          <div className="space-y-2">
-            <Label htmlFor="description">설명</Label>
-            <Input
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="키워드에 대한 설명 (선택사항)"
             />
           </div>
 

@@ -51,7 +51,7 @@ export default function EvaluationExecutionPage() {
       if (evalResult?.reportId) {
         toast({
           title: "평가 완료",
-          description: `리포트 ID: ${evalResult.reportId}, nDCG@20: ${evalResult.ndcg20?.toFixed(3) || 'N/A'}`,
+          description: `리포트 ID: ${evalResult.reportId}, Precision@20: ${evalResult.precision20?.toFixed(3) || 'N/A'}`,
           variant: "success"
         })
       } else {
@@ -203,7 +203,7 @@ export default function EvaluationExecutionPage() {
               <DialogHeader>
                 <DialogTitle>새로운 평가 실행</DialogTitle>
                 <DialogDescription>
-                  검색 성능을 평가하여 nDCG를 계산합니다.
+                  검색 성능을 평가하여 Precision@20을 계산합니다.
                   모든 쿼리에 대한 평가가 실행되며 결과는 리포트로 저장됩니다.
                 </DialogDescription>
               </DialogHeader>
@@ -298,7 +298,7 @@ export default function EvaluationExecutionPage() {
                     <TableHead className="w-16 py-2 text-xs font-semibold text-gray-700">ID</TableHead>
                     <TableHead className="py-2 text-xs font-semibold text-gray-700">제목</TableHead>
                     <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">상태</TableHead>
-                    <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">nDCG</TableHead>
+                    <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">Precision@20</TableHead>
                     <TableHead className="w-44 py-2 text-xs font-semibold text-gray-700">실행 시간</TableHead>
                     <TableHead className="text-center w-20 py-2 text-xs font-semibold text-gray-700">액션</TableHead>
                   </TableRow>
@@ -329,7 +329,7 @@ export default function EvaluationExecutionPage() {
                           <Badge className="bg-green-100 text-green-800 text-xs">완료</Badge>
                         </TableCell>
                         <TableCell className="py-2 text-center">
-                          <PerformanceScore score={report.averageNdcg20 || report.averageNdcg || 0} size="sm" showPercentage={false} />
+                          <PerformanceScore score={report.averagePrecision20 || 0} size="sm" showPercentage={false} />
                         </TableCell>
                         <TableCell className="py-2 text-xs text-gray-600">
                           {formatDate(report.createdAt)}
