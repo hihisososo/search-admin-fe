@@ -7,6 +7,7 @@ import { PopularKeywords } from "./components/PopularKeywords";
 import { TrendingKeywords } from "./components/TrendingKeywords";
 import { ProductFilters } from "./components/ProductFilters";
 import { ProductList } from "./components/ProductList";
+import { CategorySidebar } from "./components/CategorySidebar";
 
 export default function SearchDemo() {
   // 검색/필터 상태
@@ -46,6 +47,7 @@ export default function SearchDemo() {
   }>>([]);
   const [_relatedKeywords, _setRelatedKeywords] = React.useState<string[]>([]);
   const [_hasSearched, setHasSearched] = React.useState(false); // 검색 실행 여부 추적
+  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null); // 선택된 카테고리
 
   // 최소 로딩 시간을 보장하는 헬퍼 함수
   const ensureMinimumLoadingTime = React.useCallback(async <T,>(apiCall: Promise<T>, minTime: number = 500): Promise<T> => {
@@ -296,6 +298,16 @@ export default function SearchDemo() {
     }
   }, [brand, category, categorySub, page, sort, performFilterSearch]);
 
+  // 카테고리 선택 시 (카테고리 네비게이션)
+  React.useEffect(() => {
+    if (selectedCategory) {
+      // 카테고리가 선택되면 해당 카테고리 상품만 표시
+      // 백엔드 API가 준비되면 여기에 카테고리 필터링 로직 추가
+      console.log('Selected category:', selectedCategory);
+      // TODO: 백엔드 API 연동 시 카테고리 필터 적용
+    }
+  }, [selectedCategory]);
+
   // 핸들러
   const handleSearch = React.useCallback((val: string) => {
     setSearchQuery(val);
@@ -308,6 +320,7 @@ export default function SearchDemo() {
     setCategory([]);
     setCategorySub([]);
     setPrice({ from: "", to: "" });
+    setSelectedCategory(null);
     setPage(0);
   };
 
@@ -326,61 +339,76 @@ export default function SearchDemo() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-0 font-sans">
-      <div className="w-full max-w-[80%] mx-auto">
-      <SearchHeader
-        query={query}
-        setQuery={setQuery}
-        onSearch={handleSearch}
-        relatedKeywords={[]}
-        // 오타교정 props 제거 - 백엔드 미지원
-      />
-
-
-      {/* 중앙: 좌측(필터+리스트), 우측(인기/급등) 2열 레이아웃 */}
-      <div className="w-full grid grid-cols-10 gap-4 mt-2 items-start">
-        {/* 좌측: 필터 + 상품리스트 (같은 컬럼에 세로 배치) */}
-        <div className="col-span-8 space-y-4">
-          <ProductFilters
-            category={category}
-            setCategory={setCategory}
-            categorySub={categorySub}
-            setCategorySub={setCategorySub}
-            brand={brand}
-            setBrand={setBrand}
-            price={price}
-            setPrice={setPrice}
-            brandAgg={baseBrandAgg} // 그룹 필터: 최초 검색 결과 사용
-            categoryAgg={baseCategoryAgg} // 그룹 필터: 최초 검색 결과 사용
-            onResetFilters={resetFilters}
-            onPriceSearch={handlePriceSearch}
-          />
-
-          <ProductList
-            products={products}
-            loading={loading}
-            totalResults={totalResults}
-            totalPages={totalPages}
-            page={page}
-            setPage={setPage}
-            sort={sort}
-            onSortChange={handleSortChange}
-            searchQuery={searchQuery}
-          />
-        </div>
-
-        {/* 우측: 인기/급등 검색어 */}
-        <div className="col-span-2 flex flex-col">
-          <PopularKeywords
-            keywords={popularKeywords}
-            onKeywordClick={handleSearch}
-          />
-          <TrendingKeywords
-            keywords={trendingKeywords}
-            onKeywordClick={handleSearch}
+    <div className="min-h-screen bg-gray-50 font-sans">
+      {/* 검색 헤더 */}
+      <div className="w-full bg-white border-b">
+        <div className="max-w-[1400px] mx-auto">
+          <SearchHeader
+            query={query}
+            setQuery={setQuery}
+            onSearch={handleSearch}
+            relatedKeywords={[]}
+            // 오타교정 props 제거 - 백엔드 미지원
           />
         </div>
       </div>
+
+      {/* 메인 콘텐츠: 카테고리 + 콘텐츠 영역 */}
+      <div className="flex" style={{ height: 'calc(100vh - 80px)' }}>
+        {/* 왼쪽: 카테고리 사이드바 */}
+        <CategorySidebar
+          selectedCategory={selectedCategory}
+          onCategorySelect={setSelectedCategory}
+        />
+
+        {/* 오른쪽: 기존 콘텐츠 영역 */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-[1150px] mx-auto p-4">
+            <div className="grid grid-cols-10 gap-4">
+              {/* 좌측: 필터 + 상품리스트 */}
+              <div className="col-span-8 space-y-4">
+                <ProductFilters
+                  category={category}
+                  setCategory={setCategory}
+                  categorySub={categorySub}
+                  setCategorySub={setCategorySub}
+                  brand={brand}
+                  setBrand={setBrand}
+                  price={price}
+                  setPrice={setPrice}
+                  brandAgg={baseBrandAgg} // 그룹 필터: 최초 검색 결과 사용
+                  categoryAgg={baseCategoryAgg} // 그룹 필터: 최초 검색 결과 사용
+                  onResetFilters={resetFilters}
+                  onPriceSearch={handlePriceSearch}
+                />
+
+                <ProductList
+                  products={products}
+                  loading={loading}
+                  totalResults={totalResults}
+                  totalPages={totalPages}
+                  page={page}
+                  setPage={setPage}
+                  sort={sort}
+                  onSortChange={handleSortChange}
+                  searchQuery={searchQuery}
+                />
+              </div>
+
+              {/* 우측: 인기/급등 검색어 */}
+              <div className="col-span-2 flex flex-col">
+                <PopularKeywords
+                  keywords={popularKeywords}
+                  onKeywordClick={handleSearch}
+                />
+                <TrendingKeywords
+                  keywords={trendingKeywords}
+                  onKeywordClick={handleSearch}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
