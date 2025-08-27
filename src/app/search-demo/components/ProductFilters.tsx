@@ -61,20 +61,21 @@ export function ProductFilters({
       <CardContent className="p-4">
         {/* 카테고리 섹션 */}
         <div className="flex items-start gap-4 mb-4">
-          <Label className="text-sm font-semibold text-foreground w-24 mt-1">
+          <Label className="text-xs font-semibold text-foreground w-24 mt-1">
             카테고리
           </Label>
-          <div className="grid grid-cols-5 gap-x-4 gap-y-2 flex-1">
+          <div className="grid grid-cols-4 gap-x-3 gap-y-2 flex-1 max-h-32 overflow-y-auto pr-2">
             {categoryAgg.map(cat => (
-              <div key={cat.key} className="flex items-center space-x-2">
+              <div key={cat.key} className="flex items-center space-x-2 min-w-0">
                 <Checkbox
                   checked={category.includes(cat.key)}
                   onCheckedChange={(checked) => handleCategory(cat.key, checked)}
-                  className="h-4 w-4"
+                  className="h-4 w-4 flex-shrink-0"
                 />
                 <Label 
-                  className="text-xs font-normal cursor-pointer leading-tight"
+                  className="text-xs font-normal cursor-pointer leading-tight truncate"
                   onClick={() => handleCategory(cat.key, !category.includes(cat.key))}
+                  title={`${cat.key} (${cat.docCount})`}
                 >
                   {cat.key} 
                   <span className="text-muted-foreground ml-1">
@@ -84,9 +85,8 @@ export function ProductFilters({
               </div>
             ))}
           </div>
-          <div className="text-xs text-muted-foreground">
-            {category.length > 0 ? `${category.length}개` : ''} 
-            {categoryAgg.length > 10 && <span className="ml-1">+</span>}
+          <div className="text-xs text-muted-foreground w-10 text-right flex-shrink-0">
+            {category.length > 0 && `${category.length}개`}
           </div>
         </div>
 
@@ -94,20 +94,21 @@ export function ProductFilters({
 
         {/* 제조사/브랜드 섹션 */}
         <div className="flex items-start gap-4 mb-4">
-          <Label className="font-semibold text-foreground w-24 mt-1">
+          <Label className="text-xs font-semibold text-foreground w-24 mt-1">
             제조사/브랜드
           </Label>
-          <div className="grid grid-cols-5 gap-x-4 gap-y-2 flex-1">
+          <div className="grid grid-cols-4 gap-x-3 gap-y-2 flex-1 max-h-32 overflow-y-auto pr-2">
             {brandAgg.map(b => (
-              <div key={b.key} className="flex items-center space-x-2">
+              <div key={b.key} className="flex items-center space-x-2 min-w-0">
                 <Checkbox
                   checked={brand.includes(b.key)}
                   onCheckedChange={(checked) => handleBrandFilter(b.key, checked)}
-                  className="h-4 w-4"
+                  className="h-4 w-4 flex-shrink-0"
                 />
                 <Label 
-                  className="text-xs font-normal cursor-pointer leading-tight"
+                  className="text-xs font-normal cursor-pointer leading-tight truncate"
                   onClick={() => handleBrandFilter(b.key, !brand.includes(b.key))}
+                  title={`${b.key} (${b.docCount})`}
                 >
                   {b.key} 
                   <span className="text-muted-foreground ml-1">
@@ -117,9 +118,8 @@ export function ProductFilters({
               </div>
             ))}
           </div>
-          <div className="text-xs text-muted-foreground">
-            {brand.length > 0 ? `${brand.length}개` : ''} 
-            {brandAgg.length > 10 && <span className="ml-1">+</span>}
+          <div className="text-xs text-muted-foreground w-10 text-right flex-shrink-0">
+            {brand.length > 0 && `${brand.length}개`}
           </div>
         </div>
 
@@ -127,7 +127,7 @@ export function ProductFilters({
 
         {/* 가격 섹션 */}
         <div className="flex items-center gap-4">
-          <Label className="text-sm font-semibold text-foreground w-24">
+          <Label className="text-xs font-semibold text-foreground w-24">
             가격
           </Label>
           <div className="flex items-center gap-2">
