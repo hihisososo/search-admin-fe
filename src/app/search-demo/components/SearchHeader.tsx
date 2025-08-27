@@ -1,8 +1,9 @@
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
-import { searchApi } from "@/lib/api";
+import { searchApi, type SearchMode } from "@/lib/api";
 import { Link } from "react-router-dom";
 import { logger } from "@/lib/logger";
 
@@ -11,6 +12,12 @@ interface SearchHeaderProps {
   setQuery: (query: string) => void;
   onSearch: (query: string) => void;
   relatedKeywords: string[];
+  searchMode: SearchMode;
+  setSearchMode: (mode: SearchMode) => void;
+  rrfK: number;
+  setRrfK: (k: number) => void;
+  hybridTopK: number;
+  setHybridTopK: (k: number) => void;
   // 오타교정 기능은 백엔드에서 미지원
   // applyTypoCorrection?: boolean;
   // setApplyTypoCorrection?: (apply: boolean) => void;
@@ -35,7 +42,7 @@ function highlight(text: string, keyword: string) {
   );
 }
 
-export function SearchHeader({ query, setQuery, onSearch, relatedKeywords: _relatedKeywords }: SearchHeaderProps) {
+export function SearchHeader({ query, setQuery, onSearch, relatedKeywords: _relatedKeywords, searchMode, setSearchMode, rrfK, setRrfK, hybridTopK, setHybridTopK }: SearchHeaderProps) {
   const [suggestions, setSuggestions] = React.useState<string[]>([]);
   const [showSuggest, setShowSuggest] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(-1);
@@ -151,8 +158,19 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords: _rela
           </div>
           
           <div className="flex-1 flex justify-center absolute left-0 right-0">
-            <div className="flex flex-col gap-0 w-[480px]">
+            <div className="flex flex-col gap-0 w-[580px]">
               <div className="relative flex items-center bg-white rounded-full shadow-xl border-2 border-blue-300 px-4 py-2 focus-within:ring-2 focus-within:ring-blue-400" style={{minHeight:'44px', maxHeight:'48px'}}>
+                <Select value={searchMode} onValueChange={(value) => setSearchMode(value as SearchMode)}>
+                  <SelectTrigger className="w-28 h-8 text-xs border-0 bg-gray-50 rounded-lg mr-2 shadow-none focus:ring-0">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="KEYWORD_ONLY">키워드</SelectItem>
+                    <SelectItem value="VECTOR_ONLY">벡터</SelectItem>
+                    <SelectItem value="HYBRID_RRF">하이브리드</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="w-px h-6 bg-gray-300 mr-3"></div>
                 <Input
                   value={query}
                   onChange={handleInputChange}
@@ -196,6 +214,36 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords: _rela
             </div>
           </div>
         </div>
+
+        {/* 하이브리드 모드 옵션 */}
+        {searchMode === "HYBRID_RRF" && (
+          <div className="w-full flex justify-center mt-2">
+            <div className="flex items-center gap-4 px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-600">RRF K:</label>
+                <Input
+                  type="number"
+                  value={rrfK}
+                  onChange={(e) => setRrfK(Number(e.target.value))}
+                  className="w-16 h-6 text-xs"
+                  min={1}
+                  max={100}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-600">Top K:</label>
+                <Input
+                  type="number"
+                  value={hybridTopK}
+                  onChange={(e) => setHybridTopK(Number(e.target.value))}
+                  className="w-20 h-6 text-xs"
+                  min={10}
+                  max={500}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* 오타교정 옵션 제거 - 백엔드 미지원 */}
         

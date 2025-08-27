@@ -1,5 +1,5 @@
 import * as React from "react";
-import { dashboardApi, enhancedSearchApi, type Product, type AggregationBucket } from "@/lib/api";
+import { dashboardApi, enhancedSearchApi, type Product, type AggregationBucket, type SearchMode } from "@/lib/api";
 // import { type KeywordItem } from "@/types/dashboard";
 // import { logger } from "@/lib/logger";
 import { SearchHeader } from "./components/SearchHeader";
@@ -15,10 +15,14 @@ export default function SearchDemo() {
   const [brand, setBrand] = React.useState<string[]>([]);
   const [category, setCategory] = React.useState<string[]>([]);
   const [price, setPrice] = React.useState<{ from: string; to: string }>({ from: "", to: "" });
+  const [appliedPrice, setAppliedPrice] = React.useState<{ from: string; to: string }>({ from: "", to: "" }); // 실제 적용된 가격
   const [page, setPage] = React.useState(0);
   const pageSize = 10;
   const [sort, setSort] = React.useState("score");
   const [categorySub, setCategorySub] = React.useState<string[]>([]);
+  const [searchMode, setSearchMode] = React.useState<SearchMode>("KEYWORD_ONLY");
+  const [rrfK, setRrfK] = React.useState(60);
+  const [hybridTopK, setHybridTopK] = React.useState(100);
   // const [applyTypoCorrection, setApplyTypoCorrection] = React.useState(true); // 오타교정 - 백엔드 미지원
   const [products, setProducts] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -74,12 +78,16 @@ export default function SearchDemo() {
     setCategory([]);
     setCategorySub([]);
     setPrice({ from: "", to: "" });
+    setAppliedPrice({ from: "", to: "" });
     
     try {
       const searchRequest = {
         query: searchQuery,
         page: 0,
         size: pageSize,
+        searchMode: searchMode,
+        rrfK: rrfK,
+        hybridTopK: hybridTopK,
         // applyTypoCorrection 파라미터는 백엔드에서 지원하지 않음
       };
 
@@ -120,7 +128,7 @@ export default function SearchDemo() {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, pageSize, ensureMinimumLoadingTime]);
+  }, [searchQuery, pageSize, searchMode, rrfK, hybridTopK, ensureMinimumLoadingTime]);
 
   // 필터 검색 실행 (필터 변경 시 - 상품 리스트만 업데이트)
   const performFilterSearch = React.useCallback(async () => {
@@ -152,11 +160,14 @@ export default function SearchDemo() {
         size: pageSize,
         sortField: sortField,
         sortOrder: sortOrder,
+        searchMode: searchMode,
+        rrfK: rrfK,
+        hybridTopK: hybridTopK,
         // applyTypoCorrection 파라미터는 백엔드에서 지원하지 않음
         ...(brand.length > 0 && { brand }),
         ...(category.length > 0 && { category }),
-        ...(price.from && { priceFrom: Number(price.from) }),
-        ...(price.to && { priceTo: Number(price.to) })
+        ...(appliedPrice.from && { priceFrom: Number(appliedPrice.from) }),
+        ...(appliedPrice.to && { priceTo: Number(appliedPrice.to) })
       };
 
       const response = await ensureMinimumLoadingTime(
@@ -188,7 +199,7 @@ export default function SearchDemo() {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, page, pageSize, sort, brand, category, categorySub, price, ensureMinimumLoadingTime]);
+  }, [searchQuery, page, pageSize, sort, brand, category, appliedPrice, searchMode, rrfK, hybridTopK, ensureMinimumLoadingTime]);
 
   // 어제 날짜 범위를 계산하는 함수 (대시보드와 동일 포맷: 로컬 기준 YYYY-MM-DDTHH:mm:ss)
   const getYesterdayDateRange = () => {
@@ -279,7 +290,7 @@ export default function SearchDemo() {
   // 필터 변경 시 (필터 검색)
   React.useEffect(() => {
     performFilterSearch();
-  }, [brand, category, categorySub, page, sort, performFilterSearch]);
+  }, [brand, category, appliedPrice, page, sort, searchMode, rrfK, hybridTopK, performFilterSearch]);
 
   // 핸들러
   const handleSearch = React.useCallback((val: string) => {
@@ -293,6 +304,7 @@ export default function SearchDemo() {
     setCategory([]);
     setCategorySub([]);
     setPrice({ from: "", to: "" });
+    setAppliedPrice({ from: "", to: "" });
     setPage(0);
   };
 
@@ -304,8 +316,8 @@ export default function SearchDemo() {
 
   // 가격 검색 핸들러 - 가격 버튼을 눌렀을 때만 검색 실행
   const handlePriceSearch = () => {
+    setAppliedPrice(price); // 입력한 가격을 적용
     setPage(0);
-    performFilterSearch();
   };
 
   return (
@@ -316,6 +328,12 @@ export default function SearchDemo() {
           setQuery={setQuery}
           onSearch={handleSearch}
           relatedKeywords={[]}
+          searchMode={searchMode}
+          setSearchMode={setSearchMode}
+          rrfK={rrfK}
+          setRrfK={setRrfK}
+          hybridTopK={hybridTopK}
+          setHybridTopK={setHybridTopK}
           // 오타교정 props 제거 - 백엔드 미지원
         />
 
