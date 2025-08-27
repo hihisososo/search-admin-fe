@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { 
   Dialog,
   DialogContent,
@@ -26,9 +27,14 @@ import { PerformanceScore } from "../components/PerformanceScore"
 import { EvaluationReportViewer } from "../components/EvaluationReportViewer"
 import type { EvaluationReport } from "@/services/evaluation/types"
 
+type SearchMode = 'KEYWORD_ONLY' | 'VECTOR_ONLY' | 'HYBRID_RRF'
+
 export default function EvaluationExecutionPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [reportTitle, setReportTitle] = useState("")
+  const [searchMode, setSearchMode] = useState<SearchMode>("KEYWORD_ONLY")
+  const [rrfK, setRrfK] = useState(60)
+  const [hybridTopK, setHybridTopK] = useState(100)
   const [selectedReport, setSelectedReport] = useState<EvaluationReport | null>(null)
   const [isReportDrawerOpen, setIsReportDrawerOpen] = useState(false)
   const [isLoadingReport, setIsLoadingReport] = useState(false)
@@ -78,7 +84,12 @@ export default function EvaluationExecutionPage() {
     try {
       setIsStarting(true)
       const result = await evaluateMutation.mutateAsync({ 
-        reportName: reportTitle.trim()
+        reportName: reportTitle.trim(),
+        searchMode,
+        ...(searchMode === 'HYBRID_RRF' && {
+          rrfK,
+          hybridTopK
+        })
       })
       
       // 작업 추적 시작
@@ -217,6 +228,49 @@ export default function EvaluationExecutionPage() {
                     placeholder="예: 2024년 1월 검색 성능 평가"
                   />
                 </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="searchMode">검색 모드</Label>
+                  <Select value={searchMode} onValueChange={(value) => setSearchMode(value as SearchMode)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="KEYWORD_ONLY">키워드 검색 (BM25)</SelectItem>
+                      <SelectItem value="VECTOR_ONLY">벡터 검색</SelectItem>
+                      <SelectItem value="HYBRID_RRF">하이브리드 (RRF)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {searchMode === "HYBRID_RRF" && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="rrfK">RRF K값</Label>
+                      <Input
+                        id="rrfK"
+                        type="number"
+                        value={rrfK}
+                        onChange={(e) => setRrfK(Number(e.target.value))}
+                        min={1}
+                        max={100}
+                      />
+                      <p className="text-xs text-gray-500">기본값: 60</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="hybridTopK">Hybrid Top K</Label>
+                      <Input
+                        id="hybridTopK"
+                        type="number"
+                        value={hybridTopK}
+                        onChange={(e) => setHybridTopK(Number(e.target.value))}
+                        min={10}
+                        max={500}
+                      />
+                      <p className="text-xs text-gray-500">기본값: 100</p>
+                    </div>
+                  </div>
+                )}
               </div>
               <DialogFooter>
                 <Button 

@@ -28,6 +28,8 @@ export interface AggregationBucket {
   docCount: number
 }
 
+export type SearchMode = 'KEYWORD_ONLY' | 'VECTOR_ONLY' | 'HYBRID_RRF'
+
 export interface SearchRequest {
   query?: string
   page: number
@@ -38,6 +40,9 @@ export interface SearchRequest {
   category?: string[]
   priceFrom?: number
   priceTo?: number
+  searchMode?: SearchMode
+  rrfK?: number
+  hybridTopK?: number
 }
 
 export interface SearchResponse {
@@ -267,6 +272,9 @@ export const enhancedSearchApi = {
     category?: string[]
     priceFrom?: number
     priceTo?: number
+    searchMode?: SearchMode
+    rrfK?: number
+    hybridTopK?: number
   }): Promise<SearchResponse> {
     const queryString = buildQueryString(params)
     return apiFetch<SearchResponse>(`/v1/search${queryString}`)
@@ -286,6 +294,9 @@ export const enhancedSearchApi = {
     category?: string[]
     priceFrom?: number
     priceTo?: number
+    searchMode?: SearchMode
+    rrfK?: number
+    hybridTopK?: number
   }): Promise<SearchResponse> {
     const queryString = buildQueryString(params)
     return apiFetch<SearchResponse>(`/v1/search/simulation${queryString}`)

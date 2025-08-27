@@ -4,14 +4,23 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
 import { BarChart3, CheckCircle, ChevronDown, ChevronRight } from "lucide-react"
 import { useEvaluationReports } from "@/hooks/use-evaluation"
 import type { EvaluationReport, EvaluationReportSummary } from "@/services/evaluation/types"
 
+type SearchMode = 'KEYWORD_ONLY' | 'VECTOR_ONLY' | 'HYBRID_RRF'
+
 interface ReportDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onEvaluate: (data: { reportName: string }) => Promise<EvaluationReport>
+  onEvaluate: (data: { 
+    reportName: string
+    searchMode?: SearchMode
+    rrfK?: number
+    hybridTopK?: number 
+  }) => Promise<EvaluationReport>
   isLoading: boolean
 }
 
@@ -22,6 +31,9 @@ export function ReportDialog({
   isLoading
 }: ReportDialogProps) {
   const [reportName, setReportName] = useState("")
+  const [searchMode, setSearchMode] = useState<SearchMode>("KEYWORD_ONLY")
+  const [rrfK, setRrfK] = useState(60)
+  const [hybridTopK, setHybridTopK] = useState(100)
   const [latestReport, setLatestReport] = useState<EvaluationReport | null>(null)
   const [selectedReport, setSelectedReport] = useState<EvaluationReportSummary | null>(null)
   const [expandedWrongDocs, setExpandedWrongDocs] = useState<Set<string>>(new Set())
@@ -36,7 +48,12 @@ export function ReportDialog({
     }
 
     try {
-      const report = await onEvaluate({ reportName: reportName.trim() })
+      const report = await onEvaluate({ 
+        reportName: reportName.trim(),
+        searchMode,
+        rrfK: searchMode === 'HYBRID_RRF' ? rrfK : undefined,
+        hybridTopK: searchMode === 'HYBRID_RRF' ? hybridTopK : undefined
+      })
       setLatestReport(report)
       setReportName("")
     } catch (error) {
@@ -86,6 +103,49 @@ export function ReportDialog({
                   onChange={(e) => setReportName(e.target.value)}
                   placeholder="예: 2024-01-15 검색 성능 평가"
                 />
+              </div>
+              
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-sm font-medium">검색 모드</Label>
+                  <Select value={searchMode} onValueChange={(value) => setSearchMode(value as SearchMode)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="KEYWORD_ONLY">키워드 검색 (BM25)</SelectItem>
+                      <SelectItem value="VECTOR_ONLY">벡터 검색</SelectItem>
+                      <SelectItem value="HYBRID_RRF">하이브리드 (RRF)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {searchMode === "HYBRID_RRF" && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-sm font-medium">RRF K값</Label>
+                      <Input
+                        type="number"
+                        value={rrfK}
+                        onChange={(e) => setRrfK(Number(e.target.value))}
+                        min={1}
+                        max={100}
+                      />
+                      <div className="text-xs text-gray-500 mt-1">기본값: 60</div>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium">Hybrid Top K</Label>
+                      <Input
+                        type="number"
+                        value={hybridTopK}
+                        onChange={(e) => setHybridTopK(Number(e.target.value))}
+                        min={10}
+                        max={500}
+                      />
+                      <div className="text-xs text-gray-500 mt-1">기본값: 100</div>
+                    </div>
+                  </div>
+                )}
               </div>
               
               <Button 

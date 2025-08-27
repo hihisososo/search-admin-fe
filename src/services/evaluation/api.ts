@@ -128,7 +128,12 @@ class EvaluationService {
   // 3. 평가 실행 (nDCG 계산)
 
   // 평가 실행 (비동기)
-  async evaluateAsync(data: { reportName: string }): Promise<AsyncTaskResponse> {
+  async evaluateAsync(data: { 
+    reportName: string
+    searchMode?: 'KEYWORD_ONLY' | 'VECTOR_ONLY' | 'HYBRID_RRF'
+    rrfK?: number
+    hybridTopK?: number
+  }): Promise<AsyncTaskResponse> {
     return apiClient.post<AsyncTaskResponse>(`${this.baseEndpoint}/evaluate-async`, data)
   }
 

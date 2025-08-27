@@ -255,7 +255,12 @@ export function useEvaluateAsync() {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: (data: { reportName: string }) => evaluationService.evaluateAsync(data),
+    mutationFn: (data: { 
+      reportName: string
+      searchMode?: 'KEYWORD_ONLY' | 'VECTOR_ONLY' | 'HYBRID_RRF'
+      rrfK?: number
+      hybridTopK?: number 
+    }) => evaluationService.evaluateAsync(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: evaluationKeys.tasks.all })
     },
