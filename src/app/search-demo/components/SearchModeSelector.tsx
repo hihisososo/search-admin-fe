@@ -11,6 +11,8 @@ interface SearchModeSelectorProps {
   setRrfK: (k: number) => void;
   hybridTopK: number;
   setHybridTopK: (k: number) => void;
+  vectorMinScore?: number | null;
+  setVectorMinScore?: (score: number | null) => void;
 }
 
 export function SearchModeSelector({
@@ -19,7 +21,9 @@ export function SearchModeSelector({
   rrfK,
   setRrfK,
   hybridTopK,
-  setHybridTopK
+  setHybridTopK,
+  vectorMinScore,
+  setVectorMinScore
 }: SearchModeSelectorProps) {
   return (
     <Card className="shadow-sm border border-border">
@@ -35,7 +39,7 @@ export function SearchModeSelector({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="KEYWORD_ONLY">키워드 검색</SelectItem>
-                <SelectItem value="VECTOR_ONLY">벡터 검색</SelectItem>
+                <SelectItem value="VECTOR_MULTI_FIELD">벡터 검색</SelectItem>
                 <SelectItem value="HYBRID_RRF">하이브리드</SelectItem>
               </SelectContent>
             </Select>
@@ -71,6 +75,34 @@ export function SearchModeSelector({
                 />
               </div>
             </>
+          )}
+          
+          {(searchMode === "VECTOR_MULTI_FIELD" || searchMode === "HYBRID_RRF") && setVectorMinScore && (
+            <div className="flex items-center gap-2">
+              <Label 
+                className="text-xs font-semibold text-foreground"
+                title={searchMode === "VECTOR_MULTI_FIELD" ? "권장: 0.6~0.75" : "권장: 0.55~0.7"}
+              >
+                최소 점수
+              </Label>
+              <Input
+                type="number"
+                value={vectorMinScore ?? 0.6}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  if (value >= 0 && value <= 1) {
+                    setVectorMinScore(value);
+                  }
+                }}
+                className="w-20 h-7 text-xs"
+                min={0}
+                max={1}
+                step={0.05}
+              />
+              <span className="text-xs text-muted-foreground">
+                {searchMode === "VECTOR_MULTI_FIELD" ? "(0.6~0.75)" : "(0.55~0.7)"}
+              </span>
+            </div>
           )}
           
         </div>

@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
 import { ProductFilters } from "../search-demo/components/ProductFilters"
 import { ScoreProductList } from "./components/ScoreProductList"
+import { SearchModeSelector } from "../search-demo/components/SearchModeSelector"
 import { EnvironmentSelector } from "../dictionary/user/components/EnvironmentSelector"
 import { DictionaryEnvironmentType } from "@/types/dashboard"
-import type { Product, AggregationBucket } from "@/lib/api"
+import type { Product, AggregationBucket, SearchMode } from "@/lib/api"
 
 // 새로운 시뮬레이션 API 응답 타입
 interface ExplainDetail {
@@ -65,6 +66,10 @@ interface EnvironmentState {
     sort: string
     showExplain: boolean
     applyTypoCorrection: boolean  // 🆕 오타교정 옵션 추가
+    searchMode: SearchMode  // 검색 모드
+    rrfK: number  // RRF K 상수
+    hybridTopK: number  // 하이브리드 Top K
+    vectorMinScore: number | null  // 벡터 검색 최소 점수
     
     // 결과 데이터
     products: (Product & { score?: number; explain?: ExplainDetail })[]
@@ -91,6 +96,10 @@ const initialEnvironmentState: EnvironmentState = {
     sort: 'score',
     showExplain: true,
     applyTypoCorrection: true,  // 🆕 기본값 true
+    searchMode: 'KEYWORD_ONLY' as SearchMode,
+    rrfK: 60,
+    hybridTopK: 300,
+    vectorMinScore: 0.6,
     products: [],
     totalResults: 0,
     totalPages: 0,
@@ -156,7 +165,16 @@ export default function SearchSimulator() {
             page: overrideParams?.page ?? currentEnv.page,
             sort: overrideParams?.sort ?? currentEnv.sort,
             showExplain: overrideParams?.showExplain ?? currentEnv.showExplain,
-            applyTypoCorrection: overrideParams?.applyTypoCorrection ?? currentEnv.applyTypoCorrection  // 🆕 오타교정 옵션
+            applyTypoCorrection: overrideParams?.applyTypoCorrection ?? currentEnv.applyTypoCorrection,  // 🆕 오타교정 옵션
+            searchMode: overrideParams?.searchMode ?? currentEnv.searchMode,
+            rrfK: overrideParams?.rrfK ?? currentEnv.rrfK,
+            hybridTopK: overrideParams?.hybridTopK ?? currentEnv.hybridTopK,
+            vectorMinScore: overrideParams?.vectorMinScore ?? currentEnv.vectorMinScore
+        }
+        
+        // 검색 모드가 KEYWORD_ONLY가 아니면 정렬을 score로 고정
+        if (searchParams.searchMode !== 'KEYWORD_ONLY' && searchParams.sort !== 'score') {
+            searchParams.sort = 'score'
         }
 
         // 로딩 상태 설정
@@ -189,6 +207,16 @@ export default function SearchSimulator() {
 
             // 🆕 오타교정 옵션 추가
             params.append('applyTypoCorrection', searchParams.applyTypoCorrection.toString())
+            
+            // 검색 모드 관련 파라미터
+            params.append('searchMode', searchParams.searchMode)
+            params.append('rrfK', searchParams.rrfK.toString())
+            params.append('hybridTopK', searchParams.hybridTopK.toString())
+            
+            // vectorMinScore 추가 (벡터 및 하이브리드 모드일 때만)
+            if ((searchParams.searchMode === 'VECTOR_MULTI_FIELD' || searchParams.searchMode === 'HYBRID_RRF') && searchParams.vectorMinScore !== null) {
+                params.append('vectorMinScore', searchParams.vectorMinScore.toString())
+            }
 
             // 정렬 설정
             let sortField = 'score'
@@ -319,6 +347,22 @@ export default function SearchSimulator() {
 
     const currentEnvId = ENV_MAPPING[selectedEnv]
     const envState = environments[currentEnvId]
+    
+    // 검색 모드 변경 핸들러
+    const handleSearchModeChange = (newMode: SearchMode) => {
+        updateEnvironmentState(currentEnvId, { 
+            searchMode: newMode,
+            sort: 'score'  // 정렬 초기화
+        })
+        
+        // 검색했던 상태라면 재검색
+        if (envState.hasSearched) {
+            performSearch(currentEnvId, false, { 
+                searchMode: newMode, 
+                sort: 'score' 
+            })
+        }
+    }
 
     return (
         <div className="p-6">
@@ -332,6 +376,19 @@ export default function SearchSimulator() {
                             onChange={setSelectedEnv}
                         />
                     </div>
+                    
+                    {/* 검색 모드 선택 */}
+                    <SearchModeSelector
+                        searchMode={envState.searchMode}
+                        setSearchMode={handleSearchModeChange}
+                        rrfK={envState.rrfK}
+                        setRrfK={(k) => updateEnvironmentState(currentEnvId, { rrfK: k })}
+                        hybridTopK={envState.hybridTopK}
+                        setHybridTopK={(k) => updateEnvironmentState(currentEnvId, { hybridTopK: k })}
+                        vectorMinScore={envState.vectorMinScore}
+                        setVectorMinScore={(score) => updateEnvironmentState(currentEnvId, { vectorMinScore: score })}
+                    />
+                    
                     <div className="flex gap-2">
                                 <Input
                                     value={envState.query}
@@ -393,6 +450,7 @@ export default function SearchSimulator() {
                 {/* 필터 */}
                 <div>
                     <ProductFilters
+                            searchMode={envState.searchMode}
                             category={envState.category}
                             setCategory={(category) => {
                                 if (typeof category === 'function') {
@@ -452,6 +510,7 @@ export default function SearchSimulator() {
                         }}
                         searchQuery={envState.query}
                         showExplain={envState.showExplain}
+                        searchMode={envState.searchMode}
                     />
                 )}
         </div>
