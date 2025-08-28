@@ -33,7 +33,7 @@ export function ReportDialog({
   const [reportName, setReportName] = useState("")
   const [searchMode, setSearchMode] = useState<SearchMode>("KEYWORD_ONLY")
   const [rrfK, setRrfK] = useState(60)
-  const [hybridTopK, setHybridTopK] = useState(100)
+  const [hybridTopK, setHybridTopK] = useState(300)
   const [latestReport, setLatestReport] = useState<EvaluationReport | null>(null)
   const [selectedReport, setSelectedReport] = useState<EvaluationReportSummary | null>(null)
   const [expandedWrongDocs, setExpandedWrongDocs] = useState<Set<string>>(new Set())
