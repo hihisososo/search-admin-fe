@@ -21,8 +21,9 @@ export default function SearchDemo() {
   const [sort, setSort] = React.useState("score");
   const [categorySub, setCategorySub] = React.useState<string[]>([]);
   const [searchMode, setSearchMode] = React.useState<SearchMode>("KEYWORD_ONLY");
+  const [appliedSearchMode, setAppliedSearchMode] = React.useState<SearchMode>("KEYWORD_ONLY"); // 실제 검색에 적용된 모드
   const [rrfK, setRrfK] = React.useState(60);
-  const [hybridTopK, setHybridTopK] = React.useState(100);
+  const [hybridTopK, setHybridTopK] = React.useState(300);
   // const [applyTypoCorrection, setApplyTypoCorrection] = React.useState(true); // 오타교정 - 백엔드 미지원
   const [products, setProducts] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -90,6 +91,9 @@ export default function SearchDemo() {
         hybridTopK: hybridTopK,
         // applyTypoCorrection 파라미터는 백엔드에서 지원하지 않음
       };
+      
+      // 검색 실행 시 현재 선택된 모드를 저장
+      setAppliedSearchMode(searchMode);
 
       const response = await ensureMinimumLoadingTime(
         enhancedSearchApi.executeSearch(searchRequest), 
@@ -128,7 +132,7 @@ export default function SearchDemo() {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, pageSize, searchMode, rrfK, hybridTopK, ensureMinimumLoadingTime]);
+  }, [searchQuery, pageSize, ensureMinimumLoadingTime]);
 
   // 필터 검색 실행 (필터 변경 시 - 상품 리스트만 업데이트)
   const performFilterSearch = React.useCallback(async () => {
@@ -160,7 +164,7 @@ export default function SearchDemo() {
         size: pageSize,
         sortField: sortField,
         sortOrder: sortOrder,
-        searchMode: searchMode,
+        searchMode: appliedSearchMode, // 이전 검색 시 적용된 모드 사용
         rrfK: rrfK,
         hybridTopK: hybridTopK,
         // applyTypoCorrection 파라미터는 백엔드에서 지원하지 않음
@@ -199,7 +203,7 @@ export default function SearchDemo() {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, page, pageSize, sort, brand, category, appliedPrice, searchMode, rrfK, hybridTopK, ensureMinimumLoadingTime]);
+  }, [searchQuery, page, pageSize, sort, brand, category, appliedPrice, ensureMinimumLoadingTime, appliedSearchMode]);
 
   // 어제 날짜 범위를 계산하는 함수 (대시보드와 동일 포맷: 로컬 기준 YYYY-MM-DDTHH:mm:ss)
   const getYesterdayDateRange = () => {
@@ -282,15 +286,19 @@ export default function SearchDemo() {
     loadKeywords();
   }, []);
 
-  // 새 검색어로 검색 시 (초기 검색) - 검색어 변경시마다 실행
+  // 새 검색어로 검색 시
   React.useEffect(() => {
-    performInitialSearch();
+    if (searchQuery !== undefined) {
+      performInitialSearch();
+    }
   }, [searchQuery, performInitialSearch]);
 
-  // 필터 변경 시 (필터 검색)
+  // 필터 변경 시 (필터 검색 - aggregation 유지)
   React.useEffect(() => {
-    performFilterSearch();
-  }, [brand, category, appliedPrice, page, sort, searchMode, rrfK, hybridTopK, performFilterSearch]);
+    if (_hasSearched) {
+      performFilterSearch();
+    }
+  }, [brand, category, appliedPrice, page, sort, _hasSearched, performFilterSearch]);
 
   // 핸들러
   const handleSearch = React.useCallback((val: string) => {
@@ -330,11 +338,7 @@ export default function SearchDemo() {
           relatedKeywords={[]}
           searchMode={searchMode}
           setSearchMode={setSearchMode}
-          rrfK={rrfK}
-          setRrfK={setRrfK}
-          hybridTopK={hybridTopK}
-          setHybridTopK={setHybridTopK}
-          // 오타교정 props 제거 - 백엔드 미지원
+          // RRF K와 Top K는 기본값으로 사용 (UI에 노출하지 않음)
         />
 
         {/* 메인 콘텐츠: 2단 레이아웃 */}
@@ -366,6 +370,7 @@ export default function SearchDemo() {
                 sort={sort}
                 onSortChange={handleSortChange}
                 searchQuery={searchQuery}
+                searchMode={appliedSearchMode}
               />
             </div>
 

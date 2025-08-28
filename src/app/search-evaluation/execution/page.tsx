@@ -34,7 +34,7 @@ export default function EvaluationExecutionPage() {
   const [reportTitle, setReportTitle] = useState("")
   const [searchMode, setSearchMode] = useState<SearchMode>("KEYWORD_ONLY")
   const [rrfK, setRrfK] = useState(60)
-  const [hybridTopK, setHybridTopK] = useState(100)
+  const [hybridTopK, setHybridTopK] = useState(300)
   const [selectedReport, setSelectedReport] = useState<EvaluationReport | null>(null)
   const [isReportDrawerOpen, setIsReportDrawerOpen] = useState(false)
   const [isLoadingReport, setIsLoadingReport] = useState(false)
@@ -102,7 +102,7 @@ export default function EvaluationExecutionPage() {
       // 성공 토스트
       toast({
         title: "평가 시작",
-        description: `작업 ID: ${result.taskId}로 평가를 시작했습니다.`,
+        description: `평가를 시작했습니다.`,
         variant: "default"
       })
       

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Pagination } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Product } from "@/lib/api";
+import type { Product, SearchMode } from "@/lib/api";
 
 interface ProductListProps {
   products: Product[];
@@ -15,6 +15,7 @@ interface ProductListProps {
   sort: string;
   onSortChange: (sort: string) => void;
   searchQuery: string;
+  searchMode?: SearchMode;
 }
 
 const SORT_OPTIONS = [
@@ -81,7 +82,8 @@ export function ProductList({
   setPage,
   sort,
   onSortChange,
-  searchQuery
+  searchQuery,
+  searchMode
 }: ProductListProps) {
   const handleProductClick = (_product: Product) => {
     // Product clicked: ${_product.name} (ID: ${_product.id})
@@ -105,7 +107,15 @@ export function ProductList({
           {loading ? (
             <Skeleton className="h-5 w-32" />
           ) : (
-            `총 ${totalResults.toLocaleString()}개 상품`
+            <div className="space-y-1">
+              {searchMode === 'KEYWORD_ONLY' ? (
+                <div>총 {totalResults.toLocaleString()}개 상품</div>
+              ) : (
+                <div className="text-xs text-blue-600">
+                  관련도 높은 상품 표시 중
+                </div>
+              )}
+            </div>
           )}
         </div>
         <div className="flex gap-2">
@@ -218,7 +228,11 @@ export function ProductList({
         <div className="space-y-3">
           <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
           <div className="text-center text-sm text-gray-500">
-            {page + 1} / {totalPages} 페이지 (총 {totalResults.toLocaleString()}개 상품)
+            {searchMode === 'KEYWORD_ONLY' ? (
+              <>{page + 1} / {totalPages} 페이지 (총 {totalResults.toLocaleString()}개 상품)</>
+            ) : (
+              <>{page + 1} / {totalPages} 페이지</>
+            )}
           </div>
         </div>
       )}
