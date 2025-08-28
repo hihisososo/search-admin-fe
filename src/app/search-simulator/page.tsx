@@ -152,9 +152,7 @@ export default function SearchSimulator() {
         // 현재 환경 상태 가져오기
         const currentEnv = environments[envId]
         
-        if (!currentEnv.query.trim() && isInitialSearch) {
-            return
-        }
+        // 검색어 없어도 검색 가능하도록 조건 제거
 
         // 검색에 사용할 파라미터 (override 값이 있으면 적용)
         const searchParams = {
