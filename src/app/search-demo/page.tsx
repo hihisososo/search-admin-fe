@@ -12,6 +12,7 @@ export default function SearchDemo() {
   // 검색/필터 상태
   const [query, setQuery] = React.useState(""); // 입력창 값
   const [searchQuery, setSearchQuery] = React.useState(""); // 실제 검색 실행 값
+  const [searchTrigger, setSearchTrigger] = React.useState(0); // 검색 트리거
   const [brand, setBrand] = React.useState<string[]>([]);
   const [category, setCategory] = React.useState<string[]>([]);
   const [price, setPrice] = React.useState<{ from: string; to: string }>({ from: "", to: "" });
@@ -22,8 +23,25 @@ export default function SearchDemo() {
   const [categorySub, setCategorySub] = React.useState<string[]>([]);
   const [searchMode, setSearchMode] = React.useState<SearchMode>("KEYWORD_ONLY");
   const [appliedSearchMode, setAppliedSearchMode] = React.useState<SearchMode>("KEYWORD_ONLY"); // 실제 검색에 적용된 모드
-  const [rrfK, setRrfK] = React.useState(60);
-  const [hybridTopK, setHybridTopK] = React.useState(300);
+  const [rrfK, _setRrfK] = React.useState(60);
+  const [hybridTopK, _setHybridTopK] = React.useState(300);
+  
+  // ref로 최신 값 유지
+  const searchModeRef = React.useRef(searchMode);
+  const rrfKRef = React.useRef(rrfK);
+  const hybridTopKRef = React.useRef(hybridTopK);
+  
+  React.useEffect(() => {
+    searchModeRef.current = searchMode;
+  }, [searchMode]);
+  
+  React.useEffect(() => {
+    rrfKRef.current = rrfK;
+  }, [rrfK]);
+  
+  React.useEffect(() => {
+    hybridTopKRef.current = hybridTopK;
+  }, [hybridTopK]);
   // const [applyTypoCorrection, setApplyTypoCorrection] = React.useState(true); // 오타교정 - 백엔드 미지원
   const [products, setProducts] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -86,14 +104,14 @@ export default function SearchDemo() {
         query: searchQuery,
         page: 0,
         size: pageSize,
-        searchMode: searchMode,
-        rrfK: rrfK,
-        hybridTopK: hybridTopK,
+        searchMode: searchModeRef.current,
+        rrfK: rrfKRef.current,
+        hybridTopK: hybridTopKRef.current,
         // applyTypoCorrection 파라미터는 백엔드에서 지원하지 않음
       };
       
       // 검색 실행 시 현재 선택된 모드를 저장
-      setAppliedSearchMode(searchMode);
+      setAppliedSearchMode(searchModeRef.current);
 
       const response = await ensureMinimumLoadingTime(
         enhancedSearchApi.executeSearch(searchRequest), 
@@ -118,10 +136,19 @@ export default function SearchDemo() {
       if (response.aggregations?.brand_name) {
         setBrandAgg(response.aggregations.brand_name);
         setBaseBrandAgg(response.aggregations.brand_name);
+      } else {
+        // aggregation이 없으면 빈 배열로 설정
+        setBrandAgg([]);
+        setBaseBrandAgg([]);
       }
+      
       if (response.aggregations?.category_name) {
         setCategoryAgg(response.aggregations.category_name);
         setBaseCategoryAgg(response.aggregations.category_name);
+      } else {
+        // aggregation이 없으면 빈 배열로 설정
+        setCategoryAgg([]);
+        setBaseCategoryAgg([]);
       }
 
     } catch (error) {
@@ -165,8 +192,8 @@ export default function SearchDemo() {
         sortField: sortField,
         sortOrder: sortOrder,
         searchMode: appliedSearchMode, // 이전 검색 시 적용된 모드 사용
-        rrfK: rrfK,
-        hybridTopK: hybridTopK,
+        rrfK: rrfKRef.current,
+        hybridTopK: hybridTopKRef.current,
         // applyTypoCorrection 파라미터는 백엔드에서 지원하지 않음
         ...(brand.length > 0 && { brand }),
         ...(category.length > 0 && { category }),
@@ -286,12 +313,12 @@ export default function SearchDemo() {
     loadKeywords();
   }, []);
 
-  // 새 검색어로 검색 시
+  // 검색 실행 (searchTrigger가 변경될 때마다)
   React.useEffect(() => {
-    if (searchQuery !== undefined) {
+    if (searchQuery !== undefined || searchTrigger > 0) {
       performInitialSearch();
     }
-  }, [searchQuery, performInitialSearch]);
+  }, [searchQuery, searchTrigger, performInitialSearch]);
 
   // 필터 변경 시 (필터 검색 - aggregation 유지)
   React.useEffect(() => {
@@ -304,6 +331,7 @@ export default function SearchDemo() {
   const handleSearch = React.useCallback((val: string) => {
     setSearchQuery(val);
     setQuery(val); // 검색창에도 반영
+    setSearchTrigger(prev => prev + 1); // 트리거 증가로 강제 검색 실행
   }, []);
 
   // 필터 초기화
@@ -358,6 +386,7 @@ export default function SearchDemo() {
                 categoryAgg={baseCategoryAgg} // 그룹 필터: 최초 검색 결과 사용
                 onResetFilters={resetFilters}
                 onPriceSearch={handlePriceSearch}
+                searchMode={appliedSearchMode}
               />
 
               <ProductList

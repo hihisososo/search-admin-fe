@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { AggregationBucket } from "@/lib/api";
+import type { AggregationBucket, SearchMode } from "@/lib/api";
 
 interface ProductFiltersProps {
   category: string[];
@@ -20,6 +20,7 @@ interface ProductFiltersProps {
   categoryAgg: AggregationBucket[];
   onResetFilters: () => void;
   onPriceSearch: () => void;
+  searchMode?: SearchMode;
 }
 
 export function ProductFilters({
@@ -34,7 +35,8 @@ export function ProductFilters({
   brandAgg,
   categoryAgg,
   onResetFilters,
-  onPriceSearch
+  onPriceSearch,
+  searchMode
 }: ProductFiltersProps) {
   const handleCategory = (c: string, checked: boolean) => {
     if (checked) {
@@ -75,12 +77,14 @@ export function ProductFilters({
                 <Label 
                   className="text-xs font-normal cursor-pointer leading-tight truncate"
                   onClick={() => handleCategory(cat.key, !category.includes(cat.key))}
-                  title={`${cat.key} (${cat.docCount})`}
+                  title={`${cat.key}${searchMode === 'KEYWORD_ONLY' ? ` (${cat.docCount})` : ''}`}
                 >
                   {cat.key} 
-                  <span className="text-muted-foreground ml-1">
-                    ({cat.docCount})
-                  </span>
+                  {searchMode === 'KEYWORD_ONLY' && (
+                    <span className="text-muted-foreground ml-1">
+                      ({cat.docCount})
+                    </span>
+                  )}
                 </Label>
               </div>
             ))}
@@ -108,12 +112,14 @@ export function ProductFilters({
                 <Label 
                   className="text-xs font-normal cursor-pointer leading-tight truncate"
                   onClick={() => handleBrandFilter(b.key, !brand.includes(b.key))}
-                  title={`${b.key} (${b.docCount})`}
+                  title={`${b.key}${searchMode === 'KEYWORD_ONLY' ? ` (${b.docCount})` : ''}`}
                 >
                   {b.key} 
-                  <span className="text-muted-foreground ml-1">
-                    ({b.docCount})
-                  </span>
+                  {searchMode === 'KEYWORD_ONLY' && (
+                    <span className="text-muted-foreground ml-1">
+                      ({b.docCount})
+                    </span>
+                  )}
                 </Label>
               </div>
             ))}

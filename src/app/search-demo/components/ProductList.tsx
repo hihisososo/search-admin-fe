@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Pagination } from "@/components/ui/pagination";
+import { SimplePagination } from "./SimplePagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Product, SearchMode } from "@/lib/api";
 
@@ -85,6 +85,10 @@ export function ProductList({
   searchQuery,
   searchMode
 }: ProductListProps) {
+  // 검색 모드에 따른 정렬 옵션 필터링
+  const availableSortOptions = searchMode === 'KEYWORD_ONLY' 
+    ? SORT_OPTIONS 
+    : SORT_OPTIONS.filter(opt => opt.value === 'score');
   const handleProductClick = (_product: Product) => {
     // Product clicked: ${_product.name} (ID: ${_product.id})
     // 여기에 실제 클릭 로깅 API 호출을 추가할 수 있습니다
@@ -119,7 +123,7 @@ export function ProductList({
           )}
         </div>
         <div className="flex gap-2">
-          {SORT_OPTIONS.map(opt => (
+          {availableSortOptions.map(opt => (
             <Button 
               key={opt.value} 
               variant={sort === opt.value ? "default" : "outline"} 
@@ -226,7 +230,7 @@ export function ProductList({
       
       {totalPages > 1 && !loading && (
         <div className="space-y-3">
-          <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+          <SimplePagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
           <div className="text-center text-sm text-gray-500">
             {searchMode === 'KEYWORD_ONLY' ? (
               <>{page + 1} / {totalPages} 페이지 (총 {totalResults.toLocaleString()}개 상품)</>
