@@ -1,0 +1,63 @@
+import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+
+interface SimplePaginationProps {
+    currentPage: number
+    totalPages: number
+    onPageChange: (page: number) => void
+}
+
+export function SimplePagination({ currentPage, totalPages, onPageChange }: SimplePaginationProps) {
+    if (totalPages <= 1) return null
+
+    // 페이지 번호를 표시용으로 1부터 시작하도록 변환
+    const displayPage = currentPage + 1
+    
+    // 최대 10개의 페이지 번호 표시
+    const maxVisiblePages = 10
+    const halfWindow = Math.floor(maxVisiblePages / 2)
+    let startPage = Math.max(1, displayPage - halfWindow)
+    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1)
+    }
+
+    return (
+        <div className="flex justify-center items-center gap-1 mt-6">
+            <Button 
+                variant="outline" 
+                size="sm" 
+                disabled={currentPage <= 0}
+                onClick={() => onPageChange(currentPage - 1)}
+                className="px-2 border-gray-300"
+                title="이전 페이지"
+            >
+                <ChevronLeft className="h-3 w-3" />
+            </Button>
+            
+            {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((pageNum) => (
+                <Button 
+                    key={pageNum}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onPageChange(pageNum - 1)}
+                    className={`px-2 min-w-[28px] border-gray-300 ${pageNum === displayPage ? 'bg-gray-900 text-white border-gray-900' : ''}`}
+                >
+                    {pageNum}
+                </Button>
+            ))}
+            
+            <Button 
+                variant="outline" 
+                size="sm" 
+                disabled={currentPage >= totalPages - 1}
+                onClick={() => onPageChange(currentPage + 1)}
+                className="px-2 border-gray-300"
+                title="다음 페이지"
+            >
+                <ChevronRight className="h-3 w-3" />
+            </Button>
+        </div>
+    )
+}
