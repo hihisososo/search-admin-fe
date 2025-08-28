@@ -27,7 +27,7 @@ import { PerformanceScore } from "../components/PerformanceScore"
 import { EvaluationReportViewer } from "../components/EvaluationReportViewer"
 import type { EvaluationReport } from "@/services/evaluation/types"
 
-type SearchMode = 'KEYWORD_ONLY' | 'VECTOR_ONLY' | 'HYBRID_RRF'
+type SearchMode = 'KEYWORD_ONLY' | 'VECTOR_MULTI_FIELD' | 'HYBRID_RRF'
 
 export default function EvaluationExecutionPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -237,7 +237,7 @@ export default function EvaluationExecutionPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="KEYWORD_ONLY">키워드 검색 (BM25)</SelectItem>
-                      <SelectItem value="VECTOR_ONLY">벡터 검색</SelectItem>
+                      <SelectItem value="VECTOR_MULTI_FIELD">벡터 검색</SelectItem>
                       <SelectItem value="HYBRID_RRF">하이브리드 (RRF)</SelectItem>
                     </SelectContent>
                   </Select>

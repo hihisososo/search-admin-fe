@@ -12,7 +12,8 @@ export default function SearchDemo() {
   // 검색/필터 상태
   const [query, setQuery] = React.useState(""); // 입력창 값
   const [searchQuery, setSearchQuery] = React.useState(""); // 실제 검색 실행 값
-  const [searchTrigger, setSearchTrigger] = React.useState(0); // 검색 트리거
+  const isFirstRender = React.useRef(true); // 첫 렌더링 체크
+  // const [searchTrigger, setSearchTrigger] = React.useState(0); // 검색 트리거 - 중복 검색 방지를 위해 제거
   const [brand, setBrand] = React.useState<string[]>([]);
   const [category, setCategory] = React.useState<string[]>([]);
   const [price, setPrice] = React.useState<{ from: string; to: string }>({ from: "", to: "" });
@@ -69,6 +70,7 @@ export default function SearchDemo() {
   }>>([]);
   const [_relatedKeywords, _setRelatedKeywords] = React.useState<string[]>([]);
   const [_hasSearched, setHasSearched] = React.useState(false); // 검색 실행 여부 추적
+  const isInitialSearching = React.useRef(false); // 초기 검색 중인지 추적
 
   // 최소 로딩 시간을 보장하는 헬퍼 함수
   const ensureMinimumLoadingTime = React.useCallback(async <T,>(apiCall: Promise<T>, minTime: number = 500): Promise<T> => {
@@ -86,22 +88,24 @@ export default function SearchDemo() {
   }, []);
 
   // 초기 검색 실행 (새 검색어로 검색 시 - aggregation 업데이트)
-  const performInitialSearch = React.useCallback(async () => {
+  const performInitialSearch = React.useCallback(async (newQuery: string) => {
     // 검색어가 없어도 전체 리스트를 가져옴
-
-    setHasSearched(true);
+    console.log('[초기 검색] 실행:', newQuery);
+    
+    isInitialSearching.current = true; // 초기 검색 시작
     setLoading(true);
     
-    // 필터 초기화
-    setBrand([]);
-    setCategory([]);
-    setCategorySub([]);
-    setPrice({ from: "", to: "" });
-    setAppliedPrice({ from: "", to: "" });
+    // 필터 초기화 - 직접 값을 사용하여 state 변경을 최소화
+    const emptyFilters = {
+      brand: [],
+      category: [],
+      categorySub: [],
+      price: { from: "", to: "" }
+    };
     
     try {
       const searchRequest = {
-        query: searchQuery,
+        query: newQuery,
         page: 0,
         size: pageSize,
         searchMode: searchModeRef.current,
@@ -131,6 +135,13 @@ export default function SearchDemo() {
       setTotalResults(response.hits.total);
       setTotalPages(response.meta.totalPages);
       setPage(0);
+      
+      // 필터 초기화 - 모두 한번에 설정
+      setBrand([]);
+      setCategory([]);
+      setCategorySub([]);
+      setPrice({ from: "", to: "" });
+      setAppliedPrice({ from: "", to: "" });
 
       // 최초 검색 시 aggregation 저장 (그룹 필터용)
       if (response.aggregations?.brand_name) {
@@ -158,12 +169,15 @@ export default function SearchDemo() {
       setTotalPages(0);
     } finally {
       setLoading(false);
+      setHasSearched(true); // 검색 완료
+      isInitialSearching.current = false; // 초기 검색 종료
     }
-  }, [searchQuery, pageSize, ensureMinimumLoadingTime]);
+  }, [pageSize, ensureMinimumLoadingTime]);
 
   // 필터 검색 실행 (필터 변경 시 - 상품 리스트만 업데이트)
   const performFilterSearch = React.useCallback(async () => {
     // 검색어가 없어도 필터 적용 가능
+    console.log('[필터 검색] 실행 - 현재 필터:', { brand, category, appliedPrice, page, sort });
 
     setLoading(true);
     try {
@@ -313,26 +327,35 @@ export default function SearchDemo() {
     loadKeywords();
   }, []);
 
-  // 검색 실행 (searchTrigger가 변경될 때마다)
-  React.useEffect(() => {
-    if (searchQuery !== undefined || searchTrigger > 0) {
-      performInitialSearch();
-    }
-  }, [searchQuery, searchTrigger, performInitialSearch]);
-
   // 필터 변경 시 (필터 검색 - aggregation 유지)
   React.useEffect(() => {
+    // 첫 렌더링 시에는 검색하지 않음
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      console.log('[필터 useEffect] 첫 렌더링 - 검색 스킵');
+      return;
+    }
+    
+    // 초기 검색 중이면 필터 검색 스킵
+    if (isInitialSearching.current) {
+      console.log('[필터 useEffect] 초기 검색 중 - 필터 검색 스킵');
+      return;
+    }
+    
+    // 검색을 한 번이라도 했으면 필터 검색 실행
     if (_hasSearched) {
+      console.log('[필터 useEffect] 필터 검색 트리거');
       performFilterSearch();
     }
   }, [brand, category, appliedPrice, page, sort, _hasSearched, performFilterSearch]);
 
   // 핸들러
   const handleSearch = React.useCallback((val: string) => {
+    console.log('[검색 버튼] 클릭:', val);
     setSearchQuery(val);
     setQuery(val); // 검색창에도 반영
-    setSearchTrigger(prev => prev + 1); // 트리거 증가로 강제 검색 실행
-  }, []);
+    performInitialSearch(val); // 직접 검색 실행
+  }, [performInitialSearch]);
 
   // 필터 초기화
   const resetFilters = () => {

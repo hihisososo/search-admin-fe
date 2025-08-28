@@ -164,7 +164,7 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords: _rela
                   </SelectTrigger>
                   <SelectContent className="text-xs">
                     <SelectItem value="KEYWORD_ONLY" className="text-xs">키워드</SelectItem>
-                    <SelectItem value="VECTOR_ONLY" className="text-xs">벡터</SelectItem>
+                    <SelectItem value="VECTOR_MULTI_FIELD" className="text-xs">벡터</SelectItem>
                     <SelectItem value="HYBRID_RRF" className="text-xs">하이브리드</SelectItem>
                   </SelectContent>
                 </Select>

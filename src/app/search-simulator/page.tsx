@@ -354,14 +354,7 @@ export default function SearchSimulator() {
             searchMode: newMode,
             sort: 'score'  // 정렬 초기화
         })
-        
-        // 검색했던 상태라면 재검색
-        if (envState.hasSearched) {
-            performSearch(currentEnvId, false, { 
-                searchMode: newMode, 
-                sort: 'score' 
-            })
-        }
+        // 자동 재검색 제거 - 사용자가 검색 버튼을 눌러야 검색됨
     }
 
     return (

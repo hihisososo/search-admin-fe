@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Eye } from "lucide-react"
-import type { Product } from "@/lib/api"
+import type { Product, SearchMode } from "@/lib/api"
 
 interface ExplainDetail {
     value: number
@@ -25,6 +25,7 @@ interface ScoreProductListProps {
     onSortChange: (sort: string) => void
     searchQuery: string
     showExplain: boolean
+    searchMode?: SearchMode
 }
 
 const SORT_OPTIONS = [
@@ -87,8 +88,13 @@ export function ScoreProductList({
     sort,
     onSortChange,
     searchQuery,
-    showExplain
+    showExplain,
+    searchMode
 }: ScoreProductListProps) {
+    // 검색 모드에 따른 정렬 옵션 필터링
+    const availableSortOptions = searchMode === 'KEYWORD_ONLY' 
+        ? SORT_OPTIONS 
+        : SORT_OPTIONS.filter(opt => opt.value === 'score')
     return (
         <>
             {loading && (
@@ -110,13 +116,17 @@ export function ScoreProductList({
                         )}
                     </div>
                     <div className="flex gap-1">
-                        {SORT_OPTIONS.map(opt => (
+                        {availableSortOptions.map(opt => (
                             <Button 
                                 key={opt.value} 
                                 variant={sort === opt.value ? "default" : "outline"} 
                                 size="sm" 
                                 onClick={() => onSortChange(opt.value)} 
-                                className="h-6 px-2 text-xs"
+                                className={`h-6 px-2 text-xs ${
+                                    sort === opt.value 
+                                        ? 'bg-gray-900 text-white hover:bg-gray-800' 
+                                        : 'hover:bg-gray-100'
+                                }`}
                                 disabled={loading}
                             >
                                 {opt.label}

@@ -28,7 +28,7 @@ export interface AggregationBucket {
   docCount: number
 }
 
-export type SearchMode = 'KEYWORD_ONLY' | 'VECTOR_ONLY' | 'HYBRID_RRF'
+export type SearchMode = 'KEYWORD_ONLY' | 'VECTOR_MULTI_FIELD' | 'HYBRID_RRF'
 
 export interface SearchRequest {
   query?: string
@@ -165,6 +165,17 @@ export const searchApi = {
     }
     if (searchRequest.priceTo !== undefined) {
       params.set('priceTo', searchRequest.priceTo.toString())
+    }
+    
+    // 검색 모드 관련 파라미터
+    if (searchRequest.searchMode) {
+      params.set('searchMode', searchRequest.searchMode)
+    }
+    if (searchRequest.rrfK !== undefined) {
+      params.set('rrfK', searchRequest.rrfK.toString())
+    }
+    if (searchRequest.hybridTopK !== undefined) {
+      params.set('hybridTopK', searchRequest.hybridTopK.toString())
     }
     
     // 다중 값 파라미터들

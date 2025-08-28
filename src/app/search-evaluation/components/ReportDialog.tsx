@@ -10,7 +10,7 @@ import { BarChart3, CheckCircle, ChevronDown, ChevronRight } from "lucide-react"
 import { useEvaluationReports } from "@/hooks/use-evaluation"
 import type { EvaluationReport, EvaluationReportSummary } from "@/services/evaluation/types"
 
-type SearchMode = 'KEYWORD_ONLY' | 'VECTOR_ONLY' | 'HYBRID_RRF'
+type SearchMode = 'KEYWORD_ONLY' | 'VECTOR_MULTI_FIELD' | 'HYBRID_RRF'
 
 interface ReportDialogProps {
   open: boolean
@@ -114,7 +114,7 @@ export function ReportDialog({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="KEYWORD_ONLY">키워드 검색 (BM25)</SelectItem>
-                      <SelectItem value="VECTOR_ONLY">벡터 검색</SelectItem>
+                      <SelectItem value="VECTOR_MULTI_FIELD">벡터 검색</SelectItem>
                       <SelectItem value="HYBRID_RRF">하이브리드 (RRF)</SelectItem>
                     </SelectContent>
                   </Select>

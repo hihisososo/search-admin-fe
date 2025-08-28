@@ -130,7 +130,7 @@ class EvaluationService {
   // 평가 실행 (비동기)
   async evaluateAsync(data: { 
     reportName: string
-    searchMode?: 'KEYWORD_ONLY' | 'VECTOR_ONLY' | 'HYBRID_RRF'
+    searchMode?: 'KEYWORD_ONLY' | 'VECTOR_MULTI_FIELD' | 'HYBRID_RRF'
     rrfK?: number
     hybridTopK?: number
   }): Promise<AsyncTaskResponse> {

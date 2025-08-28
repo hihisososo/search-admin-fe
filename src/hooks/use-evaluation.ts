@@ -257,7 +257,7 @@ export function useEvaluateAsync() {
   return useMutation({
     mutationFn: (data: { 
       reportName: string
-      searchMode?: 'KEYWORD_ONLY' | 'VECTOR_ONLY' | 'HYBRID_RRF'
+      searchMode?: 'KEYWORD_ONLY' | 'VECTOR_MULTI_FIELD' | 'HYBRID_RRF'
       rrfK?: number
       hybridTopK?: number 
     }) => evaluationService.evaluateAsync(data),
