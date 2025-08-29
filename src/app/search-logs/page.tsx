@@ -10,11 +10,11 @@ import type {
   SearchLogSortDirection 
 } from "@/types/dashboard"
 import { SearchLogHeader } from "./components/SearchLogHeader"
-import { SearchLogTable } from "./components/SearchLogTable"
+import { SearchLogTableRefactored } from "./components/SearchLogTableRefactored"
 import { SearchLogDetailDialog } from "./components/SearchLogDetailDialog"
 import { getSearchSessionId } from "@/lib/search-session"
-import { PaginationControls } from "@/components/common/PaginationControls"
-import { DataTableToolbar } from "@/components/common/DataTableToolbar"
+import { PaginationControls } from "@/shared/components/PaginationControls"
+import { DataTableToolbar } from "@/shared/components/DataTableToolbar"
 // import { PAGINATION } from "@/constants/pagination"
 
 export default function SearchLogs() {
@@ -208,7 +208,7 @@ export default function SearchLogs() {
             <>
               {/* 상단 검색 입력 제거(원래대로) */}
 
-              <SearchLogTable
+              <SearchLogTableRefactored
                 items={items}
                 sortField={sortField}
                 sortDirection={sortDirection}

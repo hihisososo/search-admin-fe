@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 // import { Input } from "@/components/ui/input"
 // import { Button } from "@/components/ui/button"
-import { DataTableToolbar } from "@/components/common/DataTableToolbar"
+import { DataTableToolbar } from "@/shared/components/DataTableToolbar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"

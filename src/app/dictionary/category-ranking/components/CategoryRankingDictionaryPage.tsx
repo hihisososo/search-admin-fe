@@ -7,8 +7,8 @@ import { categoryRankingService } from '@/services/dictionary/category-ranking.s
 import { CategoryRankingTable } from './CategoryRankingTable'
 import { CategoryMappingDialog } from './CategoryMappingDialog'
 import { DictionaryHeader } from '@/features/dictionary/components/DictionaryHeader'
-import { DataTableToolbar } from '@/components/common/DataTableToolbar'
-import { PaginationControls } from '@/components/common/PaginationControls'
+import { DataTableToolbar } from '@/shared/components/DataTableToolbar'
+import { PaginationControls } from '@/shared/components/PaginationControls'
 import type { DictionaryEnvironmentType } from '@/types/dashboard'
 import type { CategoryRankingDictionaryListItem } from '@/services/dictionary/category-ranking.service'
 
