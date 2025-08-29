@@ -128,7 +128,7 @@ export function useSynonymActions(onRefetch: () => Promise<void>): UseSynonymAct
       description: "사전 항목이 성공적으로 삭제되었습니다."
     })
     await onRefetch()
-  }, [onRefetch])
+  }, [onRefetch, toast])
 
   return {
     addingItem,

@@ -1,7 +1,13 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { AlertCircle, CheckCircle } from "lucide-react"
-import { renderSortIcon } from "@/utils/table-helpers"
+import { 
+  renderSortIcon, 
+  formatResponseTime, 
+  formatResultCount, 
+  truncateText, 
+  getResponseTimeColor 
+} from "@/utils/table-helpers"
 import { formatTimestamp as formatTimestampUtil } from "@/utils/date-helpers"
 import type { SearchLogItem, SearchLogSortField, SearchLogSortDirection } from "@/types/dashboard"
 
@@ -21,34 +27,7 @@ export function SearchLogTable({
   onRowClick
 }: SearchLogTableProps) {
 
-
-
-  // 응답시간 포맷팅
-  const formatResponseTime = (ms: number) => {
-    if (ms < 1000) {
-      return `${ms}ms`
-    }
-    return `${(ms / 1000).toFixed(2)}s`
-  }
-
-  // 결과수 포맷팅
-  const formatResultCount = (count: number) => {
-    return count.toLocaleString('ko-KR')
-  }
-
-  // User-Agent 단축
-  const truncateUserAgent = (userAgent: string) => {
-    if (userAgent.length <= 30) return userAgent
-    return userAgent.substring(0, 90) + "..."
-  }
-
-  // 응답시간에 따른 색상 결정
-  const getResponseTimeColor = (ms: number) => {
-    if (ms < 100) return "text-green-600"
-    if (ms < 500) return "text-yellow-600" 
-    if (ms < 1000) return "text-orange-600"
-    return "text-red-600"
-  }
+  const truncateUserAgent = (userAgent: string) => truncateText(userAgent, 90)
 
   return (
     <div className="border rounded-lg overflow-x-auto">

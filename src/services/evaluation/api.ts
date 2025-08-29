@@ -29,7 +29,7 @@ class EvaluationService {
   // 쿼리 리스트 조회 (왼쪽 패널)
   async getQueries(params: PageParams = {}): Promise<EvaluationQueryListResponse> {
     // 백엔드 API 파라미터 매핑
-    const apiParams: any = {
+    const apiParams: Record<string, any> = {
       page: params.page,
       size: params.size,
       sortBy: params.sort, // sort -> sortBy
@@ -38,13 +38,14 @@ class EvaluationService {
     }
     
     // undefined 값 제거
-    Object.keys(apiParams).forEach(key => {
-      if (apiParams[key] === undefined || apiParams[key] === '') {
-        delete apiParams[key]
+    const cleanedParams = Object.entries(apiParams).reduce((acc, [key, value]) => {
+      if (value !== undefined && value !== '') {
+        acc[key] = value
       }
-    })
+      return acc
+    }, {} as Record<string, string | number>)
     
-    return apiClient.get<EvaluationQueryListResponse>(`${this.baseEndpoint}/queries`, apiParams)
+    return apiClient.get<EvaluationQueryListResponse>(`${this.baseEndpoint}/queries`, cleanedParams)
   }
 
   // 쿼리 생성
@@ -68,14 +69,21 @@ class EvaluationService {
   // 쿼리별 문서 조회 (오른쪽 패널)
   async getQueryDocuments(queryId: number, params: PageParams = {}): Promise<EvaluationDocumentListResponse> {
     // 백엔드 API 파라미터 매핑
-    const apiParams: any = {
+    const apiParams: Record<string, any> = {
       page: params.page,
       size: params.size,
       sortBy: params.sort, // sort -> sortBy
       sortDirection: params.order?.toUpperCase() || 'DESC' // order -> sortDirection (대문자로)
     }
     
-    return apiClient.get<EvaluationDocumentListResponse>(`${this.baseEndpoint}/queries/${queryId}/documents`, apiParams)
+    const cleanedParams = Object.entries(apiParams).reduce((acc, [key, value]) => {
+      if (value !== undefined && value !== '') {
+        acc[key] = value
+      }
+      return acc
+    }, {} as Record<string, string | number>)
+    
+    return apiClient.get<EvaluationDocumentListResponse>(`${this.baseEndpoint}/queries/${queryId}/documents`, cleanedParams)
   }
 
   // 상품 매핑 추가

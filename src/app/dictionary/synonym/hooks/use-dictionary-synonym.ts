@@ -1,4 +1,4 @@
-import { useDictionaryData } from '@/features/dictionary/hooks/useDictionaryData'
+import { useDictionary } from '@/app/dictionary/hooks/use-dictionary'
 import type { 
   DictionaryItem, 
   DictionarySortField, 
@@ -15,23 +15,8 @@ interface UseDictionarySynonymParams {
 }
 
 export function useDictionarySynonym(params: UseDictionarySynonymParams) {
-  const { data, isLoading, error, refetch } = useDictionaryData<DictionaryItem>({
+  return useDictionary<DictionaryItem>({
     type: 'synonym',
-    page: params.page,
-    pageSize: 20,
-    search: params.search,
-    sortField: params.sortField,
-    sortDirection: params.sortDirection,
-    environment: params.environment
+    ...params
   })
-
-  return {
-    data: data?.content || [],
-    loading: isLoading,
-    error: error?.message || '',
-    total: data?.totalElements || 0,
-    refetch: async () => {
-      await refetch()
-    }
-  }
 }

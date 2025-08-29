@@ -3,6 +3,9 @@ import type { Environment, DeployHistory } from '@/types/deploy'
 import { deploymentService } from '@/services'
 import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/logger'
+
+// 색인 모니터링 타임아웃 설정 (15분)
+const INDEXING_MONITOR_TIMEOUT = 60 * 60 * 1000
 import EnvironmentOverview from './components/EnvironmentOverview'
 import DeploymentHistory from './components/DeploymentHistory'
 
@@ -246,12 +249,18 @@ export default function DeployManagement() {
       }
     }, 1000) // 1초마다 체크
 
-    // 5분 후 자동 중단
-    setTimeout(() => {
+    // 타임아웃 후 자동 중단
+    const timeoutId = setTimeout(() => {
       clearInterval(interval)
       setIsIndexing(false)
-      logger.warn('색인 모니터링 시간 초과로 중단됨')
-    }, 300000)
+      logger.warn(`색인 모니터링 시간 초과로 중단됨 (${INDEXING_MONITOR_TIMEOUT / 1000 / 60}분)`)
+    }, INDEXING_MONITOR_TIMEOUT)
+    
+    // 정리 함수
+    return () => {
+      clearInterval(interval)
+      clearTimeout(timeoutId)
+    }
   }, [fetchDeploymentHistory])
 
   if (isLoading) {

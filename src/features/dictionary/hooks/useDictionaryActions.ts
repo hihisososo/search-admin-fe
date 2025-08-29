@@ -39,14 +39,15 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
     for (const field of config.fields) {
       const validator = config.validation[field as keyof typeof config.validation]
       if (validator && field in item && item[field as keyof T] !== undefined) {
-        const isValid = (validator as any)(item[field as keyof T])
+        const fieldValue = item[field as keyof T]
+        const isValid = typeof validator === 'function' ? (validator as (value: unknown) => boolean)(fieldValue) : false
         if (!isValid) {
           return config.messages.validationError[field as string] || '유효하지 않은 입력입니다.'
         }
       }
     }
     return null
-  }, [config])
+  }, [config.fields, config.messages.validationError, config.validation])
 
   const handleAdd = useCallback(() => {
     setEditingState(prev => ({ 
@@ -85,13 +86,13 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
       // 오타교정은 분리된 필드로 전송(typoWord/correctWord)
       const payload = type === 'typo'
         ? {
-            typoWord: String((editingState.newItem as any).keyword || '').trim(),
-            correctWord: String((editingState.newItem as any).correctedWord || '').trim(),
-            description: (editingState.newItem as any).description,
+            typoWord: String((editingState.newItem as T).keyword || '').trim(),
+            correctWord: String((editingState.newItem as T & {correctedWord?: string}).correctedWord || '').trim(),
+            description: (editingState.newItem as T & {description?: string}).description,
           }
         : editingState.newItem
 
-      const response = await (service as any).create(payload, environment)
+      const response = await (service.create as (payload: any, env: any) => Promise<any>)(payload, environment)
       
       setEditingState(prev => ({ 
         ...prev, 
@@ -117,7 +118,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         variant: 'destructive'
       })
     }
-  }, [editingState.newItem, config, refetch, toast, validateItem, environment, type])
+  }, [editingState.newItem, refetch, toast, validateItem, environment, type])
 
   const handleEdit = useCallback((item: T) => {
     setEditingState(prev => ({ 
@@ -154,13 +155,13 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
       // 오타교정은 분리된 필드로 전송(typoWord/correctWord)
       const payload = type === 'typo'
         ? {
-            typoWord: String((editingState.editingItem as any).keyword || (item as any).keyword || '').trim(),
-            correctWord: String((editingState.editingItem as any).correctedWord || (item as any).correctedWord || '').trim(),
-            description: (editingState.editingItem as any).description,
+            typoWord: String((editingState.editingItem as T).keyword || (item as T).keyword || '').trim(),
+            correctWord: String((editingState.editingItem as T & {correctedWord?: string}).correctedWord || (item as T & {correctedWord?: string}).correctedWord || '').trim(),
+            description: (editingState.editingItem as T & {description?: string}).description,
           }
         : editingState.editingItem
 
-      await (service as any).update(item.id, payload, environment)
+      await (service.update as (id: number, payload: any, env: any) => Promise<any>)(item.id, payload, environment)
       
       setEditingState(prev => ({ 
         ...prev, 
@@ -185,7 +186,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         variant: 'destructive'
       })
     }
-  }, [editingState.editingItem, config, refetch, toast, validateItem, environment, type])
+  }, [editingState.editingItem, refetch, toast, validateItem, environment, type])
 
   const handleDelete = useCallback(async (id: number) => {
     if (!confirm(config.messages.deleteConfirm || '이 항목을 삭제하시겠습니까?')) {
@@ -251,7 +252,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         variant: 'destructive'
       })
     }
-  }, [editingState.selectedIds, config, refetch, toast])
+  }, [editingState.selectedIds, config.messages.deleteConfirm, refetch, toast, environment, type])
 
   const handleApplyChanges = useCallback(async (env: DictionaryEnvironmentType) => {
     if (!config.features.realtimeSync) {
@@ -290,9 +291,9 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         variant: 'destructive'
       })
     }
-  }, [config, type, toast])
+  }, [config.features.realtimeSync, config.messages.applyConfirm, config.messages.applySuccess, type, toast])
 
-  const handleSort = useCallback((_field: any) => {
+  const handleSort = useCallback((_field: string) => {
     // This will be handled by the parent component
   }, [])
 
