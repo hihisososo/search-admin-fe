@@ -24,7 +24,7 @@ interface BaseTableProps<T> {
   data: T[]
   sortField?: string
   sortDirection?: 'asc' | 'desc'
-  onSort?: (field: string) => void
+  onSort?: (field: any) => void
   onRowClick?: (item: T) => void
   loading?: boolean
   emptyMessage?: string

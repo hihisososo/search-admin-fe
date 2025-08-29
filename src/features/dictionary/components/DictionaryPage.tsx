@@ -7,8 +7,8 @@ import { useDictionary } from '../hooks/useDictionary'
 import { getDictionaryConfig } from '../configs/dictionaryConfigs'
 import type { DictionaryType } from '../types/dictionary.types'
 import type { DictionaryEnvironmentType } from '@/types/dashboard'
-import { PaginationControls } from '@/components/common/PaginationControls'
-import { DataTableToolbar } from '@/components/common/DataTableToolbar'
+import { PaginationControls } from '@/shared/components/PaginationControls'
+import { DataTableToolbar } from '@/shared/components/DataTableToolbar'
 
 interface DictionaryPageProps {
   type: DictionaryType

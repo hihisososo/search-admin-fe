@@ -6,7 +6,7 @@ import { DASHBOARD_CONSTANTS } from './constants'
 import DashboardHeader from './components/DashboardHeader'
 import StatsCards from './components/StatsCards'
 import AnalyticsCharts from './components/AnalyticsCharts'
-import KeywordsTable from './components/KeywordsTable'
+import KeywordsTable from './components/KeywordsTableRefactored'
 
 export default function DashboardPage() {
   const [dateRange, setDateRange] = useState<DateRange>({
