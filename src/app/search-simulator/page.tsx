@@ -70,6 +70,7 @@ interface EnvironmentState {
     rrfK: number  // RRF K 상수
     hybridTopK: number  // 하이브리드 Top K
     vectorMinScore: number | null  // 벡터 검색 최소 점수
+    lastSearchMode: SearchMode  // 실제로 검색된 모드 (정렬 옵션 표시용)
     
     // 결과 데이터
     products: (Product & { score?: number; explain?: ExplainDetail })[]
@@ -100,6 +101,7 @@ const initialEnvironmentState: EnvironmentState = {
     rrfK: 60,
     hybridTopK: 300,
     vectorMinScore: 0.6,
+    lastSearchMode: 'KEYWORD_ONLY' as SearchMode,
     products: [],
     totalResults: 0,
     totalPages: 0,
@@ -281,6 +283,7 @@ export default function SearchSimulator() {
                     totalPages: response.meta?.totalPages || 0,
                     loading: false,
                     lastSearchTime: endTime - startTime,
+                    lastSearchMode: searchParams.searchMode,  // 실제로 검색된 모드 저장
                     // 초기 검색 시에만 aggregation 업데이트 (그룹 필터용)
                     ...(isInitialSearch && {
                         brandAgg: response.aggregations?.brand_name || [],
@@ -349,8 +352,8 @@ export default function SearchSimulator() {
     // 검색 모드 변경 핸들러
     const handleSearchModeChange = (newMode: SearchMode) => {
         updateEnvironmentState(currentEnvId, { 
-            searchMode: newMode,
-            sort: 'score'  // 정렬 초기화
+            searchMode: newMode
+            // 정렬은 실제 검색 시에만 변경됨
         })
         // 자동 재검색 제거 - 사용자가 검색 버튼을 눌러야 검색됨
     }
@@ -407,26 +410,26 @@ export default function SearchSimulator() {
                             </div>
                             
                     {/* 검색 옵션들 */}
-                    <div className="flex items-center gap-4">
-                        <label className="flex items-center gap-2 text-sm">
+                    <div className="flex items-center gap-3">
+                        <label className="flex items-center gap-1.5 text-xs">
                                     <input
                                         type="checkbox"
                                         checked={envState.showExplain}
                                         onChange={(e) => updateEnvironmentState(selectedEnv, { showExplain: e.target.checked })}
-                                        className="rounded w-4 h-4"
+                                        className="rounded w-3.5 h-3.5"
                                     />
-                                    <span>Explain 포함</span>
+                                    <span>Explain</span>
                                 </label>
                                 
                         {/* 오타교정 옵션 */}
-                        <label className="flex items-center gap-2 text-sm">
+                        <label className="flex items-center gap-1.5 text-xs">
                                     <input
                                         type="checkbox"
                                         checked={envState.applyTypoCorrection}
                                         onChange={(e) => updateEnvironmentState(currentEnvId, { applyTypoCorrection: e.target.checked })}
-                                        className="rounded w-4 h-4"
+                                        className="rounded w-3.5 h-3.5"
                                     />
-                                    <span>오타 자동교정</span>
+                                    <span>오타교정</span>
                                 </label>
                             </div>
 
@@ -501,7 +504,7 @@ export default function SearchSimulator() {
                         }}
                         searchQuery={envState.query}
                         showExplain={envState.showExplain}
-                        searchMode={envState.searchMode}
+                        searchMode={envState.lastSearchMode}  // 실제로 검색된 모드 전달
                     />
                 )}
         </div>

@@ -14,7 +14,7 @@ interface UseDictionaryDataParams {
   environment: DictionaryEnvironmentType
 }
 
-export function useDictionaryData<T extends BaseDictionaryItem>({
+export function useDictionaryData<_T extends BaseDictionaryItem>({
   type,
   page,
   pageSize,
@@ -37,6 +37,7 @@ export function useDictionaryData<T extends BaseDictionaryItem>({
     type === 'user' ? queryKeys.dictionary.user.list(paramsForKey) :
     type === 'stopword' ? queryKeys.dictionary.stopword.list(paramsForKey) :
     type === 'synonym' ? queryKeys.dictionary.synonym.list(paramsForKey) :
+    type === 'typo' ? queryKeys.dictionary.typoCorrection.list(paramsForKey) :
     queryKeys.dictionary.typoCorrection.list(paramsForKey)
   )
   
@@ -56,13 +57,11 @@ export function useDictionaryData<T extends BaseDictionaryItem>({
         type === 'user' ? userDictionaryService :
         type === 'stopword' ? stopwordDictionaryService :
         type === 'synonym' ? synonymDictionaryService :
+        type === 'typo' ? typoCorrectionDictionaryService :
         typoCorrectionDictionaryService
 
-      return (await service.getList(params as any)) as unknown as {
-        content: T[]
-        totalElements: number
-        totalPages: number
-      }
+      const response = await service.getList(params as any)
+      return response
     },
     retry: 1,
     staleTime: 30000,

@@ -41,7 +41,7 @@ export function useDictionary<T extends BaseDictionaryItem = BaseDictionaryItem>
   }, [sortField])
   
   const state: DictionaryState<T> = {
-    items: data?.content || [],
+    items: (data?.content || []) as unknown as T[],
     loading: isLoading,
     error: error ? (error as Error).message : null,
     total: data?.totalElements || 0,

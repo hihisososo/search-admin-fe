@@ -8,7 +8,9 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, Check, X } from "lucide-react"
+import { Edit, Trash2, Check, X } from "lucide-react"
+import { getSortIcon } from "@/utils/table-helpers"
+import { formatDate } from "@/utils/date-helpers"
 import type { DictionaryItem, DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
 
 interface SynonymDictionaryTableProps {
@@ -32,15 +34,6 @@ interface SynonymDictionaryTableProps {
     canEdit: boolean
 }
 
-const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-    })
-}
 
 const formatKeywordDisplay = (keyword: string) => {
     if (keyword.includes('=>')) {
@@ -65,10 +58,6 @@ const formatKeywordDisplay = (keyword: string) => {
     return <span className="font-medium text-gray-900">{keyword}</span>
 }
 
-const getSortIcon = (field: DictionarySortField, sortField: DictionarySortField, sortDirection: DictionarySortDirection) => {
-    if (sortField !== field) return <ArrowUpDown className="h-3.5 w-3.5" />
-    return sortDirection === 'asc' ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />
-}
 
 export function SynonymDictionaryTable({
     items,

@@ -1,6 +1,8 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { ChevronUp, ChevronDown, AlertCircle, CheckCircle } from "lucide-react"
+import { AlertCircle, CheckCircle } from "lucide-react"
+import { renderSortIcon } from "@/utils/table-helpers"
+import { formatTimestamp as formatTimestampUtil } from "@/utils/date-helpers"
 import type { SearchLogItem, SearchLogSortField, SearchLogSortDirection } from "@/types/dashboard"
 
 interface SearchLogTableProps {
@@ -19,35 +21,7 @@ export function SearchLogTable({
   onRowClick
 }: SearchLogTableProps) {
 
-  // 정렬 아이콘 렌더링
-  const renderSortIcon = (field: SearchLogSortField) => {
-    if (sortField !== field) {
-      return <ChevronUp className="w-3 h-3 opacity-30" />
-    }
-    return sortDirection === 'asc' ? 
-      <ChevronUp className="w-3 h-3" /> : 
-      <ChevronDown className="w-3 h-3" />
-  }
 
-  // 날짜 포맷팅
-  const formatTimestamp = (timestamp: string) => {
-    // 서버가 UTC 문자열을 타임존 없이 주는 경우가 있어 보정
-    // 1) 소수점 자릿수를 ms(3자리)로 축약  2) 타임존 누락 시 'Z' 추가 → UTC 파싱
-    const hasTz = /[zZ]|[+-]\d{2}:\d{2}$/.test(timestamp)
-    const withTz = hasTz ? timestamp : `${timestamp}Z`
-    const normalized = withTz.replace(/\.(\d{3})\d+(Z|[+-]\d{2}:\d{2})$/, '.$1$2')
-    const date = new Date(normalized)
-    return date.toLocaleString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-      timeZone: 'Asia/Seoul'
-    })
-  }
 
   // 응답시간 포맷팅
   const formatResponseTime = (ms: number) => {
@@ -84,25 +58,25 @@ export function SearchLogTable({
             <TableHead className="w-[120px] py-2 text-xs font-semibold text-gray-700 text-center cursor-pointer hover:bg-gray-100" onClick={() => onSort('timestamp')}>
               <div className="flex items-center justify-center gap-1">
                 검색시간
-                {renderSortIcon('timestamp')}
+                {renderSortIcon('timestamp', sortField, sortDirection)}
               </div>
             </TableHead>
             <TableHead className="min-w-[150px] py-2 text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" onClick={() => onSort('searchKeyword')}>
               <div className="flex items-center gap-1">
                 검색키워드
-                {renderSortIcon('searchKeyword')}
+                {renderSortIcon('searchKeyword', sortField, sortDirection)}
               </div>
             </TableHead>
             <TableHead className="w-[70px] py-2 text-xs font-semibold text-gray-700 text-center cursor-pointer hover:bg-gray-100" onClick={() => onSort('responseTime')}>
               <div className="flex items-center justify-center gap-1">
                 응답시간
-                {renderSortIcon('responseTime')}
+                {renderSortIcon('responseTime', sortField, sortDirection)}
               </div>
             </TableHead>
             <TableHead className="w-[60px] py-2 text-xs font-semibold text-gray-700 text-center cursor-pointer hover:bg-gray-100" onClick={() => onSort('resultCount')}>
               <div className="flex items-center justify-center gap-1">
                 결과수
-                {renderSortIcon('resultCount')}
+                {renderSortIcon('resultCount', sortField, sortDirection)}
               </div>
             </TableHead>
             <TableHead className="w-[100px] py-2 text-xs font-semibold text-gray-700 text-center">클라이언트 IP</TableHead>
@@ -115,7 +89,7 @@ export function SearchLogTable({
           {items.map((item) => (
             <TableRow key={item.id} className="hover:bg-gray-50 h-8 cursor-pointer" onClick={() => onRowClick?.(item)}>
               <TableCell className="text-xs text-gray-600 py-1 text-center">
-                {formatTimestamp(item.timestamp)}
+                {formatTimestampUtil(item.timestamp)}
               </TableCell>
               <TableCell className="font-medium py-1">
                 <div className="max-w-[200px] truncate text-xs" title={item.searchKeyword}>
