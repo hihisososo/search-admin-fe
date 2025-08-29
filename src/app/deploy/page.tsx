@@ -247,7 +247,7 @@ export default function DeployManagement() {
         clearInterval(interval)
         setIsIndexing(false)
       }
-    }, 1000) // 1초마다 체크
+    }, 5000) // 5초마다 체크
 
     // 타임아웃 후 자동 중단
     const timeoutId = setTimeout(() => {

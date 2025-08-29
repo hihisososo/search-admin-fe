@@ -140,6 +140,7 @@ export function useRunningTasks() {
     queryKey: evaluationKeys.tasks.running(),
     queryFn: () => evaluationService.getRunningTasks(),
     refetchInterval: EVALUATION_CONFIG.RUNNING_TASKS_POLL_INTERVAL,
+    staleTime: 4000, // 4초간 캐시 유지 (5초 폴링 주기보다 약간 짧게)
   })
 }
 

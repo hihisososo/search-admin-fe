@@ -16,6 +16,7 @@ interface ProductListProps {
   onSortChange: (sort: string) => void;
   searchQuery: string;
   searchMode?: SearchMode;
+  actualSearchType?: 'keyword' | 'vector' | null;
 }
 
 const SORT_OPTIONS = [
@@ -83,7 +84,8 @@ export function ProductList({
   sort,
   onSortChange,
   searchQuery,
-  searchMode
+  searchMode,
+  actualSearchType
 }: ProductListProps) {
   // 검색 모드에 따른 정렬 옵션 필터링
   const availableSortOptions = searchMode === 'KEYWORD_ONLY' 
@@ -113,10 +115,12 @@ export function ProductList({
           ) : (
             <div className="space-y-1">
               {searchMode === 'KEYWORD_ONLY' ? (
-                <div>총 {totalResults.toLocaleString()}개 상품</div>
+                <div>
+                  총 {totalResults.toLocaleString()}개 상품
+                </div>
               ) : (
                 <div className="text-xs text-blue-600">
-                  관련도 높은 상품 표시 중
+                  유사 상품 표시 중
                 </div>
               )}
             </div>
@@ -208,13 +212,26 @@ export function ProductList({
                       </svg>
                       리뷰 {p.reviewCount?.toLocaleString()}개
                     </span>
+                    {p.brand && (
+                      <span className="flex items-center gap-1">
+                        <svg className="w-3 h-3 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clipRule="evenodd" />
+                        </svg>
+                        {p.brand}
+                      </span>
+                    )}
                   </div>
                   
-                  {/* 카테고리 */}
-                  <div>
+                  {/* 카테고리 및 브랜드 */}
+                  <div className="flex flex-wrap gap-2">
                     <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
                       카테고리: {p.categoryName}
                     </span>
+                    {p.brand && (
+                      <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
+                        브랜드: {p.brand}
+                      </span>
+                    )}
                   </div>
                 </div>
               </TableCell>

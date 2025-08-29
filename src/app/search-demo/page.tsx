@@ -1,5 +1,5 @@
 import * as React from "react";
-import { dashboardApi, enhancedSearchApi, type Product, type AggregationBucket, type SearchMode } from "@/lib/api";
+import { dashboardApi, enhancedSearchApi, type Product, type AggregationBucket } from "@/lib/api";
 // import { type KeywordItem } from "@/types/dashboard";
 // import { logger } from "@/lib/logger";
 import { SearchHeader } from "./components/SearchHeader";
@@ -22,27 +22,9 @@ export default function SearchDemo() {
   const pageSize = 10;
   const [sort, setSort] = React.useState("score");
   const [categorySub, setCategorySub] = React.useState<string[]>([]);
-  const [searchMode, setSearchMode] = React.useState<SearchMode>("KEYWORD_ONLY");
-  const [appliedSearchMode, setAppliedSearchMode] = React.useState<SearchMode>("KEYWORD_ONLY"); // 실제 검색에 적용된 모드
+  const [actualSearchType, setActualSearchType] = React.useState<'keyword' | 'vector' | null>(null); // 실제로 결과를 반환한 검색 타입
   const [rrfK, _setRrfK] = React.useState(60);
   const [hybridTopK, _setHybridTopK] = React.useState(300);
-  
-  // ref로 최신 값 유지
-  const searchModeRef = React.useRef(searchMode);
-  const rrfKRef = React.useRef(rrfK);
-  const hybridTopKRef = React.useRef(hybridTopK);
-  
-  React.useEffect(() => {
-    searchModeRef.current = searchMode;
-  }, [searchMode]);
-  
-  React.useEffect(() => {
-    rrfKRef.current = rrfK;
-  }, [rrfK]);
-  
-  React.useEffect(() => {
-    hybridTopKRef.current = hybridTopK;
-  }, [hybridTopK]);
   // const [applyTypoCorrection, setApplyTypoCorrection] = React.useState(true); // 오타교정 - 백엔드 미지원
   const [products, setProducts] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -89,90 +71,131 @@ export default function SearchDemo() {
 
   // 초기 검색 실행 (새 검색어로 검색 시 - aggregation 업데이트)
   const performInitialSearch = React.useCallback(async (newQuery: string) => {
-    // 검색어가 없어도 전체 리스트를 가져옴
     console.log('[초기 검색] 실행:', newQuery);
     
     isInitialSearching.current = true; // 초기 검색 시작
     setLoading(true);
     
-    // 필터 초기화 - 직접 값을 사용하여 state 변경을 최소화
-    const emptyFilters = {
-      brand: [],
-      category: [],
-      categorySub: [],
-      price: { from: "", to: "" }
-    };
-    
     try {
-      const searchRequest = {
+      // 1차: 키워드 검색 시도
+      const keywordRequest = {
         query: newQuery,
         page: 0,
         size: pageSize,
-        searchMode: searchModeRef.current,
-        rrfK: rrfKRef.current,
-        hybridTopK: hybridTopKRef.current,
-        // applyTypoCorrection 파라미터는 백엔드에서 지원하지 않음
+        searchMode: "KEYWORD_ONLY" as const,
+        rrfK,
+        hybridTopK,
       };
-      
-      // 검색 실행 시 현재 선택된 모드를 저장
-      setAppliedSearchMode(searchModeRef.current);
 
-      const response = await ensureMinimumLoadingTime(
-        enhancedSearchApi.executeSearch(searchRequest), 
+      const keywordResponse = await ensureMinimumLoadingTime(
+        enhancedSearchApi.executeSearch(keywordRequest), 
         500 // 0.5초 최소 로딩
       );
 
-      // API 응답을 Product 타입에 맞게 변환
-      const transformedProducts = response.hits.data.map((item) => ({
-        ...item,
-        id: item.id || String(Math.floor(Math.random() * 1000000)),
-        categoryName: item.categoryName || '',
-        specsRaw: item.specsRaw || '',
-        specs: item.specs || ''
-      }));
+      // 키워드 검색 결과가 있는지 확인
+      if (keywordResponse.hits.total > 0) {
+        // 키워드 검색 결과가 있으면 사용
+        setActualSearchType('keyword');
+        
+        // API 응답을 Product 타입에 맞게 변환
+        const transformedProducts = keywordResponse.hits.data.map((item) => ({
+          ...item,
+          id: item.id || String(Math.floor(Math.random() * 1000000)),
+          categoryName: item.categoryName || '',
+          specsRaw: item.specsRaw || '',
+          specs: item.specs || ''
+        }));
 
-      setProducts(transformedProducts);
-      setTotalResults(response.hits.total);
-      setTotalPages(response.meta.totalPages);
-      setPage(0);
+        setProducts(transformedProducts);
+        setTotalResults(keywordResponse.hits.total);
+        setTotalPages(keywordResponse.meta.totalPages);
+        
+        // aggregation 저장
+        if (keywordResponse.aggregations?.brand_name) {
+          setBrandAgg(keywordResponse.aggregations.brand_name);
+          setBaseBrandAgg(keywordResponse.aggregations.brand_name);
+        } else {
+          setBrandAgg([]);
+          setBaseBrandAgg([]);
+        }
+        
+        if (keywordResponse.aggregations?.category_name) {
+          setCategoryAgg(keywordResponse.aggregations.category_name);
+          setBaseCategoryAgg(keywordResponse.aggregations.category_name);
+        } else {
+          setCategoryAgg([]);
+          setBaseCategoryAgg([]);
+        }
+      } else {
+        // 2차: 키워드 검색 결과가 없으면 벡터 검색 시도
+        console.log('[벡터 검색] 키워드 검색 결과 없음, 벡터 검색 시도');
+        
+        const vectorRequest = {
+          query: newQuery,
+          page: 0,
+          size: pageSize,
+          searchMode: "VECTOR_MULTI_FIELD" as const,
+          rrfK,
+          hybridTopK,
+          vectorMinScore: 0.7,
+        };
+
+        const vectorResponse = await enhancedSearchApi.executeSearch(vectorRequest);
+        
+        setActualSearchType('vector');
+        
+        // API 응답을 Product 타입에 맞게 변환
+        const transformedProducts = vectorResponse.hits.data.map((item) => ({
+          ...item,
+          id: item.id || String(Math.floor(Math.random() * 1000000)),
+          categoryName: item.categoryName || '',
+          specsRaw: item.specsRaw || '',
+          specs: item.specs || '',
+          brand: item.brand || '' // 브랜드 필드 확실히 포함
+        }));
+
+        setProducts(transformedProducts);
+        setTotalResults(vectorResponse.hits.total);
+        setTotalPages(vectorResponse.meta.totalPages);
+        
+        // aggregation 저장
+        if (vectorResponse.aggregations?.brand_name) {
+          setBrandAgg(vectorResponse.aggregations.brand_name);
+          setBaseBrandAgg(vectorResponse.aggregations.brand_name);
+        } else {
+          setBrandAgg([]);
+          setBaseBrandAgg([]);
+        }
+        
+        if (vectorResponse.aggregations?.category_name) {
+          setCategoryAgg(vectorResponse.aggregations.category_name);
+          setBaseCategoryAgg(vectorResponse.aggregations.category_name);
+        } else {
+          setCategoryAgg([]);
+          setBaseCategoryAgg([]);
+        }
+      }
       
-      // 필터 초기화 - 모두 한번에 설정
+      // 필터 초기화
+      setPage(0);
       setBrand([]);
       setCategory([]);
       setCategorySub([]);
       setPrice({ from: "", to: "" });
       setAppliedPrice({ from: "", to: "" });
 
-      // 최초 검색 시 aggregation 저장 (그룹 필터용)
-      if (response.aggregations?.brand_name) {
-        setBrandAgg(response.aggregations.brand_name);
-        setBaseBrandAgg(response.aggregations.brand_name);
-      } else {
-        // aggregation이 없으면 빈 배열로 설정
-        setBrandAgg([]);
-        setBaseBrandAgg([]);
-      }
-      
-      if (response.aggregations?.category_name) {
-        setCategoryAgg(response.aggregations.category_name);
-        setBaseCategoryAgg(response.aggregations.category_name);
-      } else {
-        // aggregation이 없으면 빈 배열로 설정
-        setCategoryAgg([]);
-        setBaseCategoryAgg([]);
-      }
-
     } catch (error) {
       console.error('검색 오류:', error);
       setProducts([]);
       setTotalResults(0);
       setTotalPages(0);
+      setActualSearchType(null);
     } finally {
       setLoading(false);
       setHasSearched(true); // 검색 완료
       isInitialSearching.current = false; // 초기 검색 종료
     }
-  }, [pageSize, ensureMinimumLoadingTime]);
+  }, [pageSize, rrfK, hybridTopK, ensureMinimumLoadingTime]);
 
   // 필터 검색 실행 (필터 변경 시 - 상품 리스트만 업데이트)
   const performFilterSearch = React.useCallback(async () => {
@@ -199,16 +222,19 @@ export default function SearchDemo() {
         sortOrder = 'desc';
       }
 
+      // 실제 검색 타입에 따라 검색 모드 결정
+      const searchMode = actualSearchType === 'vector' ? 'VECTOR_MULTI_FIELD' : 'KEYWORD_ONLY';
+
       const searchRequest = {
         query: searchQuery || "",
         page: page,
         size: pageSize,
         sortField: sortField,
         sortOrder: sortOrder,
-        searchMode: appliedSearchMode, // 이전 검색 시 적용된 모드 사용
-        rrfK: rrfKRef.current,
-        hybridTopK: hybridTopKRef.current,
-        // applyTypoCorrection 파라미터는 백엔드에서 지원하지 않음
+        searchMode: searchMode as "KEYWORD_ONLY" | "VECTOR_MULTI_FIELD",
+        rrfK,
+        hybridTopK,
+        ...(actualSearchType === 'vector' && { vectorMinScore: 0.7 }),
         ...(brand.length > 0 && { brand }),
         ...(category.length > 0 && { category }),
         ...(appliedPrice.from && { priceFrom: Number(appliedPrice.from) }),
@@ -220,13 +246,14 @@ export default function SearchDemo() {
         600 // 필터링은 조금 더 빠르게
       );
 
-      // API 응답을 Product 타입에 맞게 변환
+      // API 응답을 Product 타입에 망게 변환
       const transformedProducts = response.hits.data.map((item) => ({
         ...item,
         id: item.id || String(Math.floor(Math.random() * 1000000)),
         categoryName: item.categoryName || '',
         specsRaw: item.specsRaw || '',
-        specs: item.specs || ''
+        specs: item.specs || '',
+        brand: item.brand || ''
       }));
 
       setProducts(transformedProducts);
@@ -244,7 +271,7 @@ export default function SearchDemo() {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, page, pageSize, sort, brand, category, appliedPrice, ensureMinimumLoadingTime, appliedSearchMode]);
+  }, [searchQuery, page, pageSize, sort, brand, category, appliedPrice, ensureMinimumLoadingTime, actualSearchType, rrfK, hybridTopK]);
 
   // 어제 날짜 범위를 계산하는 함수 (대시보드와 동일 포맷: 로컬 기준 YYYY-MM-DDTHH:mm:ss)
   const getYesterdayDateRange = () => {
@@ -387,9 +414,6 @@ export default function SearchDemo() {
           setQuery={setQuery}
           onSearch={handleSearch}
           relatedKeywords={[]}
-          searchMode={searchMode}
-          setSearchMode={setSearchMode}
-          // RRF K와 Top K는 기본값으로 사용 (UI에 노출하지 않음)
         />
 
         {/* 메인 콘텐츠: 2단 레이아웃 */}
@@ -409,7 +433,7 @@ export default function SearchDemo() {
                 categoryAgg={baseCategoryAgg} // 그룹 필터: 최초 검색 결과 사용
                 onResetFilters={resetFilters}
                 onPriceSearch={handlePriceSearch}
-                searchMode={appliedSearchMode}
+                searchMode={actualSearchType === 'vector' ? 'VECTOR_MULTI_FIELD' : 'KEYWORD_ONLY'}
               />
 
               <ProductList
@@ -422,7 +446,8 @@ export default function SearchDemo() {
                 sort={sort}
                 onSortChange={handleSortChange}
                 searchQuery={searchQuery}
-                searchMode={appliedSearchMode}
+                searchMode={actualSearchType === 'vector' ? 'VECTOR_MULTI_FIELD' : 'KEYWORD_ONLY'}
+                actualSearchType={actualSearchType}
               />
             </div>
 

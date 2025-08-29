@@ -89,7 +89,7 @@ export function QueryTableRow({
                             ))}
                           </div>
                         )
-                      } catch (e) {
+                      } catch (_e) {
                         return null
                       }
                     })()}

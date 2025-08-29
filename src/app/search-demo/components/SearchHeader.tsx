@@ -1,9 +1,8 @@
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
-import { searchApi, type SearchMode } from "@/lib/api";
+import { searchApi } from "@/lib/api";
 import { Link } from "react-router-dom";
 import { logger } from "@/lib/logger";
 
@@ -12,13 +11,6 @@ interface SearchHeaderProps {
   setQuery: (query: string) => void;
   onSearch: (query: string) => void;
   relatedKeywords: string[];
-  searchMode: SearchMode;
-  setSearchMode: (mode: SearchMode) => void;
-  // RRF K와 Top K는 내부적으로 사용하지만 UI에 노출하지 않음
-  rrfK?: number;
-  setRrfK?: (k: number) => void;
-  hybridTopK?: number;
-  setHybridTopK?: (k: number) => void;
 }
 
 function highlight(text: string, keyword: string) {
@@ -40,7 +32,7 @@ function highlight(text: string, keyword: string) {
   );
 }
 
-export function SearchHeader({ query, setQuery, onSearch, relatedKeywords: _relatedKeywords, searchMode, setSearchMode }: SearchHeaderProps) {
+export function SearchHeader({ query, setQuery, onSearch, relatedKeywords: _relatedKeywords }: SearchHeaderProps) {
   const [suggestions, setSuggestions] = React.useState<string[]>([]);
   const [showSuggest, setShowSuggest] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(-1);
@@ -156,19 +148,8 @@ export function SearchHeader({ query, setQuery, onSearch, relatedKeywords: _rela
           </div>
           
           <div className="flex-1 flex justify-center absolute left-0 right-0">
-            <div className="flex flex-col gap-0 w-[580px]">
+            <div className="flex flex-col gap-0 w-[480px]">
               <div className="relative flex items-center bg-white rounded-full shadow-xl border-2 border-blue-300 px-4 py-2 focus-within:ring-2 focus-within:ring-blue-400" style={{minHeight:'44px', maxHeight:'48px'}}>
-                <Select value={searchMode} onValueChange={(value) => setSearchMode(value as SearchMode)}>
-                  <SelectTrigger className="w-28 h-8 text-xs border-0 bg-white rounded-lg mr-2 shadow-none focus:ring-0">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="text-xs">
-                    <SelectItem value="KEYWORD_ONLY" className="text-xs">키워드</SelectItem>
-                    <SelectItem value="VECTOR_MULTI_FIELD" className="text-xs">벡터</SelectItem>
-                    <SelectItem value="HYBRID_RRF" className="text-xs">하이브리드</SelectItem>
-                  </SelectContent>
-                </Select>
-                <div className="w-px h-6 bg-gray-300 mr-3"></div>
                 <Input
                   value={query}
                   onChange={handleInputChange}
