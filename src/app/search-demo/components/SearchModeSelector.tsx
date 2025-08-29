@@ -84,7 +84,7 @@ export function SearchModeSelector({
           </Label>
           <Input
             type="number"
-            value={vectorMinScore ?? 0.6}
+            value={vectorMinScore ?? 0.7}
             onChange={(e) => {
               const value = Number(e.target.value);
               if (value >= 0 && value <= 1) {

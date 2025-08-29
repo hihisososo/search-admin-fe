@@ -100,7 +100,7 @@ const initialEnvironmentState: EnvironmentState = {
     searchMode: 'KEYWORD_ONLY' as SearchMode,
     rrfK: 60,
     hybridTopK: 300,
-    vectorMinScore: 0.6,
+    vectorMinScore: 0.7,
     lastSearchMode: 'KEYWORD_ONLY' as SearchMode,
     products: [],
     totalResults: 0,
