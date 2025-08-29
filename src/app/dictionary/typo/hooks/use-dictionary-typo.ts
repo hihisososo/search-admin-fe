@@ -1,4 +1,4 @@
-import { useDictionaryData } from '@/features/dictionary/hooks/useDictionaryData'
+import { useDictionary } from '@/app/dictionary/hooks/use-dictionary'
 import type { DictionarySortField, DictionarySortDirection, DictionaryEnvironmentType } from '@/types/dashboard'
 import type { TypoCorrectionDictionaryItem } from '@/services/dictionary/types'
 
@@ -11,23 +11,8 @@ interface UseDictionaryTypoParams {
 }
 
 export function useDictionaryTypo(params: UseDictionaryTypoParams) {
-  const { data, isLoading, error, refetch } = useDictionaryData<TypoCorrectionDictionaryItem>({
+  return useDictionary<TypoCorrectionDictionaryItem>({
     type: 'typo',
-    page: params.page - 1, // 기존 로직 유지: page - 1
-    pageSize: 20,
-    search: params.search,
-    sortField: params.sortField,
-    sortDirection: params.sortDirection,
-    environment: params.environment
+    ...params
   })
-
-  return {
-    data: data?.content || [],
-    loading: isLoading,
-    error: error?.message || '',
-    total: data?.totalElements || 0,
-    refetch: async () => {
-      await refetch()
-    }
-  }
 }

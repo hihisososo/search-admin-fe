@@ -100,7 +100,7 @@ export function useDictionaryActions({ refetch }: UseDictionaryActionsParams) {
         variant: "destructive"
       })
     }
-  }, [refetch])
+  }, [refetch, toast])
 
   return {
     addingItem,

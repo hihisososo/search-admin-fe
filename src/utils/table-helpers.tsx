@@ -25,3 +25,26 @@ export const getSortIcon = (field: string, sortField: string, sortDirection: Sor
 export const renderSortIcon = (field: string, sortField: string, sortDirection: SortDirection) => {
   return getSortIcon(field, sortField, sortDirection, 'chevron')
 }
+
+export const formatResponseTime = (ms: number) => {
+  if (ms < 1000) {
+    return `${ms}ms`
+  }
+  return `${(ms / 1000).toFixed(2)}s`
+}
+
+export const formatResultCount = (count: number) => {
+  return count.toLocaleString('ko-KR')
+}
+
+export const truncateText = (text: string, maxLength: number = 30) => {
+  if (text.length <= maxLength) return text
+  return text.substring(0, maxLength) + "..."
+}
+
+export const getResponseTimeColor = (ms: number) => {
+  if (ms < 100) return "text-green-600"
+  if (ms < 500) return "text-yellow-600" 
+  if (ms < 1000) return "text-orange-600"
+  return "text-red-600"
+}

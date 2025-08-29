@@ -1,4 +1,4 @@
-import { useDictionaryData } from '@/features/dictionary/hooks/useDictionaryData'
+import { useDictionary } from '@/app/dictionary/hooks/use-dictionary'
 import type {
   DictionaryItem,
   DictionaryPageResponse,
@@ -23,22 +23,8 @@ interface UseDictionaryUserReturn {
 }
 
 export function useDictionaryUser(params: UseDictionaryUserParams): UseDictionaryUserReturn {
-  const { data, isLoading, error, refetch } = useDictionaryData<DictionaryItem>({
+  return useDictionary<DictionaryItem>({
     type: 'user',
-    page: params.page,
-    pageSize: 20,
-    search: params.search,
-    sortField: params.sortField,
-    sortDirection: params.sortDirection,
-    environment: params.environment
-  })
-
-  return {
-    data: data || null,
-    loading: isLoading,
-    error: error?.message || '',
-    refetch: async () => {
-      await refetch()
-    }
-  }
+    ...params
+  }) as UseDictionaryUserReturn
 }

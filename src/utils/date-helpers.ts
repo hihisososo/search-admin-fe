@@ -1,24 +1,42 @@
-export const formatDate = (dateStr: string | Date) => {
-  const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr
-  return date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
+const DEFAULT_LOCALE = 'ko-KR'
 
-export const formatDateTime = (dateStr: string | Date) => {
-  const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr
-  return date.toLocaleDateString('ko-KR', {
+const DATE_FORMAT_OPTIONS = {
+  date: {
     year: 'numeric',
     month: '2-digit',
-    day: '2-digit',
+    day: '2-digit'
+  },
+  time: {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
     hour12: false
+  },
+  timeShort: {
+    hour: '2-digit',
+    minute: '2-digit'
+  }
+} as const
+
+const formatDateWithOptions = (
+  dateStr: string | Date, 
+  options: Intl.DateTimeFormatOptions
+) => {
+  const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr
+  return date.toLocaleDateString(DEFAULT_LOCALE, options)
+}
+
+export const formatDate = (dateStr: string | Date) => {
+  return formatDateWithOptions(dateStr, {
+    ...DATE_FORMAT_OPTIONS.date,
+    ...DATE_FORMAT_OPTIONS.timeShort
+  })
+}
+
+export const formatDateTime = (dateStr: string | Date) => {
+  return formatDateWithOptions(dateStr, {
+    ...DATE_FORMAT_OPTIONS.date,
+    ...DATE_FORMAT_OPTIONS.time
   })
 }
 
@@ -43,10 +61,5 @@ export const formatTimestamp = (timestamp: string) => {
 
 export const formatTime = (dateStr: string | Date) => {
   const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr
-  return date.toLocaleTimeString('ko-KR', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false
-  })
+  return date.toLocaleTimeString(DEFAULT_LOCALE, DATE_FORMAT_OPTIONS.time)
 }
