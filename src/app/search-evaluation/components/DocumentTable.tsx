@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
 // removed add-document dialog imports
 // select 제거: 버튼형 세그먼트로 대체
 import { cn } from "@/lib/utils"
@@ -11,7 +12,8 @@ import { Edit, Trash2, X, Save, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown } fro
 import { 
   // useProductSearch, (removed add-document feature)
   // useAddDocumentMapping,
-  useUpdateCandidate
+  useUpdateCandidate,
+  useDeleteCandidates
 } from "@/hooks/use-evaluation"
 import type { EvaluationDocument } from "@/services"
 import React from "react"
@@ -65,6 +67,7 @@ export function DocumentTable({
 }: DocumentTableProps) {
   // removed add-document dialog states
   const [expandedDocument, setExpandedDocument] = useState<string | null>(null)
+  const [selectedDocumentIds, setSelectedDocumentIds] = useState<number[]>([])
   const { toast } = useToast()
   
   // 편집 상태 관리
@@ -85,6 +88,7 @@ export function DocumentTable({
   // 뮤테이션
   // removed add-document mutation
   const updateCandidateMutation = useUpdateCandidate()
+  const deleteCandidatesMutation = useDeleteCandidates()
 
   // 평가 상태 변환 함수 (relevanceScore 기반)
   const getEvaluationStatus = (relevanceScore: number | null): EvaluationStatus => {
@@ -179,13 +183,70 @@ export function DocumentTable({
   }
 
   // 문서 삭제 핸들러
-  const handleDeleteDocument = (_productId: string) => {
+  const handleDeleteDocument = async (_productId: string, candidateId: number) => {
     if (confirm('정답 문서를 삭제하시겠습니까?')) {
+      try {
+        await deleteCandidatesMutation.mutateAsync([candidateId])
+        toast({
+          title: "삭제 완료",
+          description: "후보군이 성공적으로 삭제되었습니다.",
+          variant: "success"
+        })
+      } catch (error) {
+        toast({
+          title: "삭제 실패",
+          description: (error as Error).message,
+          variant: "destructive"
+        })
+      }
+    }
+  }
+
+  // 선택된 문서 일괄 삭제
+  const handleDeleteSelected = async () => {
+    if (selectedDocumentIds.length === 0) {
       toast({
-        title: "기능 준비 중",
-        description: "삭제 기능은 현재 준비 중입니다.",
+        title: "선택된 항목 없음",
+        description: "삭제할 항목을 선택해주세요.",
         variant: "default"
       })
+      return
+    }
+
+    if (confirm(`선택한 ${selectedDocumentIds.length}개의 후보군을 삭제하시겠습니까?`)) {
+      try {
+        await deleteCandidatesMutation.mutateAsync(selectedDocumentIds)
+        setSelectedDocumentIds([])
+        toast({
+          title: "삭제 완료",
+          description: `${selectedDocumentIds.length}개의 후보군이 삭제되었습니다.`,
+          variant: "success"
+        })
+      } catch (error) {
+        toast({
+          title: "삭제 실패",
+          description: (error as Error).message,
+          variant: "destructive"
+        })
+      }
+    }
+  }
+
+  // 체크박스 핸들러
+  const handleSelectDocument = (docId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedDocumentIds(prev => [...prev, docId])
+    } else {
+      setSelectedDocumentIds(prev => prev.filter(id => id !== docId))
+    }
+  }
+
+  // 전체 선택/해제
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedDocumentIds(documents.map(doc => doc.id))
+    } else {
+      setSelectedDocumentIds([])
     }
   }
 
@@ -332,7 +393,24 @@ export function DocumentTable({
       
       {/* 페이지 정보 및 크기 선택 */}
       <div className="flex justify-between items-center mb-2">
-        <div className="flex-1"></div>
+        <div className="flex-1">
+          {selectedDocumentIds.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">
+                {selectedDocumentIds.length}개 선택됨
+              </span>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={handleDeleteSelected}
+                disabled={deleteCandidatesMutation.isPending}
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                선택 삭제
+              </Button>
+            </div>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           <div className="text-xs text-gray-500">
             전체 {Number(totalCount || 0).toLocaleString()}건 (페이지 {currentPage + 1}/{Math.max(totalPages || 1, 1)})
@@ -361,6 +439,12 @@ export function DocumentTable({
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50 hover:bg-gray-50">
+              <TableHead className="w-10 py-2 text-center">
+                <Checkbox
+                  checked={selectedDocumentIds.length > 0 && selectedDocumentIds.length === documents.length}
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
               <TableHead className="w-16 py-2 text-xs font-semibold text-gray-700 text-center">순번</TableHead>
               <TableHead
                 className="w-32 py-2 text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100"
@@ -415,7 +499,7 @@ export function DocumentTable({
           <TableBody>
             {documents.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-12 text-gray-500">
+                <TableCell colSpan={6} className="text-center py-12 text-gray-500">
                   <div className="space-y-2">
                     <p className="text-base font-medium">등록된 정답 문서가 없습니다</p>
                     <p className="text-sm text-gray-400">상품을 추가해서 정답 문서를 만들어보세요</p>
@@ -433,6 +517,12 @@ export function DocumentTable({
                       className={`hover:bg-gray-50 cursor-pointer ${isExpanded ? 'bg-amber-50' : ''}`}
                       onClick={() => toggleExpand(doc.productId)}
                     >
+                      <TableCell className="py-2 text-center" onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
+                          checked={selectedDocumentIds.includes(doc.id)}
+                          onCheckedChange={(checked) => handleSelectDocument(doc.id, checked as boolean)}
+                        />
+                      </TableCell>
                       <TableCell className="py-2 text-center font-medium text-gray-600" style={{ userSelect: 'text' }}>
                         {(currentPage * (pageSize ?? 20)) + index + 1}
                       </TableCell>
@@ -497,7 +587,7 @@ export function DocumentTable({
                     {/* 아코디언 상세 정보 */}
                     {isExpanded && (
                       <TableRow>
-                        <TableCell colSpan={5} className="p-0">
+                        <TableCell colSpan={6} className="p-0">
                           <div className="bg-gray-50 border-t p-6 space-y-6">
                             {editingDocument === doc.productId ? (
                               /* 편집 모드 */
@@ -685,10 +775,11 @@ export function DocumentTable({
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => handleDeleteDocument(doc.productId)}
+                                    onClick={() => handleDeleteDocument(doc.productId, doc.id)}
+                                    disabled={deleteCandidatesMutation.isPending}
                                   >
                                     <Trash2 className="h-4 w-4 mr-2" />
-                                    삭제
+                                    {deleteCandidatesMutation.isPending ? '삭제중...' : '삭제'}
                                   </Button>
                                 </div>
                               </>

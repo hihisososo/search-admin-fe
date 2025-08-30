@@ -85,7 +85,7 @@ export function ProductList({
   onSortChange,
   searchQuery,
   searchMode,
-  actualSearchType
+  actualSearchType: _actualSearchType
 }: ProductListProps) {
   // 검색 모드에 따른 정렬 옵션 필터링
   const availableSortOptions = searchMode === 'KEYWORD_ONLY' 
