@@ -54,27 +54,16 @@ export default function SearchDemo() {
   const [_hasSearched, setHasSearched] = React.useState(false); // 검색 실행 여부 추적
   const isInitialSearching = React.useRef(false); // 초기 검색 중인지 추적
 
-  // 최소 로딩 시간을 보장하는 헬퍼 함수
-  const ensureMinimumLoadingTime = React.useCallback(async <T,>(apiCall: Promise<T>, minTime: number = 500): Promise<T> => {
-    const startTime = Date.now();
-    
-    const result = await apiCall;
-    const elapsedTime = Date.now() - startTime;
-    
-    if (elapsedTime < minTime) {
-      // 최소 시간이 되지 않았으면 추가 대기
-      await new Promise(resolve => setTimeout(resolve, minTime - elapsedTime));
-    }
-    
-    return result;
-  }, []);
-
   // 초기 검색 실행 (새 검색어로 검색 시 - aggregation 업데이트)
   const performInitialSearch = React.useCallback(async (newQuery: string) => {
     console.log('[초기 검색] 실행:', newQuery);
     
     isInitialSearching.current = true; // 초기 검색 시작
     setLoading(true);
+    
+    // 전체 검색 프로세스 시작 시간 기록
+    const startTime = Date.now();
+    const minLoadingTime = 500; // 최소 로딩 시간 0.5초
     
     try {
       // 1차: 키워드 검색 시도
@@ -87,10 +76,7 @@ export default function SearchDemo() {
         hybridTopK,
       };
 
-      const keywordResponse = await ensureMinimumLoadingTime(
-        enhancedSearchApi.executeSearch(keywordRequest), 
-        500 // 0.5초 최소 로딩
-      );
+      const keywordResponse = await enhancedSearchApi.executeSearch(keywordRequest);
 
       // 키워드 검색 결과가 있는지 확인
       if (keywordResponse.hits.total > 0) {
@@ -184,18 +170,30 @@ export default function SearchDemo() {
       setPrice({ from: "", to: "" });
       setAppliedPrice({ from: "", to: "" });
 
+      // 전체 검색 프로세스가 끝났을 때 최소 로딩 시간 보장
+      const elapsedTime = Date.now() - startTime;
+      if (elapsedTime < minLoadingTime) {
+        await new Promise(resolve => setTimeout(resolve, minLoadingTime - elapsedTime));
+      }
+
     } catch (error) {
       console.error('검색 오류:', error);
       setProducts([]);
       setTotalResults(0);
       setTotalPages(0);
       setActualSearchType(null);
+      
+      // 에러 발생 시에도 최소 로딩 시간 보장
+      const elapsedTime = Date.now() - startTime;
+      if (elapsedTime < minLoadingTime) {
+        await new Promise(resolve => setTimeout(resolve, minLoadingTime - elapsedTime));
+      }
     } finally {
       setLoading(false);
       setHasSearched(true); // 검색 완료
       isInitialSearching.current = false; // 초기 검색 종료
     }
-  }, [pageSize, rrfK, hybridTopK, ensureMinimumLoadingTime]);
+  }, [pageSize, rrfK, hybridTopK]);
 
   // 필터 검색 실행 (필터 변경 시 - 상품 리스트만 업데이트)
   const performFilterSearch = React.useCallback(async () => {
@@ -203,6 +201,9 @@ export default function SearchDemo() {
     console.log('[필터 검색] 실행 - 현재 필터:', { brand, category, appliedPrice, page, sort });
 
     setLoading(true);
+    const startTime = Date.now();
+    const minLoadingTime = 400; // 필터링은 조금 더 빠르게
+    
     try {
       // 정렬 필드와 순서 결정
       let sortField: string = 'score';
@@ -241,12 +242,9 @@ export default function SearchDemo() {
         ...(appliedPrice.to && { priceTo: Number(appliedPrice.to) })
       };
 
-      const response = await ensureMinimumLoadingTime(
-        enhancedSearchApi.executeSearch(searchRequest), 
-        600 // 필터링은 조금 더 빠르게
-      );
+      const response = await enhancedSearchApi.executeSearch(searchRequest);
 
-      // API 응답을 Product 타입에 망게 변환
+      // API 응답을 Product 타입에 맞게 변환
       const transformedProducts = response.hits.data.map((item) => ({
         ...item,
         id: item.id || String(Math.floor(Math.random() * 1000000)),
@@ -263,15 +261,27 @@ export default function SearchDemo() {
       // 그룹 필터: aggregation은 최초 검색 결과 유지 (업데이트하지 않음)
       // 필터 옵션은 baseBrandAgg, baseCategoryAgg를 사용
 
+      // 최소 로딩 시간 보장
+      const elapsedTime = Date.now() - startTime;
+      if (elapsedTime < minLoadingTime) {
+        await new Promise(resolve => setTimeout(resolve, minLoadingTime - elapsedTime));
+      }
+
     } catch (error) {
       console.error('검색 오류:', error);
       setProducts([]);
       setTotalResults(0);
       setTotalPages(0);
+      
+      // 에러 발생 시에도 최소 로딩 시간 보장
+      const elapsedTime = Date.now() - startTime;
+      if (elapsedTime < minLoadingTime) {
+        await new Promise(resolve => setTimeout(resolve, minLoadingTime - elapsedTime));
+      }
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, page, pageSize, sort, brand, category, appliedPrice, ensureMinimumLoadingTime, actualSearchType, rrfK, hybridTopK]);
+  }, [searchQuery, page, pageSize, sort, brand, category, appliedPrice, actualSearchType, rrfK, hybridTopK]);
 
   // 어제 날짜 범위를 계산하는 함수 (대시보드와 동일 포맷: 로컬 기준 YYYY-MM-DDTHH:mm:ss)
   const getYesterdayDateRange = () => {
