@@ -69,17 +69,16 @@ export function MorphemeAnalysisHeader({
           )}
           
           {/* 기록 삭제 버튼 */}
-          {recordCount > 0 && (
-            <Button
-              onClick={onClearRecords}
-              size="sm"
-              variant="outline"
-              className="text-red-600 border-red-300 hover:bg-red-50"
-            >
-              <Trash2 className="h-4 w-4 mr-1" />
-              전체 삭제 ({recordCount})
-            </Button>
-          )}
+          <Button
+            onClick={onClearRecords}
+            size="sm"
+            variant="outline"
+            className="text-red-600 border-red-300 hover:bg-red-50"
+            disabled={recordCount === 0}
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            전체 삭제 ({recordCount})
+          </Button>
         </div>
       </div>
     </div>
