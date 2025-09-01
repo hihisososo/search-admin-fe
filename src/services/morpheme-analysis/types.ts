@@ -16,6 +16,7 @@ export interface TokenInfo {
 export interface NoriAnalysis {
   tokens: TokenInfo[]
   formattedTokens: string  // 토큰화된 형태와 동의어 확장 결과
+  synonymExpansions?: Record<string, string[]>  // 원본 토큰별 동의어 매핑
 }
 
 // 단위 정보

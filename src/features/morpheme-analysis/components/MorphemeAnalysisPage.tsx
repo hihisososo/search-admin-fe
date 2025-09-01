@@ -154,8 +154,12 @@ export function MorphemeAnalysisPage() {
       label: '토큰 및 동의어',
       render: (item) => {
         const formatted = item.result.noriAnalysis.formattedTokens
+        const synonymExpansions = item.result.noriAnalysis.synonymExpansions
         return formatted ? (
-          <FormattedTokensDisplay formattedTokens={formatted} />
+          <FormattedTokensDisplay 
+            formattedTokens={formatted} 
+            synonymExpansions={synonymExpansions}
+          />
         ) : (
           <span className="text-xs text-gray-400">없음</span>
         )
