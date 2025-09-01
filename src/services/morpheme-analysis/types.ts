@@ -6,7 +6,7 @@ export type AnalysisEnvironment = 'CURRENT' | 'DEV' | 'PROD'
 // 토큰 정보
 export interface TokenInfo {
   token: string
-  type: string  // SYNONYM, NNG, NNP, VV, VA, SN, WORD 등
+  type: string  // word, SYNONYM 등
   position: number
   startOffset: number
   endOffset: number
@@ -15,8 +15,7 @@ export interface TokenInfo {
 // Nori 분석 결과
 export interface NoriAnalysis {
   tokens: TokenInfo[]
-  synonymPaths: string[]  // 동의어 확장 경로
-  synonymExpansions: Record<string, string[]>  // 토큰별 동의어 확장 (하위 호환성)
+  synonymPaths: string[]  // 동의어 확장 경로 (전체 경로 문자열)
 }
 
 // 단위 정보
@@ -31,26 +30,17 @@ export interface MorphemeAnalysisRequest {
   environment: string  // CURRENT, DEV, PROD
 }
 
-// 형태소 분석 응답 (서버 응답)
+// 형태소 분석 응답 (서버 응답과 동일)
 export interface MorphemeAnalysisResponse {
   environment: string
   originalQuery: string
-  noriAnalysis: {
-    tokens: TokenInfo[]
-    synonymPaths: string[]
-  }
+  noriAnalysis: NoriAnalysis
   units: UnitInfo[]  // 추출된 단위 정보
   models: string[]  // 추출된 모델명
 }
 
-// 쿼리 분석 응답 (내부 사용)
-export interface QueryAnalysisResponse {
-  environment: string
-  originalQuery: string
-  noriAnalysis: NoriAnalysis
-  units: UnitInfo[]
-  models: string[]
-}
+// 쿼리 분석 응답 (MorphemeAnalysisResponse와 동일)
+export type QueryAnalysisResponse = MorphemeAnalysisResponse
 
 // 분석 기록
 export interface AnalysisRecord {

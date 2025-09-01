@@ -67,12 +67,15 @@ export function AnalysisResult({ result }: AnalysisResultProps) {
             {/* 동의어 경로 */}
             {result.noriAnalysis.synonymPaths && result.noriAnalysis.synonymPaths.length > 0 && (
               <div>
-                <h4 className="text-sm font-medium mb-2">동의어 확장</h4>
-                <div className="flex flex-wrap gap-2">
-                  {result.noriAnalysis.synonymPaths.map((synonym, index) => (
-                    <Badge key={index} variant="secondary">
-                      {synonym}
-                    </Badge>
+                <h4 className="text-sm font-medium mb-2">동의어 확장 경로</h4>
+                <div className="space-y-1">
+                  {result.noriAnalysis.synonymPaths.map((path, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500 w-4">{index + 1}.</span>
+                      <Badge variant="secondary" className="text-xs">
+                        {path}
+                      </Badge>
+                    </div>
                   ))}
                 </div>
               </div>

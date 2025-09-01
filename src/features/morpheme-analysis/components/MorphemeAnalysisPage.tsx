@@ -95,7 +95,7 @@ export function MorphemeAnalysisPage() {
       const result = await morphemeAnalysisService.refreshTempIndex()
       toast({
         title: '인덱스 갱신 완료',
-        description: result.message
+        description: result.message || '임시 인덱스가 성공적으로 갱신되었습니다.'
       })
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '임시 인덱스 갱신 중 오류가 발생했습니다.'
@@ -150,23 +150,22 @@ export function MorphemeAnalysisPage() {
     },
     {
       key: 'synonyms',
-      label: '동의어 확장',
+      label: '동의어 경로',
       render: (item) => {
-        const synonyms = item.result.noriAnalysis.synonymExpansions
+        const paths = item.result.noriAnalysis.synonymPaths
         return (
           <div className="space-y-1">
-            {Object.entries(synonyms).map(([token, syns]) => (
-              <div key={token} className="flex items-center gap-1 flex-wrap">
-                <span className="text-xs font-medium">{token}:</span>
-                {syns.map((syn, idx) => (
-                  <Badge key={idx} variant="outline" className="text-xs">
-                    {syn}
-                  </Badge>
-                ))}
-              </div>
-            ))}
-            {Object.keys(synonyms).length === 0 && (
+            {paths && paths.length > 0 ? (
+              paths.slice(0, 3).map((path, idx) => (
+                <div key={idx} className="text-xs text-gray-600">
+                  {path}
+                </div>
+              ))
+            ) : (
               <span className="text-xs text-gray-400">없음</span>
+            )}
+            {paths && paths.length > 3 && (
+              <span className="text-xs text-gray-400">... 외 {paths.length - 3}개</span>
             )}
           </div>
         )
