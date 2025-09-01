@@ -64,7 +64,7 @@ export function MorphemeAnalysisHeader({
               variant="outline"
             >
               <RefreshCw className={`h-4 w-4 mr-1 ${refreshing ? 'animate-spin' : ''}`} />
-              임시 인덱스 갱신
+              사전 최신화
             </Button>
           )}
           
