@@ -245,16 +245,14 @@ export function MorphemeAnalysisPage() {
       )}
 
       {/* 분석 기록 테이블 */}
-      {analysisRecords.length > 0 && (
-        <BaseTable
-          columns={columns}
-          data={paginatedRecords}
-          loading={loading}
-          emptyMessage="분석 기록이 없습니다."
-          keyExtractor={(item) => item.id}
-          className="bg-white"
-        />
-      )}
+      <BaseTable
+        columns={columns}
+        data={paginatedRecords}
+        loading={loading}
+        emptyMessage="분석 기록이 없습니다."
+        keyExtractor={(item) => item.id}
+        className="bg-white"
+      />
 
       {/* 페이지네이션 */}
       {totalPages > 0 && (
