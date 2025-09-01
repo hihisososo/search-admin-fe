@@ -12,6 +12,12 @@ interface SearchModeSelectorProps {
   setHybridTopK: (k: number) => void;
   vectorMinScore?: number | null;
   setVectorMinScore?: (score: number | null) => void;
+  nameVectorBoost?: number;
+  setNameVectorBoost?: (boost: number) => void;
+  specsVectorBoost?: number;
+  setSpecsVectorBoost?: (boost: number) => void;
+  bm25Weight?: number;
+  setBm25Weight?: (weight: number) => void;
 }
 
 export function SearchModeSelector({
@@ -22,7 +28,13 @@ export function SearchModeSelector({
   hybridTopK,
   setHybridTopK,
   vectorMinScore,
-  setVectorMinScore
+  setVectorMinScore,
+  nameVectorBoost,
+  setNameVectorBoost,
+  specsVectorBoost,
+  setSpecsVectorBoost,
+  bm25Weight,
+  setBm25Weight
 }: SearchModeSelectorProps) {
   return (
     <div className="flex items-center gap-4 flex-wrap">
@@ -71,6 +83,34 @@ export function SearchModeSelector({
               max={500}
             />
           </div>
+          
+          {setBm25Weight && (
+            <div className="flex items-center gap-2">
+              <Label 
+                className="text-xs font-medium text-muted-foreground"
+                title="BM25 가중치 (0.0-1.0)"
+              >
+                BM25 가중치
+              </Label>
+              <Input
+                type="number"
+                value={bm25Weight ?? 0.5}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  if (value >= 0 && value <= 1) {
+                    setBm25Weight(value);
+                  }
+                }}
+                className="w-16 h-7 text-xs"
+                min={0}
+                max={1}
+                step={0.1}
+              />
+              <span className="text-xs text-muted-foreground">
+                (0.0-1.0)
+              </span>
+            </div>
+          )}
         </>
       )}
           
@@ -100,6 +140,62 @@ export function SearchModeSelector({
             {searchMode === "VECTOR_MULTI_FIELD" ? "(0.6~0.75)" : "(0.55~0.7)"}
           </span>
         </div>
+      )}
+      
+      {(searchMode === "VECTOR_MULTI_FIELD" || searchMode === "HYBRID_RRF") && setNameVectorBoost && setSpecsVectorBoost && (
+        <>
+          <div className="flex items-center gap-2">
+            <Label 
+              className="text-xs font-medium text-muted-foreground"
+              title="상품명 벡터 필드 가중치"
+            >
+              Name 가중치
+            </Label>
+            <Input
+              type="number"
+              value={nameVectorBoost ?? 0.7}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+                if (value >= 0 && value <= 1) {
+                  setNameVectorBoost(value);
+                }
+              }}
+              className="w-16 h-7 text-xs"
+              min={0}
+              max={1}
+              step={0.1}
+            />
+            <span className="text-xs text-muted-foreground">
+              (0.0~1.0)
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Label 
+              className="text-xs font-medium text-muted-foreground"
+              title="상품 스펙 벡터 필드 가중치"
+            >
+              Specs 가중치
+            </Label>
+            <Input
+              type="number"
+              value={specsVectorBoost ?? 0.3}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+                if (value >= 0 && value <= 1) {
+                  setSpecsVectorBoost(value);
+                }
+              }}
+              className="w-16 h-7 text-xs"
+              min={0}
+              max={1}
+              step={0.1}
+            />
+            <span className="text-xs text-muted-foreground">
+              (0.0~1.0)
+            </span>
+          </div>
+        </>
       )}
     </div>
   );

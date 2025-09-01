@@ -2,11 +2,13 @@ import { useState } from "react"
 import { apiClient } from "@/services/common/api-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import { Search, Code2 } from "lucide-react"
 import { ProductFilters } from "../search-demo/components/ProductFilters"
 import { ScoreProductList } from "./components/ScoreProductList"
 import { SearchModeSelector } from "../search-demo/components/SearchModeSelector"
 import { EnvironmentSelector } from "../dictionary/user/components/EnvironmentSelector"
+import { DocumentDetailModal } from "./components/DocumentDetailModal"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DictionaryEnvironmentType } from "@/types/dashboard"
 import type { Product, AggregationBucket, SearchMode } from "@/lib/api"
 
@@ -22,6 +24,7 @@ interface SimulationSearchResponse {
         total: number
         data: Array<{
             id: string
+            documentId?: string  // Elasticsearch document ID
             score: number
             explain?: ExplainDetail
             name: string
@@ -47,6 +50,7 @@ interface SimulationSearchResponse {
         totalPages: number
         processingTime: number
     }
+    queryDsl?: string  // Elasticsearch Query DSL
 }
 
 // 환경 매핑 (사전관리와 통일)
@@ -70,16 +74,20 @@ interface EnvironmentState {
     rrfK: number  // RRF K 상수
     hybridTopK: number  // 하이브리드 Top K
     vectorMinScore: number | null  // 벡터 검색 최소 점수
+    nameVectorBoost: number  // name 벡터 필드 가중치
+    specsVectorBoost: number  // specs 벡터 필드 가중치
+    bm25Weight: number  // BM25 가중치 (하이브리드 검색용)
     lastSearchMode: SearchMode  // 실제로 검색된 모드 (정렬 옵션 표시용)
     
     // 결과 데이터
-    products: (Product & { score?: number; explain?: ExplainDetail })[]
+    products: (Product & { score?: number; explain?: ExplainDetail; documentId?: string })[]
     totalResults: number
     totalPages: number
     brandAgg: AggregationBucket[]
     categoryAgg: AggregationBucket[]
     baseBrandAgg: AggregationBucket[]
     baseCategoryAgg: AggregationBucket[]
+    queryDsl?: string  // Elasticsearch Query DSL
     
     // 상태
     loading: boolean
@@ -101,6 +109,9 @@ const initialEnvironmentState: EnvironmentState = {
     rrfK: 60,
     hybridTopK: 300,
     vectorMinScore: 0.7,
+    nameVectorBoost: 0.7,  // name 벡터 필드 가중치 기본값
+    specsVectorBoost: 0.3,  // specs 벡터 필드 가중치 기본값
+    bm25Weight: 0.5,  // BM25 가중치 기본값 (하이브리드)
     lastSearchMode: 'KEYWORD_ONLY' as SearchMode,
     products: [],
     totalResults: 0,
@@ -120,11 +131,15 @@ export default function SearchSimulator() {
         DEV: { ...initialEnvironmentState },
         PROD: { ...initialEnvironmentState }
     })
+    const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null)
+    const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false)
+    const [isQueryDslOpen, setIsQueryDslOpen] = useState(false)
 
     // API 응답을 Product 타입으로 변환
-    const transformToProduct = (item: any): Product & { score?: number; explain?: ExplainDetail } => {
+    const transformToProduct = (item: any): Product & { score?: number; explain?: ExplainDetail; documentId?: string } => {
         const product = {
             id: item.id || String(Math.floor(Math.random() * 1000000)),
+            documentId: item.documentId,  // Elasticsearch document ID
             name: item.name || '',
             nameRaw: item.nameRaw || item.name || '',
             model: item.model || [],
@@ -169,13 +184,14 @@ export default function SearchSimulator() {
             searchMode: overrideParams?.searchMode ?? currentEnv.searchMode,
             rrfK: overrideParams?.rrfK ?? currentEnv.rrfK,
             hybridTopK: overrideParams?.hybridTopK ?? currentEnv.hybridTopK,
-            vectorMinScore: overrideParams?.vectorMinScore ?? currentEnv.vectorMinScore
+            vectorMinScore: overrideParams?.vectorMinScore ?? currentEnv.vectorMinScore,
+            nameVectorBoost: overrideParams?.nameVectorBoost ?? currentEnv.nameVectorBoost,
+            specsVectorBoost: overrideParams?.specsVectorBoost ?? currentEnv.specsVectorBoost,
+            bm25Weight: overrideParams?.bm25Weight ?? currentEnv.bm25Weight
         }
         
-        // 검색 모드가 KEYWORD_ONLY가 아니면 정렬을 score로 고정
-        if (searchParams.searchMode !== 'KEYWORD_ONLY' && searchParams.sort !== 'score') {
-            searchParams.sort = 'score'
-        }
+        // 검색 모드가 KEYWORD_ONLY가 아니면 정렬을 score로 고정 - API 문서 업데이트로 제거
+        // 이제 모든 검색 모드에서 정렬 지원
 
         // 로딩 상태 설정
         setEnvironments(prev => ({
@@ -217,28 +233,42 @@ export default function SearchSimulator() {
             if ((searchParams.searchMode === 'VECTOR_MULTI_FIELD' || searchParams.searchMode === 'HYBRID_RRF') && searchParams.vectorMinScore !== null) {
                 params.append('vectorMinScore', searchParams.vectorMinScore.toString())
             }
+            
+            // 벡터 필드 가중치 추가 (벡터 및 하이브리드 모드일 때만)
+            if (searchParams.searchMode === 'VECTOR_MULTI_FIELD' || searchParams.searchMode === 'HYBRID_RRF') {
+                params.append('nameVectorBoost', searchParams.nameVectorBoost.toString())
+                params.append('specsVectorBoost', searchParams.specsVectorBoost.toString())
+            }
+            
+            // BM25 가중치 추가 (하이브리드 모드일 때만)
+            if (searchParams.searchMode === 'HYBRID_RRF') {
+                params.append('bm25Weight', searchParams.bm25Weight.toString())
+            }
 
-            // 정렬 설정
-            let sortField = 'score'
+            // 정렬 설정 (API 문서에 따라 sort.sortType, sort.sortOrder 사용)
+            let sortType = 'score'
             let sortOrder: 'asc' | 'desc' = 'desc'
 
             if (searchParams.sort === 'price_asc') {
-                sortField = 'price'
+                sortType = 'price'
                 sortOrder = 'asc'
             } else if (searchParams.sort === 'price_desc') {
-                sortField = 'price'
+                sortType = 'price'
                 sortOrder = 'desc'
             } else if (searchParams.sort === 'reviewCount') {
-                sortField = 'reviewCount'
+                sortType = 'reviewCount'
                 sortOrder = 'desc'
             } else if (searchParams.sort === 'registeredMonth') {
-                sortField = 'registeredMonth'
+                sortType = 'registeredMonth'
+                sortOrder = 'desc'
+            } else if (searchParams.sort === 'rating') {
+                sortType = 'rating'
                 sortOrder = 'desc'
             }
 
-            if (sortField !== 'score') {
-                params.append('sortField', sortField)
-                params.append('sortOrder', sortOrder)
+            if (sortType !== 'score') {
+                params.append('sort.sortType', sortType)
+                params.append('sort.sortOrder', sortOrder)
             }
 
             // 필터 조건 추가
@@ -284,6 +314,7 @@ export default function SearchSimulator() {
                     loading: false,
                     lastSearchTime: endTime - startTime,
                     lastSearchMode: searchParams.searchMode,  // 실제로 검색된 모드 저장
+                    queryDsl: response.queryDsl,  // Elasticsearch Query DSL 저장
                     // 초기 검색 시에만 aggregation 업데이트 (그룹 필터용)
                     ...(isInitialSearch && {
                         brandAgg: response.aggregations?.brand_name || [],
@@ -346,6 +377,12 @@ export default function SearchSimulator() {
         performSearch(envId, false, { page: 1 })
     }
 
+    // 문서 클릭 핸들러
+    const handleProductClick = (documentId: string) => {
+        setSelectedDocumentId(documentId)
+        setIsDocumentModalOpen(true)
+    }
+
     const currentEnvId = ENV_MAPPING[selectedEnv]
     const envState = environments[currentEnvId]
     
@@ -381,6 +418,12 @@ export default function SearchSimulator() {
                         setHybridTopK={(k) => updateEnvironmentState(currentEnvId, { hybridTopK: k })}
                         vectorMinScore={envState.vectorMinScore}
                         setVectorMinScore={(score) => updateEnvironmentState(currentEnvId, { vectorMinScore: score })}
+                        nameVectorBoost={envState.nameVectorBoost}
+                        setNameVectorBoost={(boost) => updateEnvironmentState(currentEnvId, { nameVectorBoost: boost })}
+                        specsVectorBoost={envState.specsVectorBoost}
+                        setSpecsVectorBoost={(boost) => updateEnvironmentState(currentEnvId, { specsVectorBoost: boost })}
+                        bm25Weight={envState.bm25Weight}
+                        setBm25Weight={(weight) => updateEnvironmentState(currentEnvId, { bm25Weight: weight })}
                     />
                     
                     <div className="flex gap-2">
@@ -407,6 +450,16 @@ export default function SearchSimulator() {
                                         <Search className="h-4 w-4" />
                                     )}
                                 </Button>
+                                {envState.queryDsl && (
+                                    <Button
+                                        onClick={() => setIsQueryDslOpen(true)}
+                                        variant="outline"
+                                        className="px-4"
+                                        title="QueryDSL 보기"
+                                    >
+                                        <Code2 className="h-4 w-4" />
+                                    </Button>
+                                )}
                             </div>
                             
                     {/* 검색 옵션들 */}
@@ -505,9 +558,42 @@ export default function SearchSimulator() {
                         searchQuery={envState.query}
                         showExplain={envState.showExplain}
                         searchMode={envState.lastSearchMode}  // 실제로 검색된 모드 전달
+                        onProductClick={handleProductClick}
                     />
                 )}
         </div>
+
+        {/* QueryDSL 팝업 */}
+        <Dialog open={isQueryDslOpen} onOpenChange={setIsQueryDslOpen}>
+            <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle>Elasticsearch Query DSL</DialogTitle>
+                </DialogHeader>
+                <pre className="p-4 bg-gray-900 text-gray-100 rounded-lg overflow-x-auto text-xs">
+                    <code>
+                        {(() => {
+                            if (!envState.queryDsl) return ''
+                            try {
+                                return JSON.stringify(JSON.parse(envState.queryDsl), null, 2)
+                            } catch {
+                                return envState.queryDsl
+                            }
+                        })()}
+                    </code>
+                </pre>
+            </DialogContent>
+        </Dialog>
+
+        {/* 문서 상세 조회 모달 */}
+        <DocumentDetailModal
+            documentId={selectedDocumentId}
+            environment={currentEnvId}
+            isOpen={isDocumentModalOpen}
+            onClose={() => {
+                setIsDocumentModalOpen(false)
+                setSelectedDocumentId(null)
+            }}
+        />
     </div>
     )
 } 

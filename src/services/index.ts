@@ -49,6 +49,10 @@ export { clickLogService } from './click-logs/api'
 export * from './deployment/types'
 export { deploymentService } from './deployment/api'
 
+// 형태소분석 서비스
+export * from './morpheme-analysis/types'
+export { morphemeAnalysisService } from './morpheme-analysis/api'
+
 // 하위 호환성을 위한 기존 API 별칭들
 export { dashboardService as dashboardApi } from './dashboard/api'
 export { 

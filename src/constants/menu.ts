@@ -52,6 +52,11 @@ export const MENU_ITEMS: MenuItem[] = [
         id: 'category-ranking-dictionary',
         title: '카테고리랭킹사전',
         path: '/dictionary/category-ranking'
+      },
+      {
+        id: 'morpheme-analysis',
+        title: '형태소분석',
+        path: '/dictionary/morpheme-analysis'
       }
     ]
   },

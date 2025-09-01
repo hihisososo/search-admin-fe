@@ -237,7 +237,10 @@ export function ReportDialog({
                                       <div className="text-xs">
                                         <span className="text-red-600 font-medium">누락 문서:</span>
                                         <span className="ml-1 text-gray-600 select-text">
-                                          {detail.missingDocuments.map((d: any) => typeof d === 'string' ? d : d.productId).slice(0, 3).join(', ')}
+                                          {detail.missingDocuments
+                                            .map((d: any) => typeof d === 'string' ? d : d.productId)
+                                            .slice(0, 3)
+                                            .join(', ')}
                                           {detail.missingDocuments.length > 3 && ` 외 ${detail.missingDocuments.length - 3}개`}
                                         </span>
                                       </div>

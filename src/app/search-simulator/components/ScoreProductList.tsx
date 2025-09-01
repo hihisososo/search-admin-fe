@@ -5,7 +5,7 @@ import { PaginationControls } from "@/shared/components/PaginationControls"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Eye } from "lucide-react"
+import { Eye, FileJson } from "lucide-react"
 import type { Product, SearchMode } from "@/lib/api"
 
 interface ExplainDetail {
@@ -15,7 +15,7 @@ interface ExplainDetail {
 }
 
 interface ScoreProductListProps {
-    products: (Product & { score?: number; explain?: ExplainDetail })[]
+    products: (Product & { score?: number; explain?: ExplainDetail; documentId?: string })[]
     loading: boolean
     totalResults: number
     totalPages: number
@@ -26,6 +26,7 @@ interface ScoreProductListProps {
     searchQuery: string
     showExplain: boolean
     searchMode?: SearchMode
+    onProductClick?: (documentId: string) => void
 }
 
 const SORT_OPTIONS = [
@@ -89,7 +90,8 @@ export function ScoreProductList({
     onSortChange,
     searchQuery,
     showExplain,
-    searchMode
+    searchMode,
+    onProductClick
 }: ScoreProductListProps) {
     // 검색 모드에 따른 정렬 옵션 필터링
     const availableSortOptions = searchMode === 'KEYWORD_ONLY' 
@@ -141,6 +143,7 @@ export function ScoreProductList({
                             <TableHead className="w-20 text-xs">이미지</TableHead>
                             <TableHead className="text-xs">상품정보</TableHead>
                             <TableHead className="text-right text-xs">가격</TableHead>
+                            <TableHead className="w-16 text-xs">상세</TableHead>
                             {showExplain && <TableHead className="w-16 text-xs">분석</TableHead>}
                         </TableRow>
                     </TableHeader>
@@ -151,12 +154,14 @@ export function ScoreProductList({
                             ))
                         ) : products.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={showExplain ? 5 : 4} className="text-center text-gray-400 py-4 text-xs">
+                                <TableCell colSpan={showExplain ? 6 : 5} className="text-center text-gray-400 py-4 text-xs">
                                     검색 결과가 없습니다.
                                 </TableCell>
                             </TableRow>
                         ) : products.map(p => (
-                            <TableRow key={p.id} className="transition-colors hover:bg-blue-50/60">
+                            <TableRow 
+                                key={p.id} 
+                                className="transition-colors hover:bg-blue-50/60">
                                 {/* 점수 */}
                                 <TableCell className="py-2">
                                     <div className="text-center">
@@ -211,6 +216,22 @@ export function ScoreProductList({
                                     <div className="font-bold text-blue-700 text-sm">
                                         {p.price?.toLocaleString()}원
                                     </div>
+                                </TableCell>
+                                
+                                {/* 상세 버튼 */}
+                                <TableCell className="py-2">
+                                    {p.documentId && onProductClick ? (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="h-6 px-2 text-xs"
+                                            onClick={() => onProductClick(p.documentId!)}
+                                        >
+                                            <FileJson className="h-3 w-3" />
+                                        </Button>
+                                    ) : (
+                                        <span className="text-gray-400 text-xs">-</span>
+                                    )}
                                 </TableCell>
                                 
                                 {/* Explain 버튼 */}

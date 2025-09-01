@@ -205,21 +205,24 @@ export default function SearchDemo() {
     const minLoadingTime = 400; // 필터링은 조금 더 빠르게
     
     try {
-      // 정렬 필드와 순서 결정
-      let sortField: string = 'score';
+      // 정렬 필드와 순서 결정 (API 문서에 따라 sort.sortType, sort.sortOrder 사용)
+      let sortType: string = 'score';
       let sortOrder: 'asc' | 'desc' = 'desc';
 
       if (sort === 'price_asc') {
-        sortField = 'price';
+        sortType = 'price';
         sortOrder = 'asc';
       } else if (sort === 'price_desc') {
-        sortField = 'price';
+        sortType = 'price';
         sortOrder = 'desc';
       } else if (sort === 'reviewCount') {
-        sortField = 'reviewCount';
+        sortType = 'reviewCount';
         sortOrder = 'desc';
       } else if (sort === 'registeredMonth') {
-        sortField = 'registeredMonth';
+        sortType = 'registeredMonth';
+        sortOrder = 'desc';
+      } else if (sort === 'rating') {
+        sortType = 'rating';
         sortOrder = 'desc';
       }
 
@@ -230,8 +233,8 @@ export default function SearchDemo() {
         query: searchQuery || "",
         page: page,
         size: pageSize,
-        sortField: sortField,
-        sortOrder: sortOrder,
+        'sort.sortType': sortType,
+        'sort.sortOrder': sortOrder,
         searchMode: searchMode as "KEYWORD_ONLY" | "VECTOR_MULTI_FIELD",
         rrfK,
         hybridTopK,
