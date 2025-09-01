@@ -64,19 +64,14 @@ export function AnalysisResult({ result }: AnalysisResultProps) {
               </div>
             </div>
 
-            {/* 동의어 경로 */}
-            {result.noriAnalysis.synonymPaths && result.noriAnalysis.synonymPaths.length > 0 && (
+            {/* 토큰 및 동의어 */}
+            {result.noriAnalysis.formattedTokens && (
               <div>
-                <h4 className="text-sm font-medium mb-2">동의어 확장 경로</h4>
-                <div className="space-y-1">
-                  {result.noriAnalysis.synonymPaths.map((path, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500 w-4">{index + 1}.</span>
-                      <Badge variant="secondary" className="text-xs">
-                        {path}
-                      </Badge>
-                    </div>
-                  ))}
+                <h4 className="text-sm font-medium mb-2">토큰 및 동의어 확장</h4>
+                <div className="p-3 bg-gray-50 rounded-md">
+                  <p className="text-xs font-mono text-gray-700 break-all">
+                    {result.noriAnalysis.formattedTokens}
+                  </p>
                 </div>
               </div>
             )}

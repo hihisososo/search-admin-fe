@@ -15,7 +15,7 @@ export interface TokenInfo {
 // Nori 분석 결과
 export interface NoriAnalysis {
   tokens: TokenInfo[]
-  synonymPaths: string[]  // 동의어 확장 경로 (전체 경로 문자열)
+  formattedTokens: string  // 토큰화된 형태와 동의어 확장 결과
 }
 
 // 단위 정보

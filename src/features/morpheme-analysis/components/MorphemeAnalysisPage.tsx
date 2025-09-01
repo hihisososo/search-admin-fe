@@ -149,24 +149,13 @@ export function MorphemeAnalysisPage() {
       )
     },
     {
-      key: 'synonyms',
-      label: '동의어 경로',
+      key: 'formattedTokens',
+      label: '토큰 및 동의어',
       render: (item) => {
-        const paths = item.result.noriAnalysis.synonymPaths
+        const formatted = item.result.noriAnalysis.formattedTokens
         return (
-          <div className="space-y-1">
-            {paths && paths.length > 0 ? (
-              paths.slice(0, 3).map((path, idx) => (
-                <div key={idx} className="text-xs text-gray-600">
-                  {path}
-                </div>
-              ))
-            ) : (
-              <span className="text-xs text-gray-400">없음</span>
-            )}
-            {paths && paths.length > 3 && (
-              <span className="text-xs text-gray-400">... 외 {paths.length - 3}개</span>
-            )}
+          <div className="text-xs font-mono text-gray-700 break-all">
+            {formatted || <span className="text-gray-400">없음</span>}
           </div>
         )
       }
