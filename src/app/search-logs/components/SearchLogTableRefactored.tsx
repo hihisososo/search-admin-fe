@@ -1,5 +1,4 @@
 import { BaseTable, type Column } from '@/shared/components/tables'
-import { Badge } from "@/components/ui/badge"
 import { AlertCircle, CheckCircle } from "lucide-react"
 import { 
   formatResponseTime, 
