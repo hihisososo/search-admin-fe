@@ -28,6 +28,7 @@ interface BaseTableProps<T> {
   onRowClick?: (item: T) => void
   loading?: boolean
   emptyMessage?: string
+  showEmptyTable?: boolean
   keyExtractor: (item: T) => string | number
   className?: string
   highlightedId?: string | number | null
@@ -42,6 +43,7 @@ export function BaseTable<T>({
   onRowClick,
   loading,
   emptyMessage = '데이터가 없습니다.',
+  showEmptyTable = false,
   keyExtractor,
   className = '',
   highlightedId
@@ -71,7 +73,7 @@ export function BaseTable<T>({
     )
   }
 
-  if (data.length === 0) {
+  if (data.length === 0 && !showEmptyTable) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-gray-500">{emptyMessage}</div>
@@ -105,7 +107,14 @@ export function BaseTable<T>({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((item) => {
+          {data.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="text-center py-8 text-gray-500">
+                {emptyMessage}
+              </TableCell>
+            </TableRow>
+          ) : (
+            data.map((item) => {
             const itemKey = keyExtractor(item)
             const isHighlighted = highlightedId !== null && highlightedId === itemKey
             
@@ -131,7 +140,7 @@ export function BaseTable<T>({
                 ))}
               </TableRow>
             )
-          })}
+          }))}
         </TableBody>
       </Table>
     </div>

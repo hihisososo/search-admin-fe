@@ -250,6 +250,7 @@ export function MorphemeAnalysisPage() {
         data={paginatedRecords}
         loading={loading}
         emptyMessage="분석 기록이 없습니다."
+        showEmptyTable={true}
         keyExtractor={(item) => item.id}
         className="bg-white"
       />
