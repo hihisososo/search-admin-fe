@@ -116,7 +116,12 @@ export function QueryTableRow({
       </TableCell>
       <TableCell className="py-2 text-center">
         <span className="text-xs text-gray-600">
-          {query.updatedAt ? new Date(query.updatedAt).toLocaleDateString('ko-KR') : '-'}
+          {query.updatedAt ? new Date(query.updatedAt).toLocaleDateString('ko-KR', {
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+          }) : '-'}
         </span>
       </TableCell>
       <TableCell className="py-2">
