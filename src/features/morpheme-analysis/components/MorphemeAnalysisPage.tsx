@@ -9,6 +9,7 @@ import { BaseTable, type Column } from '@/shared/components/tables/BaseTable'
 import { DataTableToolbar } from '@/shared/components/DataTableToolbar'
 import { PaginationControls } from '@/shared/components/PaginationControls'
 import { MorphemeAnalysisHeader } from './MorphemeAnalysisHeader'
+import { FormattedTokensDisplay } from './FormattedTokensDisplay'
 
 interface AnalysisRecord {
   id: string
@@ -153,10 +154,10 @@ export function MorphemeAnalysisPage() {
       label: '토큰 및 동의어',
       render: (item) => {
         const formatted = item.result.noriAnalysis.formattedTokens
-        return (
-          <div className="text-xs font-mono text-gray-700 break-all">
-            {formatted || <span className="text-gray-400">없음</span>}
-          </div>
+        return formatted ? (
+          <FormattedTokensDisplay formattedTokens={formatted} />
+        ) : (
+          <span className="text-xs text-gray-400">없음</span>
         )
       }
     },
