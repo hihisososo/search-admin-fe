@@ -114,6 +114,11 @@ export function QueryTableRow({
       <TableCell className="py-2 text-center">
         <Badge variant="secondary" className="text-xs">{unevaluatedCount}</Badge>
       </TableCell>
+      <TableCell className="py-2 text-center">
+        <span className="text-xs text-gray-600">
+          {query.updatedAt ? new Date(query.updatedAt).toLocaleDateString('ko-KR') : '-'}
+        </span>
+      </TableCell>
       <TableCell className="py-2">
         <div className="flex gap-1 justify-center">
           <Button

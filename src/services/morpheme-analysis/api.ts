@@ -11,7 +11,7 @@ export const morphemeAnalysisService = {
     }
     
     const data = await apiClient.post<MorphemeAnalysisResponse>(
-      '/api/v1/search/query-analysis',
+      '/v1/search/query-analysis',
       request
     )
     
@@ -40,7 +40,7 @@ export const morphemeAnalysisService = {
 
   // 임시 인덱스 갱신 (CURRENT 환경용)
   refreshTempIndex: async (): Promise<{ message: string }> => {
-    await apiClient.post('/api/v1/search/temp-index/refresh', {})
+    await apiClient.post('/v1/search/temp-index/refresh', {})
     return { message: '인덱스가 갱신되었습니다.' }
   }
 }

@@ -256,13 +256,25 @@ export function QueryTable({
                 {sortField !== 'unevaluatedCount' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
               </div>
             </TableHead>
+            <TableHead 
+              className="py-2 text-xs font-semibold text-gray-700 text-center w-32 cursor-pointer hover:bg-gray-100" 
+              onClick={() => onSort?.('updatedAt')}
+            >
+              <div className="flex items-center justify-center gap-1">
+                <span>수정일</span>
+                {sortField === 'updatedAt' && (
+                  sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                )}
+                {sortField !== 'updatedAt' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+              </div>
+            </TableHead>
             <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-20">액션</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {queries.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-8 text-gray-500">
+              <TableCell colSpan={9} className="text-center py-8 text-gray-500">
                 <p className="text-sm">등록된 쿼리가 없습니다</p>
                 <p className="text-xs text-gray-400 mt-1">새 쿼리를 추가하거나 LLM으로 생성해보세요</p>
               </TableCell>
