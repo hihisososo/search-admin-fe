@@ -53,9 +53,8 @@ interface SimulationSearchResponse {
     queryDsl?: string  // Elasticsearch Query DSL
 }
 
-// 환경 매핑 (사전관리와 통일)
-const ENV_MAPPING: Record<DictionaryEnvironmentType, string> = {
-    [DictionaryEnvironmentType.CURRENT]: 'DEV', // 현재 = 개발환경
+// 환경 매핑 (사전관리와 통일) - 검색 시뮬레이터는 CURRENT 사용 안 함
+const ENV_MAPPING: Partial<Record<DictionaryEnvironmentType, string>> = {
     [DictionaryEnvironmentType.DEV]: 'DEV',
     [DictionaryEnvironmentType.PROD]: 'PROD'
 }
@@ -383,7 +382,7 @@ export default function SearchSimulator() {
         setIsDocumentModalOpen(true)
     }
 
-    const currentEnvId = ENV_MAPPING[selectedEnv]
+    const currentEnvId = ENV_MAPPING[selectedEnv] || 'DEV'
     const envState = environments[currentEnvId]
     
     // 검색 모드 변경 핸들러
@@ -405,6 +404,7 @@ export default function SearchSimulator() {
                         <EnvironmentSelector
                             value={selectedEnv}
                             onChange={setSelectedEnv}
+                            excludeOptions={[DictionaryEnvironmentType.CURRENT]}
                         />
                     </div>
                     

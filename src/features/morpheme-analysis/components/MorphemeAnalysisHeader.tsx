@@ -64,22 +64,21 @@ export function MorphemeAnalysisHeader({
               variant="outline"
             >
               <RefreshCw className={`h-4 w-4 mr-1 ${refreshing ? 'animate-spin' : ''}`} />
-              임시 인덱스 갱신
+              사전 최신화
             </Button>
           )}
           
           {/* 기록 삭제 버튼 */}
-          {recordCount > 0 && (
-            <Button
-              onClick={onClearRecords}
-              size="sm"
-              variant="outline"
-              className="text-red-600 border-red-300 hover:bg-red-50"
-            >
-              <Trash2 className="h-4 w-4 mr-1" />
-              전체 삭제 ({recordCount})
-            </Button>
-          )}
+          <Button
+            onClick={onClearRecords}
+            size="sm"
+            variant="outline"
+            className="text-red-600 border-red-300 hover:bg-red-50"
+            disabled={recordCount === 0}
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            전체 삭제 ({recordCount})
+          </Button>
         </div>
       </div>
     </div>
