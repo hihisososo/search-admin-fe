@@ -40,13 +40,21 @@ export interface MorphemeAnalysisResponse {
   models: string[]  // 추출된 모델명
 }
 
-// 쿼리 분석 응답 (새로운 API 응답 형식)
+// 검색용 쿼리 분석 응답 (API v2 - 2025.01.03)
 export interface QueryAnalysisResponse {
   environment: string
   originalQuery: string
-  tokens: string[]  // 분석된 토큰 리스트
-  synonymExpansions: Record<string, string[]>  // 동의어 확장 결과
-  mermaidGraph: string  // Mermaid 형식의 토큰 그래프 다이어그램
+  tokens: string[]  // 분석된 원본 토큰 리스트 (동의어 제외)
+  mermaidGraph: string  // Mermaid 형식의 토큰 그래프 다이어그램 (동의어 포함)
+  queryExpression: string  // 검색식 (AND/OR 조합)
+}
+
+// 색인용 쿼리 분석 응답 (API v2 - 2025.01.03)
+export interface IndexAnalysisResponse {
+  environment: string
+  originalQuery: string
+  tokens: string[]  // 분석된 원본 토큰 리스트
+  additionalTokens: string[]  // 추가 색인어 리스트
 }
 
 // 분석 기록

@@ -22,7 +22,17 @@ export function MermaidGraph({ graph, query = '쿼리' }: MermaidGraphProps) {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!graph || !isOpen || !containerRef.current) return
+    if (!graph || !isOpen) {
+      return
+    }
+
+    // DOM이 준비될 때까지 대기
+    const timer = setTimeout(() => {
+      if (!containerRef.current) {
+        return
+      }
+      renderGraph()
+    }, 100)
 
     const renderGraph = async () => {
       try {
@@ -75,7 +85,9 @@ export function MermaidGraph({ graph, query = '쿼리' }: MermaidGraphProps) {
       }
     }
 
-    renderGraph()
+    return () => {
+      clearTimeout(timer)
+    }
   }, [graph, isOpen])
 
   if (!graph) {
