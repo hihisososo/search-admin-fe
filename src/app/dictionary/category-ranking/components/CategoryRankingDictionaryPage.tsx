@@ -164,7 +164,10 @@ export function CategoryRankingDictionaryPage() {
         showSearch
         searchValue={searchInput}
         onSearchChange={setSearchInput}
-        onSearch={() => setSearch(searchInput)}
+        onSearch={() => {
+          setSearch(searchInput)
+          setPage(0)  // 검색 시 첫 페이지로 이동
+        }}
         totalCount={data?.totalElements || 0}
         currentPage={page}
         totalPages={totalPages}

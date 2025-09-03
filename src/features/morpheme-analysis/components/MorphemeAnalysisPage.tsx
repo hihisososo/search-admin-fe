@@ -1,55 +1,33 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { Badge } from '@/components/ui/badge'
+import { useState, useEffect, useRef } from 'react'
 import { morphemeAnalysisService } from '@/services'
-import type { AnalysisEnvironment, QueryAnalysisResponse } from '@/services/morpheme-analysis/types'
+import type { AnalysisEnvironment, QueryAnalysisResponse, IndexAnalysisResponse } from '@/services/morpheme-analysis/types'
 import { useToast } from '@/components/ui/use-toast'
-import { BaseTable, type Column } from '@/shared/components/tables/BaseTable'
-import { DataTableToolbar } from '@/shared/components/DataTableToolbar'
-import { PaginationControls } from '@/shared/components/PaginationControls'
 import { MorphemeAnalysisHeader } from './MorphemeAnalysisHeader'
-import { MermaidGraph } from './MermaidGraph'
-
-interface AnalysisRecord {
-  id: string
-  query: string
-  environment: AnalysisEnvironment
-  timestamp: Date
-  result: QueryAnalysisResponse
-}
+import { Search } from 'lucide-react'
+import mermaid from 'mermaid'
+import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
 
 export function MorphemeAnalysisPage() {
   const [environment, setEnvironment] = useState<AnalysisEnvironment>('CURRENT')
+  const [analysisType, setAnalysisType] = useState<'search' | 'index'>('search')
   const [searchInput, setSearchInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
-  const [analysisRecords, setAnalysisRecords] = useState<AnalysisRecord[]>([])
+  const [analysisResult, setAnalysisResult] = useState<QueryAnalysisResponse | IndexAnalysisResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
-  
-  // 페이지네이션
-  const [page, setPage] = useState(0)
-  const [pageSize, setPageSize] = useState(10)
-  
-  // 페이지네이션된 데이터
-  const paginatedRecords = useMemo(() => {
-    const start = page * pageSize
-    const end = start + pageSize
-    return analysisRecords.slice(start, end)
-  }, [analysisRecords, page, pageSize])
-  
-  const totalPages = useMemo(() => {
-    if (analysisRecords.length === 0) return 0
-    return Math.ceil(analysisRecords.length / pageSize)
-  }, [analysisRecords.length, pageSize])
+  const graphRef = useRef<HTMLDivElement>(null)
 
   const handleAnalyze = async () => {
     const queryToAnalyze = searchInput.trim()
     if (!queryToAnalyze) {
       toast({
-        title: '오류',
-        description: '분석할 쿼리를 입력해주세요.',
+        title: '검색어를 입력해주세요',
+        description: '분석할 검색어가 필요합니다.',
         variant: 'destructive'
       })
       return
@@ -57,27 +35,25 @@ export function MorphemeAnalysisPage() {
 
     setLoading(true)
     setError(null)
-    
+    setAnalysisResult(null)
+
     try {
-      const result = await morphemeAnalysisService.analyzeQuery({
-        query: queryToAnalyze,
-        environment
-      })
-      
-      // 분석 기록 추가
-      const newRecord: AnalysisRecord = {
-        id: Date.now().toString(),
-        query: queryToAnalyze,
-        environment,
-        timestamp: new Date(),
-        result
+      let response
+      if (analysisType === 'search') {
+        response = await morphemeAnalysisService.analyzeQuery({
+          query: queryToAnalyze,
+          environment
+        })
+      } else {
+        response = await morphemeAnalysisService.analyzeIndexQuery({
+          query: queryToAnalyze,
+          environment
+        })
       }
       
-      setAnalysisRecords(prev => [newRecord, ...prev])
-      setSearchInput('') // 검색 입력 초기화
-      setPage(0) // 첫 페이지로 이동
+      setAnalysisResult(response)
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '쿼리 분석 중 오류가 발생했습니다.'
+      const errorMessage = err instanceof Error ? err.message : '분석 중 오류가 발생했습니다.'
       setError(errorMessage)
       toast({
         title: '분석 실패',
@@ -89,13 +65,22 @@ export function MorphemeAnalysisPage() {
     }
   }
 
-  const handleRefreshIndex = async () => {
+  const handleRefresh = async () => {
+    if (environment !== 'CURRENT') {
+      toast({
+        title: '갱신 불가',
+        description: 'CURRENT 환경에서만 임시 인덱스를 갱신할 수 있습니다.',
+        variant: 'destructive'
+      })
+      return
+    }
+
     setRefreshing(true)
-    
     try {
       const result = await morphemeAnalysisService.refreshTempIndex()
+      
       toast({
-        title: '인덱스 갱신 완료',
+        title: '갱신 완료',
         description: result.message || '임시 인덱스가 성공적으로 갱신되었습니다.'
       })
     } catch (err) {
@@ -110,111 +95,106 @@ export function MorphemeAnalysisPage() {
     }
   }
 
-  const handleClearRecords = () => {
-    setAnalysisRecords([])
-    setPage(0)
-  }
+  // Mermaid 그래프 렌더링
+  useEffect(() => {
+    if (!analysisResult || !('mermaidGraph' in analysisResult) || !analysisResult.mermaidGraph || !graphRef.current) return
 
-  // 테이블 컬럼 정의
-  const columns: Column<AnalysisRecord>[] = [
-    {
-      key: 'query',
-      label: '쿼리',
-      width: 'w-[200px]',
-      render: (item) => (
-        <span className="font-mono text-sm">{item.query}</span>
-      )
-    },
-    {
-      key: 'environment',
-      label: '환경',
-      width: 'w-[80px]',
-      align: 'center',
-      render: (item) => (
-        <Badge variant="outline" className="text-xs">
-          {item.environment}
-        </Badge>
-      )
-    },
-    {
-      key: 'tokens',
-      label: '토큰',
-      render: (item) => (
-        <div className="flex flex-wrap gap-1">
-          {item.result.tokens.map((token, idx) => (
-            <Badge key={idx} variant="secondary" className="text-xs">
-              {token}
-            </Badge>
-          ))}
-        </div>
-      )
-    },
-    {
-      key: 'synonymExpansions',
-      label: '동의어 확장',
-      render: (item) => {
-        const expansions = item.result.synonymExpansions
-        const hasExpansions = Object.keys(expansions).length > 0
-        
-        if (!hasExpansions) {
-          return <span className="text-xs text-gray-400">없음</span>
-        }
-        
-        return (
-          <div className="space-y-1">
-            {Object.entries(expansions).map(([key, values], idx) => (
-              <div key={idx} className="flex items-center gap-1 flex-wrap">
-                <span className="text-xs font-medium">{key}:</span>
-                {values.map((value, i) => (
-                  <Badge key={i} variant="outline" className="text-xs">
-                    {value}
-                  </Badge>
-                ))}
-              </div>
-            ))}
-          </div>
-        )
-      }
-    },
-    {
-      key: 'mermaidGraph',
-      label: '토큰 그래프',
-      width: 'w-[120px]',
-      render: (item) => (
-        <MermaidGraph 
-          graph={item.result.mermaidGraph} 
-          query={item.query}
-        />
-      )
+    // 실제 노드가 있는지 확인 (classDef만 있고 노드가 없는 빈 그래프 체크)
+    const hasNodes = analysisResult.mermaidGraph.includes('-->') || 
+                     analysisResult.mermaidGraph.includes('==>') ||
+                     analysisResult.mermaidGraph.includes('---')
+    
+    if (!hasNodes) {
+      graphRef.current!.innerHTML = '<div class="text-gray-400 text-sm">동의어 확장 결과가 없습니다</div>'
+      return
     }
-  ]
+
+    const renderGraph = async () => {
+      try {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'default',
+          securityLevel: 'loose',
+          flowchart: {
+            htmlLabels: true,
+            curve: 'linear',
+            nodeSpacing: 50,
+            rankSpacing: 80
+          }
+        })
+
+        // 기존 내용 제거
+        graphRef.current!.innerHTML = ''
+
+        // 고유 ID 생성
+        const id = `mermaid-${Date.now()}`
+
+        // JSON escape 처리 해제 및 화살표 문법 수정
+        const unescapedGraph = analysisResult.mermaidGraph
+          .replace(/\\n/g, '\n')
+          .replace(/\\"/g, '"')
+          .replace(/\\\\/g, '\\')
+          .replace(/===([^=]+)===>/g, '==>|$1|')
+        
+        // 그래프 렌더링
+        const { svg } = await mermaid.render(id, unescapedGraph)
+        
+        if (graphRef.current && svg) {
+          graphRef.current.innerHTML = svg
+        }
+      } catch (err) {
+        console.error('Mermaid rendering error:', err)
+      }
+    }
+
+    // DOM이 준비될 때까지 대기
+    setTimeout(renderGraph, 100)
+  }, [analysisResult])
 
   return (
     <div className="p-6 space-y-4">
       {/* 헤더 */}
-      <MorphemeAnalysisHeader
+      <MorphemeAnalysisHeader 
         environment={environment}
         onEnvironmentChange={setEnvironment}
-        onRefreshIndex={handleRefreshIndex}
+        onRefreshIndex={handleRefresh}
         refreshing={refreshing}
-        recordCount={analysisRecords.length}
-        onClearRecords={handleClearRecords}
+        recordCount={0}
+        onClearRecords={() => setAnalysisResult(null)}
       />
 
-      {/* 검색 툴바 */}
-      <DataTableToolbar
-        showSearch
-        searchValue={searchInput}
-        onSearchChange={setSearchInput}
-        onSearch={handleAnalyze}
-        searchPlaceholder="분석할 검색어를 입력하세요 (예: 삼성전자 노트북 1kg)"
-        totalCount={analysisRecords.length}
-        currentPage={page}
-        totalPages={totalPages}
-        pageSize={pageSize}
-        onPageSizeChange={(ps) => { setPageSize(ps); setPage(0) }}
-        disabled={loading}
-      />
+      {/* 검색 입력 */}
+      <div className="flex items-center gap-2">
+        <Select value={analysisType} onValueChange={(value: 'search' | 'index') => setAnalysisType(value)}>
+          <SelectTrigger className="w-28 text-xs h-9">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="search" className="text-xs">검색용</SelectItem>
+            <SelectItem value="index" className="text-xs">색인용</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <Input
+          placeholder="분석할 검색어를 입력하세요 (예: 삼성전자 노트북 1kg)"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
+          className="max-w-md text-sm"
+          disabled={loading}
+        />
+        
+        <Button 
+          onClick={handleAnalyze} 
+          disabled={loading} 
+          size="icon" 
+          variant="outline" 
+          className="w-9" 
+          aria-label="검색"
+        >
+          <Search className="w-4 h-4" />
+        </Button>
+      </div>
 
       {/* 에러 메시지 */}
       {error && (
@@ -223,27 +203,75 @@ export function MorphemeAnalysisPage() {
         </div>
       )}
 
-      {/* 분석 기록 테이블 */}
-      <BaseTable
-        columns={columns}
-        data={paginatedRecords}
-        loading={loading}
-        emptyMessage="분석 기록이 없습니다."
-        showEmptyTable={true}
-        keyExtractor={(item) => item.id}
-        className="bg-white"
-      />
+      {/* 분석 결과 */}
+      {analysisResult && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="space-y-6">
+            {/* 기본 정보 */}
+            <div className="pb-4 border-b border-gray-100">
+              <div>
+                <span className="text-xs text-gray-500">원본:</span>
+                <span className="font-mono text-sm text-gray-900 ml-2">{analysisResult.originalQuery}</span>
+              </div>
+            </div>
 
-      {/* 페이지네이션 */}
-      {totalPages > 0 && (
-        <PaginationControls
-          currentPage={page}
-          totalPages={totalPages}
-          totalCount={analysisRecords.length}
-          pageSize={pageSize}
-          onPageChange={setPage}
-          onPageSizeChange={(ps) => { setPageSize(ps); setPage(0) }}
-        />
+            {/* 토큰 목록 */}
+            <div className="pb-4 border-b border-gray-100">
+              <div>
+                <span className="text-xs text-gray-500">분석된 토큰:</span>
+                <span className="text-sm text-gray-900 ml-2">
+                  {analysisResult.tokens.length > 0 ? analysisResult.tokens.join(', ') : '없음'}
+                </span>
+              </div>
+            </div>
+
+            {/* 검색용 분석: 검색식 */}
+            {'queryExpression' in analysisResult && (
+              <div className="pb-4 border-b border-gray-100">
+                <div>
+                  <span className="text-xs text-gray-500">검색식:</span>
+                  <span className="text-sm font-mono text-gray-900 ml-2">
+                    {analysisResult.queryExpression || '없음'}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* 색인용 분석: 추가 색인어 */}
+            {'additionalTokens' in analysisResult && (
+              <div className="pb-4 border-b border-gray-100">
+                <div>
+                  <span className="text-xs text-gray-500">추가 색인어:</span>
+                  <span className="text-sm text-gray-900 ml-2">
+                    {analysisResult.additionalTokens.length > 0 
+                      ? analysisResult.additionalTokens.join(', ')
+                      : '없음'}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Mermaid 그래프 (검색용만) */}
+            {'mermaidGraph' in analysisResult && (
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-3">동의어 확장 결과</h4>
+                <div className="border rounded-lg p-6 bg-gray-50">
+                  <div ref={graphRef} className="flex justify-center" />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 초기 상태 */}
+      {!loading && !analysisResult && !error && (
+        <div className="bg-white border border-gray-200 rounded-lg p-12">
+          <div className="text-center text-gray-500">
+            <Search className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+            <p className="text-sm">검색어를 입력하여 형태소 분석을 시작하세요</p>
+          </div>
+        </div>
       )}
     </div>
   )

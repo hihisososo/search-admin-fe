@@ -54,7 +54,10 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
         showSearch
         searchValue={searchInput}
         onSearchChange={setSearchInput}
-        onSearch={() => setSearch(searchInput)}
+        onSearch={() => {
+          setSearch(searchInput)
+          setPage(0)  // 검색 시 첫 페이지로 이동
+        }}
         totalCount={state.total}
         currentPage={page}
         totalPages={totalPages}

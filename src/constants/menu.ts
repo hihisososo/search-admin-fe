@@ -68,7 +68,7 @@ export const MENU_ITEMS: MenuItem[] = [
   },
   {
     id: 'deploy',
-    title: '배포관리',
+    title: '색인관리',
     path: '/deploy',
     icon: Rocket,
   },
