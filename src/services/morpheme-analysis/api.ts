@@ -1,5 +1,5 @@
 import { apiClient } from "@/services/common/api-client"
-import type { MorphemeAnalysisRequest, MorphemeAnalysisResponse, QueryAnalysisResponse } from "./types"
+import type { MorphemeAnalysisRequest, QueryAnalysisResponse } from "./types"
 
 // 형태소 분석 서비스
 export const morphemeAnalysisService = {
@@ -10,7 +10,7 @@ export const morphemeAnalysisService = {
       environment: params.environment
     }
     
-    const response = await apiClient.post<MorphemeAnalysisResponse>(
+    const response = await apiClient.post<QueryAnalysisResponse>(
       '/v1/search/query-analysis',
       request
     )

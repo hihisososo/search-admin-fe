@@ -9,7 +9,7 @@ import { BaseTable, type Column } from '@/shared/components/tables/BaseTable'
 import { DataTableToolbar } from '@/shared/components/DataTableToolbar'
 import { PaginationControls } from '@/shared/components/PaginationControls'
 import { MorphemeAnalysisHeader } from './MorphemeAnalysisHeader'
-import { FormattedTokensDisplay } from './FormattedTokensDisplay'
+import { MermaidGraph } from './MermaidGraph'
 
 interface AnalysisRecord {
   id: string
@@ -141,65 +141,50 @@ export function MorphemeAnalysisPage() {
       label: '토큰',
       render: (item) => (
         <div className="flex flex-wrap gap-1">
-          {item.result.noriAnalysis.tokens.map((token, idx) => (
+          {item.result.tokens.map((token, idx) => (
             <Badge key={idx} variant="secondary" className="text-xs">
-              {token.token}
+              {token}
             </Badge>
           ))}
         </div>
       )
     },
     {
-      key: 'formattedTokens',
-      label: '토큰 및 동의어',
+      key: 'synonymExpansions',
+      label: '동의어 확장',
       render: (item) => {
-        const formatted = item.result.noriAnalysis.formattedTokens
-        const synonymExpansions = item.result.noriAnalysis.synonymExpansions
-        return formatted ? (
-          <FormattedTokensDisplay 
-            formattedTokens={formatted} 
-            synonymExpansions={synonymExpansions}
-          />
-        ) : (
-          <span className="text-xs text-gray-400">없음</span>
+        const expansions = item.result.synonymExpansions
+        const hasExpansions = Object.keys(expansions).length > 0
+        
+        if (!hasExpansions) {
+          return <span className="text-xs text-gray-400">없음</span>
+        }
+        
+        return (
+          <div className="space-y-1">
+            {Object.entries(expansions).map(([key, values], idx) => (
+              <div key={idx} className="flex items-center gap-1 flex-wrap">
+                <span className="text-xs font-medium">{key}:</span>
+                {values.map((value, i) => (
+                  <Badge key={i} variant="outline" className="text-xs">
+                    {value}
+                  </Badge>
+                ))}
+              </div>
+            ))}
+          </div>
         )
       }
     },
     {
-      key: 'units',
-      label: '단위',
+      key: 'mermaidGraph',
+      label: '토큰 그래프',
+      width: 'w-[120px]',
       render: (item) => (
-        <div className="space-y-1">
-          {item.result.units.map((unit, idx) => (
-            <div key={idx} className="flex items-center gap-1 flex-wrap">
-              <span className="text-xs font-medium">{unit.original}:</span>
-              {unit.expanded.map((exp, i) => (
-                <Badge key={i} variant="outline" className="text-xs">
-                  {exp}
-                </Badge>
-              ))}
-            </div>
-          ))}
-          {item.result.units.length === 0 && (
-            <span className="text-xs text-gray-400">없음</span>
-          )}
-        </div>
-      )
-    },
-    {
-      key: 'models',
-      label: '모델명',
-      render: (item) => (
-        <div className="flex flex-wrap gap-1">
-          {item.result.models.map((model, idx) => (
-            <Badge key={idx} variant="secondary" className="text-xs">
-              {model}
-            </Badge>
-          ))}
-          {item.result.models.length === 0 && (
-            <span className="text-xs text-gray-400">없음</span>
-          )}
-        </div>
+        <MermaidGraph 
+          graph={item.result.mermaidGraph} 
+          query={item.query}
+        />
       )
     }
   ]

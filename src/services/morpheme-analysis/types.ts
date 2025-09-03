@@ -40,8 +40,14 @@ export interface MorphemeAnalysisResponse {
   models: string[]  // 추출된 모델명
 }
 
-// 쿼리 분석 응답 (MorphemeAnalysisResponse와 동일)
-export type QueryAnalysisResponse = MorphemeAnalysisResponse
+// 쿼리 분석 응답 (새로운 API 응답 형식)
+export interface QueryAnalysisResponse {
+  environment: string
+  originalQuery: string
+  tokens: string[]  // 분석된 토큰 리스트
+  synonymExpansions: Record<string, string[]>  // 동의어 확장 결과
+  mermaidGraph: string  // Mermaid 형식의 토큰 그래프 다이어그램
+}
 
 // 분석 기록
 export interface AnalysisRecord {
