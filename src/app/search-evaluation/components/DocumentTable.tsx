@@ -126,6 +126,27 @@ export function DocumentTable({
     )
   }
 
+  // 검색 소스 뱃지 렌더링
+  const getSearchSourceBadge = (searchSource?: 'BM25' | 'BIGRAM' | 'VECTOR' | 'MULTIPLE' | null) => {
+    if (!searchSource) {
+      return <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-gray-50 text-gray-600 border-gray-200">수동</Badge>
+    }
+    
+    const sourceConfig = {
+      BM25: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+      BIGRAM: { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200' },
+      VECTOR: { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+      MULTIPLE: { bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200' }
+    }
+    
+    const config = sourceConfig[searchSource]
+    return (
+      <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${config.bg} ${config.text} ${config.border}`}>
+        {searchSource}
+      </Badge>
+    )
+  }
+
   // 상품 추가 핸들러
   // removed add-document handler
 
@@ -305,6 +326,7 @@ export function DocumentTable({
                   <TableHead className="w-16 py-2 text-xs font-semibold text-gray-700">순번</TableHead>
                   <TableHead className="w-32 py-2 text-xs font-semibold text-gray-700">상품 ID</TableHead>
                   <TableHead className="py-2 text-xs font-semibold text-gray-700">상품명</TableHead>
+                  <TableHead className="w-24 py-2 text-xs font-semibold text-gray-700">검색 소스</TableHead>
                   <TableHead className="w-32 py-2 text-xs font-semibold text-gray-700 text-center">평가 상태</TableHead>
                 </TableRow>
               </TableHeader>
@@ -383,6 +405,17 @@ export function DocumentTable({
         </div>
         
         <div className="flex items-center gap-2">
+          {selectedDocumentIds.length > 0 && (
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={handleDeleteSelected}
+              disabled={deleteCandidatesMutation.isPending}
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              선택 삭제 ({selectedDocumentIds.length})
+            </Button>
+          )}
           {onClose && (
             <Button variant="outline" size="sm" onClick={onClose} className="h-8 w-8 p-0">
               <X className="h-4 w-4" />
@@ -399,15 +432,6 @@ export function DocumentTable({
               <span className="text-sm text-gray-600">
                 {selectedDocumentIds.length}개 선택됨
               </span>
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={handleDeleteSelected}
-                disabled={deleteCandidatesMutation.isPending}
-              >
-                <Trash2 className="h-4 w-4 mr-1" />
-                선택 삭제
-              </Button>
             </div>
           )}
         </div>
@@ -471,6 +495,18 @@ export function DocumentTable({
                 </div>
               </TableHead>
               <TableHead 
+                className="w-24 py-2 text-xs font-semibold text-gray-700 text-center cursor-pointer hover:bg-gray-100" 
+                onClick={() => onSort?.('searchSource')}
+              >
+                <div className="flex items-center justify-center gap-1">
+                  <span>검색 소스</span>
+                  {sortField === 'searchSource' && (
+                    sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  )}
+                  {sortField !== 'searchSource' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
+                </div>
+              </TableHead>
+              <TableHead 
                 className="w-32 py-2 text-xs font-semibold text-gray-700 text-center cursor-pointer hover:bg-gray-100" 
                 onClick={() => onSort?.('relevanceScore')}
               >
@@ -499,7 +535,7 @@ export function DocumentTable({
           <TableBody>
             {documents.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-12 text-gray-500">
+                <TableCell colSpan={7} className="text-center py-12 text-gray-500">
                   <div className="space-y-2">
                     <p className="text-base font-medium">등록된 정답 문서가 없습니다</p>
                     <p className="text-sm text-gray-400">상품을 추가해서 정답 문서를 만들어보세요</p>
@@ -537,6 +573,10 @@ export function DocumentTable({
                         <div className="font-medium text-xs text-gray-900" style={{ userSelect: 'text' }}>
                           {doc.productName}
                         </div>
+                      </TableCell>
+                      
+                      <TableCell className="py-2 text-center">
+                        {getSearchSourceBadge(doc.searchSource)}
                       </TableCell>
                       
                       <TableCell className="py-2 text-center">
@@ -587,7 +627,7 @@ export function DocumentTable({
                     {/* 아코디언 상세 정보 */}
                     {isExpanded && (
                       <TableRow>
-                        <TableCell colSpan={6} className="p-0">
+                        <TableCell colSpan={7} className="p-0">
                           <div className="bg-gray-50 border-t p-6 space-y-6">
                             {editingDocument === doc.productId ? (
                               /* 편집 모드 */

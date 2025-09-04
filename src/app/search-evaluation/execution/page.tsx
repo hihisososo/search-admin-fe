@@ -47,7 +47,7 @@ export default function EvaluationExecutionPage() {
   const deleteReportMutation = useDeleteEvaluationReport()
   
   // 비동기 작업 관리
-  const evaluationTask = useAsyncTask('EVALUATION', {
+  const evaluationTask = useAsyncTask('EVALUATION_EXECUTION', {
     onComplete: (result) => {
       // 리포트 목록 새로고침
       reportsQuery.refetch()
@@ -353,6 +353,7 @@ export default function EvaluationExecutionPage() {
                     <TableHead className="py-2 text-xs font-semibold text-gray-700">제목</TableHead>
                     <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">상태</TableHead>
                     <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">Precision@20</TableHead>
+                    <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">F1-Score</TableHead>
                     <TableHead className="w-44 py-2 text-xs font-semibold text-gray-700">실행 시간</TableHead>
                     <TableHead className="text-center w-20 py-2 text-xs font-semibold text-gray-700">액션</TableHead>
                   </TableRow>
@@ -360,7 +361,7 @@ export default function EvaluationExecutionPage() {
                 <TableBody>
                   {!reportsQuery.data || reportsQuery.data.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-12 text-gray-500">
+                      <TableCell colSpan={7} className="text-center py-12 text-gray-500">
                         <div className="text-gray-500">
                           <p>아직 실행된 평가가 없습니다.</p>
                           <p className="text-sm text-gray-400 mt-1">새 평가를 실행해보세요.</p>
@@ -384,6 +385,15 @@ export default function EvaluationExecutionPage() {
                         </TableCell>
                         <TableCell className="py-2 text-center">
                           <PerformanceScore score={report.averagePrecision20 || 0} size="sm" showPercentage={false} />
+                        </TableCell>
+                        <TableCell className="py-2 text-center">
+                          <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
+                            (report.averageF1ScoreAt20 || 0) >= 0.7 ? 'bg-purple-100 text-purple-800' :
+                            (report.averageF1ScoreAt20 || 0) >= 0.5 ? 'bg-orange-100 text-orange-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {(report.averageF1ScoreAt20 || 0).toFixed(3)}
+                          </div>
                         </TableCell>
                         <TableCell className="py-2 text-xs text-gray-600">
                           {formatDate(report.createdAt)}
