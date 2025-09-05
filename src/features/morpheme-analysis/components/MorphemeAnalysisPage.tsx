@@ -209,9 +209,17 @@ export function MorphemeAnalysisPage() {
           <div className="space-y-6">
             {/* 기본 정보 */}
             <div className="pb-4 border-b border-gray-100">
-              <div>
-                <span className="text-xs text-gray-500">원본:</span>
-                <span className="font-mono text-sm text-gray-900 ml-2">{analysisResult.originalQuery}</span>
+              <div className="space-y-2">
+                <div>
+                  <span className="text-xs text-gray-500">원본:</span>
+                  <span className="font-mono text-sm text-gray-900 ml-2">{analysisResult.originalQuery}</span>
+                </div>
+                {'preprocessedQuery' in analysisResult && analysisResult.preprocessedQuery !== analysisResult.originalQuery && (
+                  <div>
+                    <span className="text-xs text-gray-500">전처리:</span>
+                    <span className="font-mono text-sm text-blue-600 ml-2">{analysisResult.preprocessedQuery}</span>
+                  </div>
+                )}
               </div>
             </div>
 

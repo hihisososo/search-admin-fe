@@ -63,6 +63,7 @@ export function DictionaryPage({ type }: DictionaryPageProps) {
         totalPages={totalPages}
         pageSize={pageSize}
         onPageSizeChange={(ps) => { setPageSize(ps); setPage(0) }}
+        environment={environment}
       />
 
       <DictionaryTable

@@ -23,6 +23,7 @@ interface DataTableToolbarProps {
   disabled?: boolean
   leftMessage?: React.ReactNode
   showMorphemeAnalysis?: boolean // 형태소 분석 표시 여부
+  environment?: string // 형태소 분석 환경
 }
 
 export function DataTableToolbar({
@@ -41,6 +42,7 @@ export function DataTableToolbar({
   disabled = false,
   leftMessage,
   showMorphemeAnalysis = true, // 기본적으로 활성화
+  environment = 'CURRENT', // 기본값 CURRENT
 }: DataTableToolbarProps) {
   const [tokens, setTokens] = useState<string[]>([])
   
@@ -57,14 +59,14 @@ export function DataTableToolbar({
     try {
       const result = await morphemeAnalysisService.analyzeQuery({
         query: query.trim(),
-        environment: 'CURRENT'
+        environment: environment
       })
       setTokens(result.tokens || [])
     } catch (error) {
       console.error('형태소 분석 실패:', error)
       setTokens([])
     }
-  }, [])
+  }, [environment])
 
   // 검색어 변경 시 형태소 분석
   useEffect(() => {

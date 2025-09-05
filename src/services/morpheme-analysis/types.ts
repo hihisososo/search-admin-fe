@@ -44,15 +44,17 @@ export interface MorphemeAnalysisResponse {
 export interface QueryAnalysisResponse {
   environment: string
   originalQuery: string
+  preprocessedQuery: string  // 전처리된 쿼리 (천단위 구분자 제거, 단위 정규화 등)
   tokens: string[]  // 분석된 원본 토큰 리스트 (동의어 제외)
   mermaidGraph: string  // Mermaid 형식의 토큰 그래프 다이어그램 (동의어 포함)
-  queryExpression: string  // 검색식 (AND/OR 조합)
+  queryExpression?: string  // 검색식 (AND/OR 조합) - optional
 }
 
 // 색인용 쿼리 분석 응답 (API v2 - 2025.01.03)
 export interface IndexAnalysisResponse {
   environment: string
   originalQuery: string
+  preprocessedQuery: string  // 전처리된 쿼리 (천단위 구분자 제거, 단위 정규화 등)
   tokens: string[]  // 분석된 원본 토큰 리스트
   additionalTokens: string[]  // 추가 색인어 리스트
 }
