@@ -77,7 +77,7 @@ export function MorphemeAnalysisHeader({
             disabled={recordCount === 0}
           >
             <Trash2 className="h-4 w-4 mr-1" />
-            전체 삭제 ({recordCount})
+            선택 삭제{recordCount > 0 ? ` (${recordCount})` : ''}
           </Button>
         </div>
       </div>
