@@ -56,6 +56,9 @@ export interface UserDictionaryItem extends DictionaryItem {
   }
 }
 
+// 단위 사전 아이템
+export type UnitDictionaryItem = DictionaryItem
+
 // 사전 페이지 응답
 export type DictionaryPageResponse<T> = PageResponse<T>
 

@@ -3,7 +3,7 @@ import type { DictionaryEnvironmentType } from '@/types/dashboard'
 export type DictionarySortField = 'keyword' | 'updatedAt' | 'createdAt'
 export type DictionarySortDirection = 'asc' | 'desc'
 
-export type DictionaryType = 'user' | 'stopword' | 'synonym' | 'typo'
+export type DictionaryType = 'user' | 'stopword' | 'synonym' | 'typo' | 'unit'
 
 export interface BaseDictionaryItem {
   id: number
@@ -25,11 +25,14 @@ export interface TypoDictionaryItem extends BaseDictionaryItem {
   correctedWord: string
 }
 
+export type UnitDictionaryItem = BaseDictionaryItem
+
 export type DictionaryItem = 
   | UserDictionaryItem 
   | StopwordDictionaryItem 
   | SynonymDictionaryItem 
   | TypoDictionaryItem
+  | UnitDictionaryItem
 
 export interface DictionaryConfig<T extends BaseDictionaryItem = BaseDictionaryItem> {
   name: string
@@ -98,5 +101,6 @@ export type DictionaryConfigs = {
     K extends 'stopword' ? DictionaryConfig<StopwordDictionaryItem> :
     K extends 'synonym' ? DictionaryConfig<SynonymDictionaryItem> :
     K extends 'typo' ? DictionaryConfig<TypoDictionaryItem> :
+    K extends 'unit' ? DictionaryConfig<UnitDictionaryItem> :
     never
 }

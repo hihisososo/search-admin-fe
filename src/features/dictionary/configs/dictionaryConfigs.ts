@@ -108,6 +108,33 @@ export const dictionaryConfigs: DictionaryConfigs = {
       applyConfirm: '변경사항을 실시간으로 반영하시겠습니까?',
       applySuccess: '오타교정 사전이 실시간으로 반영되었습니다.'
     }
+  },
+
+  unit: {
+    name: '단위명',
+    apiPath: '/units',
+    theme: {
+      color: 'purple',
+      iconName: 'Ruler'
+    },
+    fields: ['keyword'],
+    validation: {
+      keyword: (value) => value.trim() !== ''
+    },
+    features: {
+      realtimeSync: true
+    },
+    messages: {
+      placeholder: {
+        keyword: '단위명을 입력하세요 (예: "kg", "ml", "개")'
+      },
+      validationError: {
+        keyword: '단위명을 입력해주세요.'
+      },
+      deleteConfirm: '단위명사전을 삭제하시겠습니까?',
+      applyConfirm: '변경사항을 실시간으로 반영하시겠습니까?',
+      applySuccess: '단위명사전이 실시간으로 반영되었습니다.'
+    }
   }
 }
 

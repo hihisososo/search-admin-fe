@@ -44,6 +44,12 @@ export const queryKeys = {
       list: (params?: QueryParams) => [...queryKeys.dictionary.user.all, 'list', params] as const,
       detail: (id: number) => [...queryKeys.dictionary.user.all, 'detail', id] as const,
     },
+    unit: {
+      all: ['dictionary', 'unit'] as const,
+      list: (params?: QueryParams) => [...queryKeys.dictionary.unit.all, 'list', params] as const,
+      detail: (id: number) => [...queryKeys.dictionary.unit.all, 'detail', id] as const,
+      syncStatus: () => [...queryKeys.dictionary.unit.all, 'sync-status'] as const,
+    },
   },
   
   searchLogs: {

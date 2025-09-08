@@ -7,6 +7,7 @@ const Dashboard = lazy(() => import("@/app/dashboard/page"))
 const UserDictionary = lazy(() => import("@/app/dictionary/user/page"))
 const SynonymDictionary = lazy(() => import("@/app/dictionary/synonym/page"))
 const StopwordDictionary = lazy(() => import("@/app/dictionary/stopword/page"))
+const UnitDictionary = lazy(() => import("@/app/dictionary/unit/page"))
 const TypoCorrectionDictionary = lazy(() => import("@/app/dictionary/typo/page"))
 const CategoryRankingDictionary = lazy(() => import("@/app/dictionary/category-ranking/page"))
 const MorphemeAnalysis = lazy(() => import("@/app/dictionary/morpheme-analysis/page"))
@@ -36,6 +37,7 @@ export function AdminRoutes() {
         <Route path="/dictionary/user" element={<UserDictionary />} />
         <Route path="/dictionary/synonym" element={<SynonymDictionary />} />
         <Route path="/dictionary/stopword" element={<StopwordDictionary />} />
+        <Route path="/dictionary/unit" element={<UnitDictionary />} />
         <Route path="/dictionary/typo" element={<TypoCorrectionDictionary />} />
         <Route path="/dictionary/category-ranking" element={<CategoryRankingDictionary />} />
         <Route path="/dictionary/morpheme-analysis" element={<MorphemeAnalysis />} />
