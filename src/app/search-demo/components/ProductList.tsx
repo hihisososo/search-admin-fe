@@ -85,12 +85,11 @@ export function ProductList({
   onSortChange,
   searchQuery,
   searchMode,
-  actualSearchType: _actualSearchType
+  actualSearchType
 }: ProductListProps) {
-  // 검색 모드에 따른 정렬 옵션 필터링
-  const availableSortOptions = searchMode === 'KEYWORD_ONLY' 
-    ? SORT_OPTIONS 
-    : SORT_OPTIONS.filter(opt => opt.value === 'score');
+  // 벡터 검색에서도 모든 정렬 옵션 사용 가능
+  const availableSortOptions = SORT_OPTIONS;
+  
   const handleProductClick = (_product: Product) => {
     // Product clicked: ${_product.name} (ID: ${_product.id})
     // 여기에 실제 클릭 로깅 API 호출을 추가할 수 있습니다
@@ -114,13 +113,17 @@ export function ProductList({
             <Skeleton className="h-5 w-32" />
           ) : (
             <div className="space-y-1">
-              {searchMode === 'KEYWORD_ONLY' ? (
+              {actualSearchType === 'keyword' ? (
                 <div>
                   총 {totalResults.toLocaleString()}개 상품
                 </div>
-              ) : (
+              ) : actualSearchType === 'vector' ? (
                 <div className="text-xs text-blue-600">
-                  유사 상품 표시 중
+                  유사 상품 {totalResults.toLocaleString()}개를 표시 중입니다
+                </div>
+              ) : (
+                <div>
+                  총 {totalResults.toLocaleString()}개 상품
                 </div>
               )}
             </div>
