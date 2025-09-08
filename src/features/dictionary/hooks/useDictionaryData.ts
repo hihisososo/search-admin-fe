@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { synonymDictionaryService, typoCorrectionDictionaryService, stopwordDictionaryService, userDictionaryService } from '@/services'
+import { synonymDictionaryService, typoCorrectionDictionaryService, stopwordDictionaryService, userDictionaryService, unitDictionaryService } from '@/services'
 import { queryKeys } from '@/lib/query-client'
 import type { DictionaryType, BaseDictionaryItem } from '../types/dictionary.types'
 import type { DictionaryEnvironmentType, DictionarySortField, DictionarySortDirection } from '@/types/dashboard'
@@ -30,6 +30,10 @@ const DICTIONARY_CONFIG = {
   typo: {
     queryKey: queryKeys.dictionary.typoCorrection.list,
     service: typoCorrectionDictionaryService
+  },
+  unit: {
+    queryKey: queryKeys.dictionary.unit.list,
+    service: unitDictionaryService
   }
 } as const
 

@@ -27,7 +27,8 @@ const DICTIONARY_CONFIGS: Record<DictionaryType, UseDictionaryConfig> = {
   synonym: {},
   typo: { pageOffset: -1 },
   user: { returnFullData: true },
-  stopword: {}
+  stopword: {},
+  unit: {}
 }
 
 export function useDictionary<T extends DictionaryItem | TypoCorrectionDictionaryItem>(

@@ -7,6 +7,7 @@ import type {
   TypoCorrectionDictionaryItem,
   StopwordDictionaryItem,
   UserDictionaryItem,
+  UnitDictionaryItem,
   CreateDictionaryRequest,
   CreateTypoCorrectionRequest,
   UpdateDictionaryRequest,
@@ -124,6 +125,25 @@ class UserDictionaryService extends BaseDictionaryService<
   }
 }
 
+// 단위 사전 서비스
+class UnitDictionaryService extends BaseDictionaryService<
+  UnitDictionaryItem,
+  CreateDictionaryRequest,
+  UpdateDictionaryRequest
+> {
+  protected readonly endpoint = '/v1/dictionaries/units'
+
+  // 실시간 동기화
+  async realtimeSync(environment: Environment): Promise<RealtimeSyncResponse> {
+    return apiClient.post<RealtimeSyncResponse>(`${this.endpoint}/realtime-sync?environment=${environment}`)
+  }
+
+  // 동기화 상태 조회
+  async getSyncStatus(): Promise<SyncStatusResponse> {
+    return apiClient.get<SyncStatusResponse>(`${this.endpoint}/sync-status`)
+  }
+}
+
 // 사전 배포 서비스
 class DictionaryDeployService {
   private readonly endpoint = '/v1/dictionaries/deploy'
@@ -142,4 +162,5 @@ export const synonymDictionaryService = new SynonymDictionaryService()
 export const typoCorrectionDictionaryService = new TypoCorrectionDictionaryService()
 export const stopwordDictionaryService = new StopwordDictionaryService()
 export const userDictionaryService = new UserDictionaryService()
+export const unitDictionaryService = new UnitDictionaryService()
 export const dictionaryDeployService = new DictionaryDeployService() 

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { synonymDictionaryService, typoCorrectionDictionaryService, stopwordDictionaryService, userDictionaryService } from '@/services'
+import { synonymDictionaryService, typoCorrectionDictionaryService, stopwordDictionaryService, userDictionaryService, unitDictionaryService } from '@/services'
 import { useToast } from '@/components/ui/use-toast'
 import { getDictionaryConfig } from '../configs/dictionaryConfigs'
 import type { DictionaryType, BaseDictionaryItem, DictionaryActions } from '../types/dictionary.types'
@@ -81,6 +81,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         type === 'user' ? userDictionaryService :
         type === 'stopword' ? stopwordDictionaryService :
         type === 'synonym' ? synonymDictionaryService :
+        type === 'unit' ? unitDictionaryService :
         typoCorrectionDictionaryService
 
       // 오타교정은 분리된 필드로 전송(typoWord/correctWord)
@@ -150,6 +151,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         type === 'user' ? userDictionaryService :
         type === 'stopword' ? stopwordDictionaryService :
         type === 'synonym' ? synonymDictionaryService :
+        type === 'unit' ? unitDictionaryService :
         typoCorrectionDictionaryService
 
       // 오타교정은 분리된 필드로 전송(typoWord/correctWord)
@@ -198,6 +200,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         type === 'user' ? userDictionaryService :
         type === 'stopword' ? stopwordDictionaryService :
         type === 'synonym' ? synonymDictionaryService :
+        type === 'unit' ? unitDictionaryService :
         typoCorrectionDictionaryService
 
       await service.delete(id, environment)
@@ -230,6 +233,7 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         type === 'user' ? userDictionaryService :
         type === 'stopword' ? stopwordDictionaryService :
         type === 'synonym' ? synonymDictionaryService :
+        type === 'unit' ? unitDictionaryService :
         typoCorrectionDictionaryService
 
       await service.bulkDelete(Array.from(editingState.selectedIds), environment)
@@ -278,6 +282,8 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         await synonymDictionaryService.realtimeSync(env)
       } else if (type === 'typo') {
         await typoCorrectionDictionaryService.realtimeSync(env)
+      } else if (type === 'unit') {
+        await unitDictionaryService.realtimeSync(env)
       }
       
       toast({

@@ -44,6 +44,11 @@ export const MENU_ITEMS: MenuItem[] = [
         path: '/dictionary/stopword'
       },
       {
+        id: 'unit-dictionary',
+        title: '단위명사전',
+        path: '/dictionary/unit'
+      },
+      {
         id: 'typo-dictionary',
         title: '오타교정사전',
         path: '/dictionary/typo'

@@ -44,11 +44,11 @@ export function EvaluationReportViewer({ report }: EvaluationReportViewerProps) 
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">{(report.averagePrecision20 || report.averagePrecision || 0).toFixed(3)}</div>
-              <div className="text-sm text-gray-600">정확도</div>
+              <div className="text-sm text-gray-600">Precision@20</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-yellow-600">{(report.averageRecall300 || report.averageRecall || 0).toFixed(3)}</div>
-              <div className="text-sm text-gray-600">Recall@300</div>
+              <div className="text-sm text-gray-600">Recall</div>
             </div>
             <div className="text-center">
               <div className={`text-2xl font-bold ${
@@ -248,7 +248,7 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
                 onClick={() => handleSort('recallAt300')}
               >
                 <div className="flex items-center justify-center gap-1">
-                  <span>Recall@300</span>
+                  <span>Recall</span>
                   {sortField === 'recallAt300' && (
                     sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                   )}

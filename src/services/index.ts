@@ -22,7 +22,8 @@ export {
   synonymDictionaryService,
   typoCorrectionDictionaryService,
   stopwordDictionaryService,
-  userDictionaryService
+  userDictionaryService,
+  unitDictionaryService
 } from './dictionary/api'
 
 // 검색 로그 서비스
@@ -59,7 +60,8 @@ export {
   synonymDictionaryService as synonymDictionaryApi,
   typoCorrectionDictionaryService as typoCorrectionDictionaryApi,
   stopwordDictionaryService as stopwordDictionaryApi,
-  userDictionaryService as userDictionaryApi
+  userDictionaryService as userDictionaryApi,
+  unitDictionaryService as unitDictionaryApi
 } from './dictionary/api'
 export { searchLogService as searchLogApi } from './search-logs/api'
 export { evaluationService as evaluationApi } from './evaluation/api'
