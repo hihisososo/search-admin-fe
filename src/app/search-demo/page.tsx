@@ -66,11 +66,34 @@ export default function SearchDemo() {
     const minLoadingTime = 500; // 최소 로딩 시간 0.5초
     
     try {
+      // 정렬 필드와 순서 결정
+      let sortType: string = 'score';
+      let sortOrder: 'asc' | 'desc' = 'desc';
+
+      if (sort === 'price_asc') {
+        sortType = 'price';
+        sortOrder = 'asc';
+      } else if (sort === 'price_desc') {
+        sortType = 'price';
+        sortOrder = 'desc';
+      } else if (sort === 'reviewCount') {
+        sortType = 'reviewCount';
+        sortOrder = 'desc';
+      } else if (sort === 'registeredMonth') {
+        sortType = 'registeredMonth';
+        sortOrder = 'desc';
+      } else if (sort === 'rating') {
+        sortType = 'rating';
+        sortOrder = 'desc';
+      }
+
       // 1차: 키워드 검색 시도
       const keywordRequest = {
         query: newQuery,
         page: 0,
         size: pageSize,
+        sortField: sortType,
+        sortOrder: sortOrder,
         searchMode: "KEYWORD_ONLY" as const,
         rrfK,
         hybridTopK,
@@ -120,6 +143,8 @@ export default function SearchDemo() {
           query: newQuery,
           page: 0,
           size: pageSize,
+          sortField: sortType,
+          sortOrder: sortOrder,
           searchMode: "VECTOR_MULTI_FIELD" as const,
           rrfK,
           hybridTopK,
@@ -193,7 +218,7 @@ export default function SearchDemo() {
       setHasSearched(true); // 검색 완료
       isInitialSearching.current = false; // 초기 검색 종료
     }
-  }, [pageSize, rrfK, hybridTopK]);
+  }, [pageSize, rrfK, hybridTopK, sort]);
 
   // 필터 검색 실행 (필터 변경 시 - 상품 리스트만 업데이트)
   const performFilterSearch = React.useCallback(async () => {
@@ -301,6 +326,11 @@ export default function SearchDemo() {
       to: `${y}-${m}-${d}T23:59:59`  // 어제의 마지막 시간
     };
   };
+
+  // 컴포넌트 마운트 시 자동 검색 실행
+  React.useEffect(() => {
+    performInitialSearch(""); // 빈 검색어로 초기 검색 실행
+  }, []); // 빈 의존성 배열로 컴포넌트 마운트 시 한 번만 실행
 
   // 인기/급등 검색어 로드
   React.useEffect(() => {

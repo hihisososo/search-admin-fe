@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/components/ui/use-toast'
-import { Plus, X } from 'lucide-react'
+import { Plus, X, ChevronDown, ChevronUp } from 'lucide-react'
 import { categoryRankingService } from '@/services/dictionary/category-ranking.service'
 import type { DictionaryEnvironmentType } from '@/types/dashboard'
 import type { 
@@ -42,6 +42,7 @@ export function CategoryMappingDialog({
   const [mappings, setMappings] = useState<CategoryMapping[]>([])
   const [newCategory, setNewCategory] = useState('')
   const [newWeight, setNewWeight] = useState(1000)
+  const [showCategoryList, setShowCategoryList] = useState(false)
   const { toast } = useToast()
 
   // 카테고리 목록 조회
@@ -183,37 +184,76 @@ export function CategoryMappingDialog({
             <Label>카테고리 매핑 *</Label>
             
             {/* 카테고리 추가 폼 */}
-            <div className="flex gap-2">
-              <Input
-                placeholder="카테고리명 입력..."
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
-                className="flex-1"
-                list="category-suggestions"
-              />
-              <datalist id="category-suggestions">
-                {categoriesData?.categories.map(cat => (
-                  <option key={cat} value={cat} />
-                ))}
-              </datalist>
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <div className="flex-1 relative">
+                  <Input
+                    placeholder="카테고리명 입력..."
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    className="w-full pr-8"
+                  />
+                  
+                  {/* 카테고리 목록 토글 버튼 */}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-2"
+                    onClick={() => setShowCategoryList(!showCategoryList)}
+                  >
+                    {showCategoryList ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                
+                <Input
+                  type="number"
+                  placeholder="가중치"
+                  value={newWeight}
+                  onChange={(e) => setNewWeight(Number(e.target.value))}
+                  className="w-24"
+                  min={1}
+                  max={10000}
+                />
+                
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={addMapping}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
               
-              <Input
-                type="number"
-                placeholder="가중치"
-                value={newWeight}
-                onChange={(e) => setNewWeight(Number(e.target.value))}
-                className="w-24"
-                min={1}
-                max={10000}
-              />
-              
-              <Button
-                type="button"
-                size="sm"
-                onClick={addMapping}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
+              {/* 카테고리 목록 박스 */}
+              {showCategoryList && categoriesData?.categories && (
+                <div className="border rounded-md max-h-48 overflow-y-auto">
+                  {categoriesData.categories.length > 0 ? (
+                    <div className="p-1">
+                      {categoriesData.categories.map(cat => (
+                        <div
+                          key={cat}
+                          className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer rounded"
+                          onClick={() => {
+                            setNewCategory(cat)
+                            setShowCategoryList(false)
+                          }}
+                        >
+                          {cat}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-4 text-sm text-gray-500 text-center">
+                      카테고리가 없습니다.
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* 매핑된 카테고리 목록 */}
