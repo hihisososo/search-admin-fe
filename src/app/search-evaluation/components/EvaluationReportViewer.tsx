@@ -50,14 +50,6 @@ export function EvaluationReportViewer({ report }: EvaluationReportViewerProps) 
               <div className="text-2xl font-bold text-yellow-600">{(report.averageRecall300 || report.averageRecall || 0).toFixed(3)}</div>
               <div className="text-sm text-gray-600">Recall</div>
             </div>
-            <div className="text-center">
-              <div className={`text-2xl font-bold ${
-                (report.averageF1ScoreAt20 || 0) >= 0.7 ? 'text-purple-600' : 
-                (report.averageF1ScoreAt20 || 0) >= 0.5 ? 'text-orange-600' : 
-                'text-red-600'
-              }`}>{(report.averageF1ScoreAt20 || 0).toFixed(3)}</div>
-              <div className="text-sm text-gray-600">F1-Score</div>
-            </div>
           </div>
         </CardContent>
       </Card>
@@ -134,10 +126,6 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
         case 'recallAt300':
           aValue = a.recallAt300 || 0
           bValue = b.recallAt300 || 0
-          break
-        case 'f1ScoreAt20':
-          aValue = a.f1ScoreAt20 || 0
-          bValue = b.f1ScoreAt20 || 0
           break
         case 'relevantCount':
           aValue = a.relevantCount || 0
@@ -256,18 +244,6 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
                 </div>
               </TableHead>
               <TableHead 
-                className="py-2 text-xs font-semibold text-gray-700 text-center w-24 cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort('f1ScoreAt20')}
-              >
-                <div className="flex items-center justify-center gap-1">
-                  <span>F1-Score</span>
-                  {sortField === 'f1ScoreAt20' && (
-                    sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
-                  )}
-                  {sortField !== 'f1ScoreAt20' && <ArrowUpDown className="h-3 w-3 text-gray-400" />}
-                </div>
-              </TableHead>
-              <TableHead 
                 className="py-2 text-xs font-semibold text-gray-700 text-center w-20 cursor-pointer hover:bg-gray-100"
                 onClick={() => handleSort('relevantCount')}
               >
@@ -333,7 +309,7 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
           <TableBody>
             {currentItems.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={8} className="text-center py-8 text-gray-500">
                   <p className="text-sm">쿼리별 상세 데이터가 없습니다.</p>
                 </TableCell>
               </TableRow>
@@ -358,7 +334,7 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
                             'bg-red-50 text-red-700 border-red-200'
                           }`}
                         >
-                          {detail.precisionAt20?.toFixed(3) || '-'}
+                          {(detail.precisionAt20 || 0).toFixed(3)}
                         </Badge>
                       </TableCell>
                       <TableCell className="py-2 text-center">
@@ -370,19 +346,7 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
                             'bg-red-50 text-red-700 border-red-200'
                           }`}
                         >
-                          {detail.recallAt300 ? `${(detail.recallAt300 * 100).toFixed(1)}%` : '-'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="py-2 text-center">
-                        <Badge 
-                          variant="outline"
-                          className={`text-xs ${
-                            (detail.f1ScoreAt20 || 0) >= 0.7 ? 'bg-purple-50 text-purple-700 border-purple-200' :
-                            (detail.f1ScoreAt20 || 0) >= 0.5 ? 'bg-orange-50 text-orange-700 border-orange-200' :
-                            'bg-red-50 text-red-700 border-red-200'
-                          }`}
-                        >
-                          {detail.f1ScoreAt20?.toFixed(3) || '-'}
+                          {`${((detail.recallAt300 || 0) * 100).toFixed(1)}%`}
                         </Badge>
                       </TableCell>
                       <TableCell className="py-2 text-center text-xs">{detail.relevantCount || 0}</TableCell>
@@ -405,7 +369,7 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
                     
                     {expanded && (
                       <TableRow>
-                        <TableCell colSpan={10} className="p-0">
+                        <TableCell colSpan={9} className="p-0">
                           <div className="bg-gray-50 border-t p-4 space-y-4">
                             {/* 누락/오답 영역 */}
                             {(detail.missingDocuments?.length > 0 || detail.wrongDocuments?.length > 0) ? (

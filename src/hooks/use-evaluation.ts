@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { evaluationService } from '@/services'
+import { evaluationService, taskService } from '@/services'
 import { EVALUATION_CONFIG } from '@/constants/evaluation'
 import type { PageParams } from '@/services'
 import type {
@@ -113,11 +113,11 @@ export function useDeleteEvaluationReport() {
   })
 }
 
-// 비동기 작업 상태 조회
+// 비동기 작업 상태 조회 - 통합 Task 서비스 사용
 export function useTaskStatus(taskId: number | null) {
   return useQuery({
     queryKey: evaluationKeys.tasks.status(taskId || 0),
-    queryFn: () => evaluationService.getTaskStatus(taskId!),
+    queryFn: () => taskService.getTask(taskId!),
     enabled: !!taskId,
     refetchInterval: (query) => {
       if (query.state.data?.status === 'COMPLETED' || query.state.data?.status === 'FAILED') {
@@ -131,14 +131,14 @@ export function useTaskStatus(taskId: number | null) {
 export function useTasks(params: PageParams = {}) {
   return useQuery({
     queryKey: evaluationKeys.tasks.list(params),
-    queryFn: () => evaluationService.getTasks(params),
+    queryFn: () => taskService.getTasks(params),
   })
 }
 
 export function useRunningTasks() {
   return useQuery({
     queryKey: evaluationKeys.tasks.running(),
-    queryFn: () => evaluationService.getRunningTasks(),
+    queryFn: () => taskService.getRunningTasks(),
     refetchInterval: EVALUATION_CONFIG.RUNNING_TASKS_POLL_INTERVAL,
     staleTime: 4000, // 4초간 캐시 유지 (5초 폴링 주기보다 약간 짧게)
   })

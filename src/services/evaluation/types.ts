@@ -165,7 +165,6 @@ export interface QueryEvaluationDetail {
   correctCount: number
   precisionAt20?: number  // 쿼리별 Precision@20
   recallAt300?: number  // 쿼리별 Recall@300
-  f1ScoreAt20?: number  // 쿼리별 F1-Score@20
   missingDocuments: DocumentInfo[]
   wrongDocuments: DocumentInfo[]
 }
@@ -176,7 +175,6 @@ export interface EvaluationExecuteResponse {
   reportName: string
   recall: number
   precision: number
-  f1ScoreAt20?: number  // 전체 F1-Score@20
   totalQueries: number
   totalRelevantDocuments: number
   totalRetrievedDocuments: number
@@ -191,7 +189,6 @@ export interface EvaluationReport {
   totalQueries: number
   averageRecall300: number  // Recall@300
   averagePrecision20: number  // Precision@20
-  averageF1ScoreAt20?: number  // F1-Score@20
   averagePrecision?: number  // 기존 호환성
   averageRecall?: number  // 기존 호환성
   totalRelevantDocuments?: number
@@ -207,7 +204,6 @@ export interface EvaluationReportSummary {
   totalQueries: number
   averagePrecision20: number  // Precision@20
   averageRecall300: number  // Recall@300
-  averageF1ScoreAt20?: number  // F1-Score@20
   totalRelevantDocuments?: number
   totalRetrievedDocuments?: number
   totalCorrectDocuments?: number

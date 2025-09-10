@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -10,6 +9,8 @@ interface EnvironmentOverviewProps {
   onDeploy: (description?: string) => void
   onReindex: (environment: Environment, description?: string) => void
   isIndexing: boolean
+  indexingProgress: number
+  indexingMessage: string
   isDeploying: boolean
 }
 
@@ -17,22 +18,11 @@ export default function EnvironmentOverview({
   environments, 
   onDeploy, 
   onReindex, 
-  isIndexing: _isIndexing,
+  isIndexing,
+  indexingProgress,
+  indexingMessage,
   isDeploying 
 }: EnvironmentOverviewProps) {
-  // 디버깅용: 환경 정보가 업데이트 될 때마다 로그
-  useEffect(() => {
-    const devEnv = environments.find(env => env.environmentType === 'DEV')
-    if (devEnv && (devEnv.isIndexing || devEnv.indexStatus === 'IN_PROGRESS')) {
-      console.log('DEV 환경 색인 상태:', {
-        isIndexing: devEnv.isIndexing,
-        indexStatus: devEnv.indexStatus,
-        progress: devEnv.indexingProgress,
-        indexed: devEnv.indexedDocumentCount,
-        total: devEnv.totalDocumentCount
-      })
-    }
-  }, [environments])
 
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('ko-KR').format(num)
@@ -68,20 +58,21 @@ export default function EnvironmentOverview({
 
   // 색인 중인지 확인하는 명확한 함수
   const isEnvironmentIndexing = (env: Environment) => {
-    return env.indexStatus === 'IN_PROGRESS' || env.isIndexing
+    // 개발 환경인 경우 prop으로 받은 isIndexing 상태만 확인
+    return env.environmentType === 'DEV' && isIndexing
   }
 
-  const canDeploy = () => {
+  const canDeploy = (env: Environment) => {
     const devEnv = getDevelopmentEnvironment()
     
-    return devEnv && 
-           (devEnv.indexStatus === 'COMPLETED' || devEnv.indexStatus === 'ACTIVE') && 
-           !isEnvironmentIndexing(devEnv) && 
+    return env.environmentType === 'DEV' &&  // DEV 환경에서만 배포 가능
+           devEnv && 
+           !isIndexing && 
            !isDeploying
   }
 
   const canReindex = (env: Environment) => {
-    return env.environmentType === 'DEV' && 
+    return env.environmentType === 'DEV' &&  // DEV 환경에서만 색인 가능
            !isEnvironmentIndexing(env) && 
            !isDeploying
     // 실패 상태에서도 재실행 가능하도록 FAILED 체크 제거
@@ -105,9 +96,9 @@ export default function EnvironmentOverview({
                 {env.environmentDescription}
                 <Badge 
                   variant="outline" 
-                  className={`text-xs ${getStatusColor(env.indexStatus)}`}
+                  className={`text-xs ${isEnvironmentIndexing(env) ? 'bg-blue-50 text-blue-600 border-blue-200' : getStatusColor(env.indexStatus)}`}
                 >
-                  {env.indexStatusDescription}
+                  {isEnvironmentIndexing(env) ? '색인 중' : env.indexStatusDescription}
                   {isEnvironmentIndexing(env) && (
                     <Loader2 className="h-3 w-3 ml-1 animate-spin" />
                   )}
@@ -125,13 +116,19 @@ export default function EnvironmentOverview({
                 <div className="min-w-0 flex-1">
                   <div className="text-xs text-gray-600 font-medium">색인명</div>
                   <div className="text-xs text-gray-500 break-all font-mono leading-snug">
-                    <span className="text-gray-400">상품: </span>
-                    <span>{env.indexName}</span>
-                    {env.autocompleteIndexName && (
+                    {env.indexStatus === 'ACTIVE' ? (
                       <>
-                        <span className="text-gray-400"> · 자동완성: </span>
-                        <span>{env.autocompleteIndexName}</span>
+                        <span className="text-gray-400">상품: </span>
+                        <span>{env.indexName}</span>
+                        {env.autocompleteIndexName && (
+                          <>
+                            <span className="text-gray-400"> · 자동완성: </span>
+                            <span>{env.autocompleteIndexName}</span>
+                          </>
+                        )}
                       </>
+                    ) : (
+                      <span className="text-gray-400">-</span>
                     )}
                   </div>
                 </div>
@@ -141,7 +138,7 @@ export default function EnvironmentOverview({
                 <div>
                   <div className="text-xs text-gray-600 font-medium">문서 수</div>
                   <div className="text-xs text-gray-500">
-                    {formatNumber(env.documentCount)}
+                    {env.indexStatus === 'ACTIVE' ? formatNumber(env.documentCount) : '-'}
                   </div>
                 </div>
               </div>
@@ -150,35 +147,28 @@ export default function EnvironmentOverview({
             <div className="flex items-center gap-2 pt-1 border-t border-gray-100">
               <Calendar className="h-3 w-3 text-gray-400" />
               <div className="text-xs text-gray-500">
-                {formatDate(env.indexDate)}
+                {env.indexStatus === 'ACTIVE' ? formatDate(env.indexDate) : '-'}
               </div>
             </div>
 
             {/* 색인 진행률 표시 */}
-            {env.environmentType === 'DEV' && isEnvironmentIndexing(env) && env.indexingProgress !== null && env.indexingProgress !== undefined && (
+            {env.environmentType === 'DEV' && isEnvironmentIndexing(env) && (
               <div className="space-y-1 pt-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-600">색인 진행중</span>
-                  <span className="font-semibold text-blue-600">{env.indexingProgress}%</span>
+                  <span className="text-gray-600 truncate flex-1 mr-2">{indexingMessage}</span>
+                  <span className="font-semibold text-blue-600">{indexingProgress}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                   <div 
                     className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
-                    style={{ width: `${env.indexingProgress}%` }}
+                    style={{ width: `${indexingProgress}%` }}
                   />
                 </div>
-                {env.indexedDocumentCount !== null && env.indexedDocumentCount !== undefined && 
-                 env.totalDocumentCount !== null && env.totalDocumentCount !== undefined && (
-                  <div className="text-xs text-gray-500 text-center">
-                    {formatNumber(env.indexedDocumentCount)} / {formatNumber(env.totalDocumentCount)} 문서
-                  </div>
-                )}
               </div>
             )}
 
-            {/* 개발 환경에만 버튼들 표시 */}
-            {env.environmentType === 'DEV' && (
-              <div className="flex gap-2 pt-1">
+            {/* 버튼들 표시 (PROD에서는 disabled) */}
+            <div className="flex gap-2 pt-1">
                 <Button
                   onClick={() => onReindex(env)}
                   variant="outline"
@@ -189,7 +179,7 @@ export default function EnvironmentOverview({
                   {isEnvironmentIndexing(env) ? (
                     <>
                       <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                      색인중 ({env.indexingProgress}%)
+                      색인중 ({indexingProgress}%)
                     </>
                   ) : (
                     <>
@@ -200,7 +190,7 @@ export default function EnvironmentOverview({
                 </Button>
                 <Button
                   onClick={() => onDeploy()}
-                  disabled={isDeploying || !canDeploy()}
+                  disabled={isDeploying || !canDeploy(env)}
                   variant="outline"
                   size="sm"
                   className="flex-1 text-xs h-8"
@@ -218,7 +208,6 @@ export default function EnvironmentOverview({
                   )}
                 </Button>
               </div>
-            )}
           </CardContent>
           
           {/* 환경 타입 표시 */}

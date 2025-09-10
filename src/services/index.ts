@@ -2,6 +2,10 @@
 export { Environment, type PageParams } from './common/types'
 export * from './common/api-client'
 
+// Task 서비스 (비동기 작업 관리)
+export * from './task/types'
+export { taskService } from './task/api'
+
 // 대시보드 서비스
 export {
   type DashboardStats,

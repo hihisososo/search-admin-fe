@@ -17,8 +17,7 @@ import type {
   EvaluationReport,
   EvaluationReportSummary,
   ProductSearchParams,
-  AsyncTaskResponse,
-  AsyncTaskStatus
+  AsyncTaskResponse
 } from './types'
 
 class EvaluationService {
@@ -118,20 +117,10 @@ class EvaluationService {
     return apiClient.post<AsyncTaskResponse>(`${this.baseEndpoint}/candidates/evaluate-llm-async`, data)
   }
 
-  // 비동기 작업 상태 조회
-  async getTaskStatus(taskId: number): Promise<AsyncTaskStatus> {
-    return apiClient.get<AsyncTaskStatus>(`${this.baseEndpoint}/tasks/${taskId}`)
-  }
-
-  // 비동기 작업 리스트 조회
-  async getTasks(params: PageParams = {}): Promise<{ tasks: AsyncTaskStatus[], totalCount: number, totalPages: number, currentPage: number, size: number }> {
-    return apiClient.get(`${this.baseEndpoint}/tasks`, params)
-  }
-
-  // 실행 중인 작업 조회
-  async getRunningTasks(): Promise<AsyncTaskStatus[]> {
-    return apiClient.get<AsyncTaskStatus[]>(`${this.baseEndpoint}/tasks/running`)
-  }
+  // Task 관련 메서드는 통합 Task 서비스(taskService) 사용
+  // - getTaskStatus -> taskService.getTask
+  // - getRunningTasks -> taskService.getRunningTasks
+  // - getTasks -> taskService.getTasks
 
   // 3. 평가 실행 (nDCG 계산)
 

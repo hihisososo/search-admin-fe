@@ -5,7 +5,7 @@ export interface Environment {
   indexName: string
   autocompleteIndexName: string
   documentCount: number
-  indexStatus: 'COMPLETED' | 'IN_PROGRESS' | 'FAILED'
+  indexStatus: 'COMPLETED' | 'IN_PROGRESS' | 'FAILED' | 'ACTIVE'
   indexStatusDescription: string
   indexDate: string
   version: string
@@ -46,6 +46,12 @@ export interface OperationResponse {
   version: string | null
   environmentType: 'DEV' | 'PROD'
   timestamp: string
+}
+
+// 색인 시작 응답 (Task 기반)
+export interface IndexingTaskResponse {
+  taskId: number
+  message: string
 }
 
 // 환경 목록 응답

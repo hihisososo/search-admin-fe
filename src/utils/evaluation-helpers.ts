@@ -1,4 +1,8 @@
 import type { AsyncTaskStatus } from '@/services/evaluation/types'
+import type { Task } from '@/services/task/types'
+
+// Task와 AsyncTaskStatus의 호환성을 위한 타입
+type TaskLike = AsyncTaskStatus | Task
 
 /**
  * 날짜 포맷팅 (한국어)
@@ -20,7 +24,7 @@ export function getPerformanceColor(score: number): string {
  * 비동기 작업 진행률 표시 텍스트 생성
  */
 export function getTaskProgressText(
-  taskStatus: AsyncTaskStatus | undefined,
+  taskStatus: TaskLike | undefined,
   defaultText: string,
   _startingText: string = '시작중...'
 ): string {
@@ -56,16 +60,18 @@ export function getTaskProgressText(
  * 작업 완료 알림 메시지 생성
  */
 export function getTaskCompletionMessage(
-  taskType: 'QUERY_GENERATION' | 'CANDIDATE_GENERATION' | 'LLM_EVALUATION',
+  taskType: 'QUERY_GENERATION' | 'CANDIDATE_GENERATION' | 'LLM_EVALUATION' | 'EVALUATION_EXECUTION' | 'INDEXING',
   result?: string | null
 ): string {
-  const baseMessages = {
+  const baseMessages: Record<string, string> = {
     QUERY_GENERATION: '쿼리 생성 완료!',
     CANDIDATE_GENERATION: '후보군 생성 완료!',
-    LLM_EVALUATION: 'LLM 평가 완료!'
+    LLM_EVALUATION: 'LLM 평가 완료!',
+    EVALUATION_EXECUTION: '평가 실행 완료!',
+    INDEXING: '색인 완료!'
   }
 
-  let message = `🎉 ${baseMessages[taskType]}`
+  let message = `🎉 ${baseMessages[taskType] || '작업 완료!'}`
 
   if (result && taskType === 'QUERY_GENERATION') {
     try {

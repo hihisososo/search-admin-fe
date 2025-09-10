@@ -93,10 +93,8 @@ export function ScoreProductList({
     searchMode,
     onProductClick
 }: ScoreProductListProps) {
-    // 검색 모드에 따른 정렬 옵션 필터링
-    const availableSortOptions = searchMode === 'KEYWORD_ONLY' 
-        ? SORT_OPTIONS 
-        : SORT_OPTIONS.filter(opt => opt.value === 'score')
+    // 모든 검색 모드에서 동일한 정렬 옵션 사용
+    const availableSortOptions = SORT_OPTIONS
     return (
         <>
             {loading && (

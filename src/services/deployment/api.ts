@@ -4,6 +4,7 @@ import type {
   OperationResponse,
   DeploymentHistoryResponse,
   IndexingRequest,
+  IndexingTaskResponse,
   DeploymentRequest,
   DeploymentHistoryParams
 } from './types'
@@ -16,9 +17,9 @@ class DeploymentService {
     return apiClient.get<EnvironmentsResponse>(`${this.baseEndpoint}/environments`)
   }
 
-  // 색인 실행 (개발환경만)
-  async executeIndexing(request: IndexingRequest = {}): Promise<OperationResponse> {
-    return apiClient.post<OperationResponse>(`${this.baseEndpoint}/indexing`, request)
+  // 색인 실행 (개발환경만) - Task 기반
+  async executeIndexing(request: IndexingRequest = {}): Promise<IndexingTaskResponse> {
+    return apiClient.post<IndexingTaskResponse>(`${this.baseEndpoint}/indexing`, request)
   }
 
   // 배포 실행

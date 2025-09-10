@@ -8,7 +8,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { 
-  useGenerateQueriesAsync,
   useGenerateCandidatesAsync,
   useEvaluateLlmAsync,
   useUpdateQuery,
@@ -72,7 +71,6 @@ export function QueryTable({
   const [searchText, setSearchText] = useState("")
   
   // 뮤테이션
-  const generateQueriesAsyncMutation = useGenerateQueriesAsync()
   const generateCandidatesAsyncMutation = useGenerateCandidatesAsync()
   const evaluateLlmAsyncMutation = useEvaluateLlmAsync()
   const updateQueryMutation = useUpdateQuery()
@@ -80,10 +78,6 @@ export function QueryTable({
   const createQueryMutation = useCreateQuery()
 
   // 액션 핸들러들
-  const handleGenerateQueries = async (data: { count: number }) => {
-    return await generateQueriesAsyncMutation.mutateAsync(data)
-  }
-
   const handleCreateQuery = async (text: string) => {
     await createQueryMutation.mutateAsync({ value: text.trim() })
     toast({ title: '추가 완료', description: '쿼리가 성공적으로 추가되었습니다.', variant: 'success' })
@@ -160,7 +154,6 @@ export function QueryTable({
       <div className="flex flex-wrap items-center gap-3 mb-8">
         <ActionButtons
           selectedQueryIds={selectedQueryIds}
-          onGenerateQueries={handleGenerateQueries}
           onCreateQuery={handleCreateQuery}
           onGenerateCandidates={handleGenerateCandidates}
           onEvaluateLlm={handleEvaluateLlm}
