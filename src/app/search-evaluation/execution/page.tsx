@@ -23,7 +23,6 @@ import { useAsyncTask } from "@/hooks/use-async-task"
 import { evaluationService } from "@/services/evaluation/api"
 import { formatDate, getTaskProgressText } from "@/utils/evaluation-helpers"
 import { useToast } from "@/components/ui/use-toast"
-import { PerformanceScore } from "../components/PerformanceScore"
 import { EvaluationReportViewer } from "../components/EvaluationReportViewer"
 import type { EvaluationReport } from "@/services/evaluation/types"
 

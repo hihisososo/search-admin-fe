@@ -90,7 +90,7 @@ export function ScoreProductList({
     onSortChange,
     searchQuery,
     showExplain,
-    searchMode,
+    searchMode: _searchMode,
     onProductClick
 }: ScoreProductListProps) {
     // 모든 검색 모드에서 동일한 정렬 옵션 사용
