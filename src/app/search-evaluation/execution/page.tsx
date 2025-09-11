@@ -352,7 +352,6 @@ export default function EvaluationExecutionPage() {
                     <TableHead className="w-16 py-2 text-xs font-semibold text-gray-700">ID</TableHead>
                     <TableHead className="py-2 text-xs font-semibold text-gray-700">제목</TableHead>
                     <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">상태</TableHead>
-                    <TableHead className="text-center w-24 py-2 text-xs font-semibold text-gray-700">Precision@20</TableHead>
                     <TableHead className="w-44 py-2 text-xs font-semibold text-gray-700">실행 시간</TableHead>
                     <TableHead className="text-center w-20 py-2 text-xs font-semibold text-gray-700">액션</TableHead>
                   </TableRow>
@@ -360,7 +359,7 @@ export default function EvaluationExecutionPage() {
                 <TableBody>
                   {!reportsQuery.data || reportsQuery.data.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-12 text-gray-500">
+                      <TableCell colSpan={5} className="text-center py-12 text-gray-500">
                         <div className="text-gray-500">
                           <p>아직 실행된 평가가 없습니다.</p>
                           <p className="text-sm text-gray-400 mt-1">새 평가를 실행해보세요.</p>
@@ -381,9 +380,6 @@ export default function EvaluationExecutionPage() {
                         </TableCell>
                         <TableCell className="py-2 text-center">
                           <Badge className="bg-green-100 text-green-800 text-xs">완료</Badge>
-                        </TableCell>
-                        <TableCell className="py-2 text-center">
-                          <PerformanceScore score={report.averagePrecision20 || 0} size="sm" showPercentage={false} />
                         </TableCell>
                         <TableCell className="py-2 text-xs text-gray-600">
                           {formatDate(report.createdAt)}

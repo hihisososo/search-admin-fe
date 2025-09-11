@@ -269,7 +269,6 @@ export function QueryTable({
             <TableRow>
               <TableCell colSpan={9} className="text-center py-8 text-gray-500">
                 <p className="text-sm">등록된 쿼리가 없습니다</p>
-                <p className="text-xs text-gray-400 mt-1">새 쿼리를 추가하거나 LLM으로 생성해보세요</p>
               </TableCell>
             </TableRow>
           ) : (
