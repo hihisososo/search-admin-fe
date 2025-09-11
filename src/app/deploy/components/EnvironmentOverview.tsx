@@ -64,9 +64,6 @@ export default function EnvironmentOverview({
   }
 
   const canDeploy = (env: Environment) => {
-    // 프로덕션 환경에서는 항상 비활성화
-    if (config.isProduction()) return false
-    
     const devEnv = getDevelopmentEnvironment()
     
     return env.environmentType === 'DEV' &&  // DEV 환경에서만 배포 가능
@@ -76,9 +73,6 @@ export default function EnvironmentOverview({
   }
 
   const canReindex = (env: Environment) => {
-    // 프로덕션 환경에서는 항상 비활성화
-    if (config.isProduction()) return false
-    
     return env.environmentType === 'DEV' &&  // DEV 환경에서만 색인 가능
            !isEnvironmentIndexing(env) && 
            !isDeploying
@@ -177,7 +171,13 @@ export default function EnvironmentOverview({
             {/* 버튼들 표시 (PROD에서는 disabled) */}
             <div className="flex gap-2 pt-1">
                 <Button
-                  onClick={() => onReindex(env)}
+                  onClick={() => {
+                    if (config.isProduction()) {
+                      alert('죄송하지만, 프로덕션 환경에서 임의 색인 및 배포는 막아놨습니다.')
+                      return
+                    }
+                    onReindex(env)
+                  }}
                   variant="outline"
                   size="sm"
                   disabled={!canReindex(env)}
@@ -196,7 +196,13 @@ export default function EnvironmentOverview({
                   )}
                 </Button>
                 <Button
-                  onClick={() => onDeploy()}
+                  onClick={() => {
+                    if (config.isProduction()) {
+                      alert('죄송하지만, 프로덕션 환경에서 임의 색인 및 배포는 막아놨습니다.')
+                      return
+                    }
+                    onDeploy()
+                  }}
                   disabled={isDeploying || !canDeploy(env)}
                   variant="outline"
                   size="sm"
