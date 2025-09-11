@@ -122,7 +122,7 @@ export const dictionaryConfigs: DictionaryConfigs = {
       keyword: (value) => value.trim() !== ''
     },
     features: {
-      realtimeSync: true
+      realtimeSync: false
     },
     messages: {
       placeholder: {
@@ -131,9 +131,7 @@ export const dictionaryConfigs: DictionaryConfigs = {
       validationError: {
         keyword: '단위명을 입력해주세요.'
       },
-      deleteConfirm: '단위명사전을 삭제하시겠습니까?',
-      applyConfirm: '변경사항을 실시간으로 반영하시겠습니까?',
-      applySuccess: '단위명사전이 실시간으로 반영되었습니다.'
+      deleteConfirm: '단위명사전을 삭제하시겠습니까?'
     }
   }
 }
