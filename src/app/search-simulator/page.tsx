@@ -107,7 +107,7 @@ const initialEnvironmentState: EnvironmentState = {
     searchMode: 'KEYWORD_ONLY' as SearchMode,
     rrfK: 60,
     hybridTopK: 300,
-    vectorMinScore: 0.7,
+    vectorMinScore: 0.6,
     nameVectorBoost: 0.7,  // name 벡터 필드 가중치 기본값
     specsVectorBoost: 0.3,  // specs 벡터 필드 가중치 기본값
     bm25Weight: 0.5,  // BM25 가중치 기본값 (하이브리드)
@@ -265,10 +265,9 @@ export default function SearchSimulator() {
                 sortOrder = 'desc'
             }
 
-            if (sortType !== 'score') {
-                params.append('sort.sortType', sortType)
-                params.append('sort.sortOrder', sortOrder)
-            }
+            // 항상 정렬 파라미터 전송 (API 문서에 맞는 파라미터명 사용)
+            params.append('sortField', sortType)
+            params.append('sortOrder', sortOrder)
 
             // 필터 조건 추가
             if (searchParams.brand.length > 0) {

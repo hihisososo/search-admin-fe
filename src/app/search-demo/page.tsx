@@ -148,7 +148,7 @@ export default function SearchDemo() {
           searchMode: "VECTOR_MULTI_FIELD" as const,
           rrfK,
           hybridTopK,
-          vectorMinScore: 0.7,
+          vectorMinScore: 0.6,
         };
 
         const vectorResponse = await enhancedSearchApi.executeSearch(vectorRequest);
@@ -263,7 +263,7 @@ export default function SearchDemo() {
         searchMode: searchMode as "KEYWORD_ONLY" | "VECTOR_MULTI_FIELD",
         rrfK,
         hybridTopK,
-        ...(actualSearchType === 'vector' && { vectorMinScore: 0.7 }),
+        ...(actualSearchType === 'vector' && { vectorMinScore: 0.6 }),
         ...(brand.length > 0 && { brand }),
         ...(category.length > 0 && { category }),
         ...(appliedPrice.from && { priceFrom: Number(appliedPrice.from) }),

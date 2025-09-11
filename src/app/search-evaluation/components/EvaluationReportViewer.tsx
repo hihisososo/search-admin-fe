@@ -48,7 +48,7 @@ export function EvaluationReportViewer({ report }: EvaluationReportViewerProps) 
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-yellow-600">{(report.averageRecall300 || report.averageRecall || 0).toFixed(3)}</div>
-              <div className="text-sm text-gray-600">Recall</div>
+              <div className="text-sm text-gray-600">Recall@300</div>
             </div>
           </div>
         </CardContent>
@@ -236,7 +236,7 @@ function QueryDetailsView({ queryDetails }: { queryDetails: any[] }) {
                 onClick={() => handleSort('recallAt300')}
               >
                 <div className="flex items-center justify-center gap-1">
-                  <span>Recall</span>
+                  <span>Recall@300</span>
                   {sortField === 'recallAt300' && (
                     sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                   )}
