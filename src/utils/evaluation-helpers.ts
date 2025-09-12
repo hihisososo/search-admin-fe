@@ -71,7 +71,7 @@ export function getTaskCompletionMessage(
     INDEXING: '색인 완료!'
   }
 
-  let message = `🎉 ${baseMessages[taskType] || '작업 완료!'}`
+  let message = baseMessages[taskType] || '작업 완료!'
 
   if (result && taskType === 'QUERY_GENERATION') {
     try {
