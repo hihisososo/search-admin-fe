@@ -17,7 +17,7 @@ interface SearchLogTableProps {
   onRowClick?: (item: SearchLogItem) => void
 }
 
-export function SearchLogTableRefactored({
+export function SearchLogTable({
   items,
   sortField,
   sortDirection,

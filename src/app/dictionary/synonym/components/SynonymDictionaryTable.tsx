@@ -1,7 +1,7 @@
 import { DictionaryBaseTable } from '@/shared/components/tables/DictionaryBaseTable'
 import type { DictionaryItem, DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
 
-interface UserDictionaryTableProps {
+interface SynonymDictionaryTableProps {
   items: DictionaryItem[]
   addingItem: boolean
   newKeyword: string
@@ -22,7 +22,30 @@ interface UserDictionaryTableProps {
   canEdit: boolean
 }
 
-export function UserDictionaryTableRefactored({
+const formatKeywordDisplay = (keyword: string) => {
+  if (keyword.includes('=>')) {
+    const [base, synonyms] = keyword.split('=>').map(s => s.trim())
+    const synonymList = synonyms.split(',').map(s => s.trim())
+    return (
+      <span className="flex items-start gap-2 flex-wrap">
+        <span className="font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-xs">
+          {base}
+        </span>
+        <span className="text-gray-400 text-xs mt-0.5">→</span>
+        <div className="flex flex-wrap gap-1">
+          {synonymList.map((synonym, index) => (
+            <span key={index} className="font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded text-xs">
+              {synonym}
+            </span>
+          ))}
+        </div>
+      </span>
+    )
+  }
+  return <span className="font-medium text-gray-900">{keyword}</span>
+}
+
+export function SynonymDictionaryTable({
   items,
   addingItem,
   newKeyword,
@@ -41,7 +64,7 @@ export function UserDictionaryTableRefactored({
   onCancelNew,
   validateKeyword,
   canEdit
-}: UserDictionaryTableProps) {
+}: SynonymDictionaryTableProps) {
   
   const editingItem = items.find(item => 
     editingKeyword && item.keyword === editingKeyword
@@ -56,7 +79,7 @@ export function UserDictionaryTableRefactored({
       canEdit={canEdit}
       highlightedId={highlightedId}
       addingItem={addingItem}
-      editingItem={editingItem ? { ...editingItem, keyword: editingKeyword } : {}}
+      editingItem={editingItem ? { ...editingItem, keyword: editingKeyword } : undefined}
       newItem={{ keyword: newKeyword }}
       onEdit={onEdit}
       onSaveEdit={onSaveEdit}
@@ -74,8 +97,12 @@ export function UserDictionaryTableRefactored({
         }
       }}
       validateKeyword={validateKeyword}
-      emptyMessage="사용자 사전에 등록된 키워드가 없습니다."
-      keywordPlaceholder="사용자 정의 키워드 입력"
+      renderKeyword={(item, isEditing, isNew) => {
+        if (isNew || isEditing) return undefined
+        return formatKeywordDisplay(item.keyword)
+      }}
+      emptyMessage="동의어 사전에 등록된 규칙이 없습니다."
+      keywordPlaceholder="동의어 규칙을 입력하세요 (예: 휴대폰 => 핸드폰,모바일,스마트폰)"
     />
   )
 }

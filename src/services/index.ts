@@ -56,18 +56,4 @@ export { deploymentService } from './deployment/api'
 
 // 형태소분석 서비스
 export * from './morpheme-analysis/types'
-export { morphemeAnalysisService } from './morpheme-analysis/api'
-
-// 하위 호환성을 위한 기존 API 별칭들
-export { dashboardService as dashboardApi } from './dashboard/api'
-export { 
-  synonymDictionaryService as synonymDictionaryApi,
-  typoCorrectionDictionaryService as typoCorrectionDictionaryApi,
-  stopwordDictionaryService as stopwordDictionaryApi,
-  userDictionaryService as userDictionaryApi,
-  unitDictionaryService as unitDictionaryApi
-} from './dictionary/api'
-export { searchLogService as searchLogApi } from './search-logs/api'
-export { evaluationService as evaluationApi } from './evaluation/api'
-export { clickLogService as clickLogApi } from './click-logs/api'
-export { deploymentService as deploymentApi } from './deployment/api' 
+export { morphemeAnalysisService } from './morpheme-analysis/api' 

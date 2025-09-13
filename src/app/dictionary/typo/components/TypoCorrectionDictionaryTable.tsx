@@ -29,7 +29,7 @@ interface TypoCorrectionDictionaryTableProps {
   canEdit: boolean
 }
 
-export function TypoCorrectionDictionaryTableRefactored({
+export function TypoCorrectionDictionaryTable({
   items,
   addingItem,
   newKeyword,

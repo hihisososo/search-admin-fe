@@ -22,7 +22,7 @@ interface StopwordDictionaryTableProps {
   canEdit: boolean
 }
 
-export function StopwordDictionaryTableRefactored({
+export function StopwordDictionaryTable({
   items,
   addingItem,
   newKeyword,

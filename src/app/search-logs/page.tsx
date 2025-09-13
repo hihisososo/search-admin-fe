@@ -10,7 +10,7 @@ import type {
   SearchLogSortDirection 
 } from "@/types/dashboard"
 import { SearchLogHeader } from "./components/SearchLogHeader"
-import { SearchLogTableRefactored } from "./components/SearchLogTableRefactored"
+import { SearchLogTable } from "./components/SearchLogTable"
 import { SearchLogDetailDialog } from "./components/SearchLogDetailDialog"
 import { getSearchSessionId } from "@/lib/search-session"
 import { PaginationControls } from "@/shared/components/PaginationControls"
@@ -208,7 +208,7 @@ export default function SearchLogs() {
             <>
               {/* 상단 검색 입력 제거(원래대로) */}
 
-              <SearchLogTableRefactored
+              <SearchLogTable
                 items={items}
                 sortField={sortField}
                 sortDirection={sortDirection}
