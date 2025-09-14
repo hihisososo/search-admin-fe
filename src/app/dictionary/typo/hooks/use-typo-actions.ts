@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react'
-import { typoCorrectionDictionaryApi } from '@/lib/api'
 import { typoCorrectionDictionaryService } from '@/services'
 import { useToast } from '@/components/ui/use-toast'
 import type { DictionaryEnvironmentType } from '@/types/dashboard'
@@ -64,7 +63,7 @@ export function useTypoActions(onRefetch: () => Promise<void>): UseTypoActionsRe
       return
     }
     
-    const response = await typoCorrectionDictionaryApi.create({ 
+    const response = await typoCorrectionDictionaryService.create({ 
       typoWord: newKeyword.trim(),
       correctWord: newCorrectedWord.trim(),
       // keyword: `${newKeyword.trim()} => ${newCorrectedWord.trim()}` // 하위 호환 필요 시
@@ -101,7 +100,7 @@ export function useTypoActions(onRefetch: () => Promise<void>): UseTypoActionsRe
       throw new Error('Invalid typo correction format')
     }
     
-    const response = await typoCorrectionDictionaryApi.update(item.id, { 
+    const response = await typoCorrectionDictionaryService.update(item.id, { 
       typoWord: editingKeyword.trim(),
       correctWord: editingCorrectedWord.trim(),
       // keyword: `${editingKeyword.trim()} => ${editingCorrectedWord.trim()}` // 하위 호환 필요 시
@@ -129,7 +128,7 @@ export function useTypoActions(onRefetch: () => Promise<void>): UseTypoActionsRe
   const handleDelete = useCallback(async (id: number) => {
     if (!confirm('정말로 삭제하시겠습니까?')) return
     
-    await typoCorrectionDictionaryApi.delete(id)
+    await typoCorrectionDictionaryService.delete(id)
     toast({
       title: "삭제 완료",
       description: "사전 항목이 성공적으로 삭제되었습니다."

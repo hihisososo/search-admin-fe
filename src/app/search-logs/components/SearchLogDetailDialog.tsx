@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { searchLogApi } from "@/lib/api"
+import { searchLogService } from "@/lib/api"
 import type { SearchLogResponse } from "@/services/search-logs/types"
 import { BarChart3 } from "lucide-react"
 
@@ -21,7 +21,7 @@ export function SearchLogDetailDialog({ logId, open, onOpenChange }: SearchLogDe
       setLoading(true)
       setError("")
       try {
-        const res = await searchLogApi.getDetail(logId)
+        const res = await searchLogService.getDetail(logId)
         setData(res)
       } catch (e) {
         setError(e instanceof Error ? e.message : "상세 조회 중 오류가 발생했습니다.")

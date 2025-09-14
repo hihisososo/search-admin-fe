@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card"
 import { EnvironmentSelector } from "@/app/dictionary/user/components/EnvironmentSelector"
 import { DictionaryEnvironmentType } from "@/types/dashboard"
 import type { AutocompleteResponse } from "@/lib/api"
-import { enhancedSearchApi } from "@/lib/api"
+import { searchApi } from "@/lib/api"
 
 export default function AutocompleteSimulatorPage() {
   const [selectedEnv, setSelectedEnv] = useState<DictionaryEnvironmentType>(DictionaryEnvironmentType.DEV)
@@ -38,11 +38,8 @@ export default function AutocompleteSimulatorPage() {
       setLoading(true)
       setError("")
       try {
-        // 시뮬레이션 자동완성 엔드포인트 사용
-        const res: AutocompleteResponse = await enhancedSearchApi.simulateAutocomplete({
-          keyword,
-          environmentType: selectedEnv,
-        })
+        // 자동완성 엔드포인트 사용
+        const res: AutocompleteResponse = await searchApi.getAutocomplete(keyword)
         setSuggestions(res.suggestions || [])
       } catch (e) {
         setError(e instanceof Error ? e.message : "자동완성 조회 실패")

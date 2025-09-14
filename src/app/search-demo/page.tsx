@@ -1,5 +1,5 @@
 import * as React from "react";
-import { dashboardApi, enhancedSearchApi, type Product, type AggregationBucket } from "@/lib/api";
+import { dashboardService, searchApi, type Product, type AggregationBucket } from "@/lib/api";
 // import { type KeywordItem } from "@/types/dashboard";
 // import { logger } from "@/lib/logger";
 import { SearchHeader } from "./components/SearchHeader";
@@ -67,7 +67,7 @@ export default function SearchDemo() {
     
     try {
       // 정렬 필드와 순서 결정
-      let sortType: string = 'score';
+      let sortType: 'score' | 'price' | 'rating' | 'reviewCount' | 'name' = 'score';
       let sortOrder: 'asc' | 'desc' = 'desc';
 
       if (sort === 'price_asc') {
@@ -80,7 +80,7 @@ export default function SearchDemo() {
         sortType = 'reviewCount';
         sortOrder = 'desc';
       } else if (sort === 'registeredMonth') {
-        sortType = 'registeredMonth';
+        sortType = 'score'; // registeredMonth는 지원하지 않으므로 score로 대체
         sortOrder = 'desc';
       } else if (sort === 'rating') {
         sortType = 'rating';
@@ -99,7 +99,7 @@ export default function SearchDemo() {
         hybridTopK,
       };
 
-      const keywordResponse = await enhancedSearchApi.executeSearch(keywordRequest);
+      const keywordResponse = await searchApi.searchProducts(keywordRequest);
 
       // 키워드 검색 결과가 있는지 확인
       if (keywordResponse.hits.total > 0) {
@@ -107,7 +107,7 @@ export default function SearchDemo() {
         setActualSearchType('keyword');
         
         // API 응답을 Product 타입에 맞게 변환
-        const transformedProducts = keywordResponse.hits.data.map((item) => ({
+        const transformedProducts = keywordResponse.hits.data.map((item: Product) => ({
           ...item,
           id: item.id || String(Math.floor(Math.random() * 1000000)),
           categoryName: item.categoryName || '',
@@ -151,12 +151,12 @@ export default function SearchDemo() {
           vectorMinScore: 0.6,
         };
 
-        const vectorResponse = await enhancedSearchApi.executeSearch(vectorRequest);
+        const vectorResponse = await searchApi.searchProducts(vectorRequest);
         
         setActualSearchType('vector');
         
         // API 응답을 Product 타입에 맞게 변환
-        const transformedProducts = vectorResponse.hits.data.map((item) => ({
+        const transformedProducts = vectorResponse.hits.data.map((item: Product) => ({
           ...item,
           id: item.id || String(Math.floor(Math.random() * 1000000)),
           categoryName: item.categoryName || '',
@@ -231,7 +231,7 @@ export default function SearchDemo() {
     
     try {
       // 정렬 필드와 순서 결정 (API 문서에 따라 sort.sortType, sort.sortOrder 사용)
-      let sortType: string = 'score';
+      let sortType: 'score' | 'price' | 'rating' | 'reviewCount' | 'name' = 'score';
       let sortOrder: 'asc' | 'desc' = 'desc';
 
       if (sort === 'price_asc') {
@@ -244,7 +244,7 @@ export default function SearchDemo() {
         sortType = 'reviewCount';
         sortOrder = 'desc';
       } else if (sort === 'registeredMonth') {
-        sortType = 'registeredMonth';
+        sortType = 'score'; // registeredMonth는 지원하지 않으므로 score로 대체
         sortOrder = 'desc';
       } else if (sort === 'rating') {
         sortType = 'rating';
@@ -270,10 +270,10 @@ export default function SearchDemo() {
         ...(appliedPrice.to && { priceTo: Number(appliedPrice.to) })
       };
 
-      const response = await enhancedSearchApi.executeSearch(searchRequest);
+      const response = await searchApi.searchProducts(searchRequest);
 
       // API 응답을 Product 타입에 맞게 변환
-      const transformedProducts = response.hits.data.map((item) => ({
+      const transformedProducts = response.hits.data.map((item: Product) => ({
         ...item,
         id: item.id || String(Math.floor(Math.random() * 1000000)),
         categoryName: item.categoryName || '',
@@ -341,8 +341,8 @@ export default function SearchDemo() {
         // 데모 페이지: 어제 하루치 기준으로 조회 (대시보드와 동일 파라미터 구성)
         const commonParams = { from, to, limit: 10 };
         const [popularResponse, trendingResponse] = await Promise.all([
-          dashboardApi.getPopularKeywords(commonParams),
-          dashboardApi.getTrendingKeywords(commonParams)
+          dashboardService.getPopularKeywords(commonParams),
+          dashboardService.getTrendingKeywords(commonParams)
         ]);
 
         // 인기 검색어 정렬/상위 10개 제한 + 표시용 순번 보정

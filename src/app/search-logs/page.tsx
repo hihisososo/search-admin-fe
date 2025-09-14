@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 // 상단 입력 제거되어 미사용 import 삭제
-import { searchLogApi } from "@/lib/api"
+import { searchLogService } from "@/lib/api"
 import type { 
   SearchLogItem, 
   SearchLogParams,
@@ -69,7 +69,7 @@ export default function SearchLogs() {
         ...(maxResultCount !== undefined && { maxResultCount })
       }
       
-      const response = await searchLogApi.getList(params)
+      const response = await searchLogService.getList(params)
       const serverTotal = response.totalElements || 0
       const cappedTotal = Math.min(serverTotal, MAX_TOTAL)
       const cappedTotalPages = Math.max(1, Math.ceil(cappedTotal / pageSize))
