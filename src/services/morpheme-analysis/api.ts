@@ -11,7 +11,7 @@ export const morphemeAnalysisService = {
     }
     
     const response = await apiClient.post<QueryAnalysisResponse>(
-      '/v1/search/query-analysis',
+      '/api/v1/analysis/search',
       request
     )
     
@@ -27,7 +27,7 @@ export const morphemeAnalysisService = {
     }
     
     const response = await apiClient.post<IndexAnalysisResponse>(
-      '/v1/search/index-analysis',
+      '/api/v1/analysis/index',
       request
     )
     
