@@ -13,8 +13,8 @@ import { SearchLogHeader } from "./components/SearchLogHeader"
 import { SearchLogTable } from "./components/SearchLogTable"
 import { SearchLogDetailDialog } from "./components/SearchLogDetailDialog"
 import { getSearchSessionId } from "@/lib/search-session"
-import { PaginationControls } from "@/shared/components/PaginationControls"
-import { DataTableToolbar } from "@/shared/components/DataTableToolbar"
+import { PaginationControls } from "@/components/common/PaginationControls"
+import { DataTableToolbar } from "@/components/common/DataTableToolbar"
 // import { PAGINATION } from "@/constants/pagination"
 
 export default function SearchLogs() {
@@ -219,7 +219,6 @@ export default function SearchLogs() {
               {items.length === 0 && (
                 <div className="text-center py-4 text-gray-500">
                   <div className="mb-1 text-xs">검색 결과가 없습니다</div>
-                  <div className="text-xs text-gray-400">필터 조건을 변경해서 다시 검색해보세요</div>
                 </div>
               )}
 

@@ -46,10 +46,6 @@ export { searchLogService } from './search-logs/api'
 export * from './evaluation/types'
 export { evaluationService } from './evaluation/api'
 
-// 클릭 로그 서비스
-export * from './click-logs/types'
-export { clickLogService } from './click-logs/api'
-
 // 배포 관리 서비스
 export * from './deployment/types'
 export { deploymentService } from './deployment/api'

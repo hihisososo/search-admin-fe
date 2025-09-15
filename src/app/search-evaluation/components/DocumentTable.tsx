@@ -19,7 +19,7 @@ import type { EvaluationDocument } from "@/services"
 import React from "react"
 import { useToast } from "@/components/ui/use-toast"
 // import { PAGINATION } from "@/constants/pagination"
-import { PaginationControls } from "@/shared/components/PaginationControls"
+import { PaginationControls } from "@/components/common/PaginationControls"
 
 // 평가 상태 타입 정의 (UI용)
 type EvaluationStatus = 'correct' | 'incorrect' | 'unspecified'

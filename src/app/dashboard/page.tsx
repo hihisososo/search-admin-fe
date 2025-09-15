@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { DateRange } from 'react-day-picker'
 import { useDashboardData } from '@/hooks/use-dashboard'
 import { useDashboardTransformers } from './hooks/use-dashboard-transformers'
@@ -63,13 +63,6 @@ export default function DashboardPage() {
     return transformers.convertTrendingKeywordsToTableData(keywords)
   }, [dashboardData.trendingKeywords.data, transformers])
 
-  const handleRefresh = useCallback(() => {
-    Object.values(dashboardData).forEach(query => {
-      if (query && typeof query === 'object' && 'refetch' in query) {
-        query.refetch()
-      }
-    })
-  }, [dashboardData])
 
   const isLoading = Object.values(dashboardData).some(query => {
     return query && typeof query === 'object' && 'isLoading' in query && query.isLoading
@@ -80,9 +73,6 @@ export default function DashboardPage() {
         <DashboardHeader
           dateRange={dateRange}
           setDateRange={setDateRange}
-          onRefresh={handleRefresh}
-          loading={isLoading}
-          lastUpdated={new Date()}
         />
         
         <StatsCards stats={stats} loading={isLoading} />

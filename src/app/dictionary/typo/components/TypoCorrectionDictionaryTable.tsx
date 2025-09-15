@@ -1,5 +1,5 @@
 import React from 'react'
-import { DictionaryBaseTable } from '@/shared/components/tables/DictionaryBaseTable'
+import { DictionaryBaseTable } from '@/components/common/tables/DictionaryBaseTable'
 import { Input } from "@/components/ui/input"
 import type { DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
 import type { TypoCorrectionDictionaryItem } from "@/services/dictionary/types"
@@ -118,7 +118,7 @@ export function TypoCorrectionDictionaryTable({
                   onEditingKeywordChange(e.target.value)
                 }
               }}
-              placeholder="오타 단어를 입력하세요 (예: 삼송)"
+              placeholder="?��? ?�어�??�력?�세??(?? ?�송)"
               className={`h-8 ${!isValid && currentValue ? 'border-red-500' : ''}`}
               autoFocus
             />
@@ -149,7 +149,7 @@ export function TypoCorrectionDictionaryTable({
                   onEditingCorrectedWordChange(e.target.value)
                 }
               }}
-              placeholder="교정어를 입력하세요 (예: 삼성)"
+              placeholder="교정?��? ?�력?�세??(?? ?�성)"
               className={`h-8 ${!isValid && currentValue ? 'border-red-500' : ''}`}
             />
           )
@@ -163,7 +163,7 @@ export function TypoCorrectionDictionaryTable({
           </span>
         )
       }}
-      emptyMessage="오타교정 사전에 등록된 항목이 없습니다."
+      emptyMessage="오타교정 사전에 등록된 단어가 없습니다."
       keywordPlaceholder="오타 단어를 입력하세요"
     />
   )

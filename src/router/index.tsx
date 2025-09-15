@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from "@/components/layout/Layout"
-import { LoadingSpinner } from "@/components/dictionary/common"
+import { LoadingSpinner } from "@/components/common"
 
 const Dashboard = lazy(() => import("@/app/dashboard/page"))
 const UserDictionary = lazy(() => import("@/app/dictionary/user/page"))

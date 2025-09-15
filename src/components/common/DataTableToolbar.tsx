@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PAGINATION } from "@/constants/pagination"
 import { Search } from "lucide-react"
 import { morphemeAnalysisService } from '@/services'
-import { useDebounce } from '@/hooks/useDebounce'
+import { useDebounce } from '@/hooks/use-debounce'
 
 interface DataTableToolbarProps {
   showSearch?: boolean

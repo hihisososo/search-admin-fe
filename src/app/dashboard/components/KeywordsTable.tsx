@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { BaseTable, type Column } from '@/shared/components/tables'
+import { BaseTable, type Column } from '@/components/common/tables'
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import type { TopKeyword } from '../hooks/use-dashboard-transformers'
 

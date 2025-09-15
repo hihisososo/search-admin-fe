@@ -1,4 +1,4 @@
-import { BaseTable, type Column } from '@/shared/components/tables'
+import { BaseTable, type Column } from '@/components/common/tables'
 import { AlertCircle, CheckCircle } from "lucide-react"
 import { 
   formatResponseTime, 
@@ -132,7 +132,7 @@ export function SearchLogTable({
       sortDirection={sortDirection}
       onSort={onSort}
       onRowClick={onRowClick}
-      emptyMessage="검색 로그가 없습니다."
+      emptyMessage=""
       keyExtractor={(item) => `${item.timestamp}-${item.searchSessionId || item.id}`}
     />
   )

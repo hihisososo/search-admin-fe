@@ -1,4 +1,4 @@
-import { DictionaryBaseTable } from '@/shared/components/tables/DictionaryBaseTable'
+import { DictionaryBaseTable } from '@/components/common/tables/DictionaryBaseTable'
 import type { DictionaryItem, DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
 
 interface StopwordDictionaryTableProps {
@@ -82,8 +82,8 @@ export function StopwordDictionaryTable({
           </span>
         )
       }}
-      emptyMessage="불용어 사전에 등록된 키워드가 없습니다."
-      keywordPlaceholder="불용어를 입력하세요 (예: 그)"
+      emptyMessage="불용???�전???�록???�워?��? ?�습?�다."
+      keywordPlaceholder="불용?��? ?�력?�세??(?? �?"
     />
   )
 }

@@ -1,4 +1,4 @@
-import { DictionaryBaseTable } from '@/shared/components/tables/DictionaryBaseTable'
+import { DictionaryBaseTable } from '@/components/common/tables/DictionaryBaseTable'
 import type { DictionaryItem, DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
 
 interface UserDictionaryTableProps {
@@ -74,8 +74,8 @@ export function UserDictionaryTable({
         }
       }}
       validateKeyword={validateKeyword}
-      emptyMessage="사용자 사전에 등록된 키워드가 없습니다."
-      keywordPlaceholder="사용자 정의 키워드 입력"
+      emptyMessage="?�용???�전???�록???�워?��? ?�습?�다."
+      keywordPlaceholder="?�용???�의 ?�워???�력"
     />
   )
 }
