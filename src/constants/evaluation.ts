@@ -22,12 +22,6 @@ export const EVALUATION_CONFIG = {
   MAX_DISPLAYED_WRONG_DOCS: 3,
 } as const
 
-export const RELEVANCE_STATUS_LABELS = {
-  UNSPECIFIED: '미지정',
-  RELEVANT: '관련',
-  IRRELEVANT: '무관'
-} as const
-
 export const TASK_TYPE_LABELS = {
   QUERY_GENERATION: '쿼리 생성',
   CANDIDATE_GENERATION: '후보군 생성', 

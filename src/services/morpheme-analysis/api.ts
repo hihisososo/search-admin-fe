@@ -37,7 +37,7 @@ export const morphemeAnalysisService = {
   // 임시 인덱스 갱신 (CURRENT 환경용)
   refreshTempIndex: async (): Promise<{ status: string; message: string; indexName?: string }> => {
     const response = await apiClient.post<{ status: string; message: string; indexName?: string }>(
-      '/v1/search/temp-index/refresh', 
+      '/v1/analysis/temp-index-refresh',
       {}
     )
     return response

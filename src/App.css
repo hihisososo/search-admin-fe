@@ -4,33 +4,6 @@ html, body, #root {
   padding: 0;
 }
 
-@keyframes pulseColorAmber {
-  0%, 100% { background-color: #fffbeb; border-color: #fcd34d; color: #92400e; }
-  50% { background-color: #fff; border-color: #fde68a; color: #a16207; }
-}
-
-@keyframes pulseColorBlue {
-  0%, 100% { background-color: #eff6ff; border-color: #93c5fd; color: #1e3a8a; }
-  50% { background-color: #fff; border-color: #bfdbfe; color: #1d4ed8; }
-}
-
-@keyframes pulseColorIndigo {
-  0%, 100% { background-color: #eef2ff; border-color: #a5b4fc; color: #3730a3; }
-  50% { background-color: #fff; border-color: #c7d2fe; color: #4338ca; }
-}
-
-.animate-color-amber {
-  animation: pulseColorAmber 1s ease-in-out infinite;
-}
-
-.animate-color-blue {
-  animation: pulseColorBlue 1s ease-in-out infinite;
-}
-
-.animate-color-indigo {
-  animation: pulseColorIndigo 1s ease-in-out infinite;
-}
-
 /* Strong flashing styles for high visibility */
 @keyframes flashAmber {
   0%, 100% { background-color: #f59e0b; border-color: #f59e0b; color: #ffffff; }
@@ -42,19 +15,10 @@ html, body, #root {
   50% { background-color: #60a5fa; border-color: #60a5fa; color: #ffffff; }
 }
 
-@keyframes flashIndigo {
-  0%, 100% { background-color: #6366f1; border-color: #6366f1; color: #ffffff; }
-  50% { background-color: #818cf8; border-color: #818cf8; color: #ffffff; }
-}
-
 .flash-amber {
   animation: flashAmber 0.8s ease-in-out infinite;
 }
 
 .flash-blue {
   animation: flashBlue 0.8s ease-in-out infinite;
-}
-
-.flash-indigo {
-  animation: flashIndigo 0.8s ease-in-out infinite;
 }
