@@ -38,8 +38,8 @@ export default function AutocompleteSimulatorPage() {
       setLoading(true)
       setError("")
       try {
-        // 자동완성 엔드포인트 사용
-        const res: AutocompleteResponse = await searchApi.getAutocomplete(keyword)
+        // 자동완성 시뮬레이션 엔드포인트 사용
+        const res: AutocompleteResponse = await searchApi.getAutocompleteSimulation(keyword, selectedEnv)
         setSuggestions(res.suggestions || [])
       } catch (e) {
         setError(e instanceof Error ? e.message : "자동완성 조회 실패")
@@ -55,7 +55,10 @@ export default function AutocompleteSimulatorPage() {
     <div className="p-6">
       <div className="space-y-4">
         <div className="flex justify-start">
-          <EnvironmentSelector value={selectedEnv} onChange={setSelectedEnv} />
+          <EnvironmentSelector
+            value={selectedEnv}
+            onChange={setSelectedEnv}
+            excludeOptions={[DictionaryEnvironmentType.CURRENT]} />
         </div>
         <Card className="p-4">
           <div className="flex items-center gap-2">

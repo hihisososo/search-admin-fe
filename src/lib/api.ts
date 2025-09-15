@@ -127,8 +127,8 @@ function buildQueryString(params: Record<string, any>): string {
 // 검색 API 함수들
 export const searchApi = {
   // 자동완성
-  async getAutocomplete(keyword: string): Promise<AutocompleteResponse> {
-    const queryString = buildQueryString({ keyword })
+  async getAutocomplete(keyword: string, environmentType?: string): Promise<AutocompleteResponse> {
+    const queryString = buildQueryString({ keyword, environmentType })
     return apiFetch<AutocompleteResponse>(`/v1/search/autocomplete${queryString}`)
   },
 
@@ -186,5 +186,11 @@ export const searchApi = {
   async getRealtimeKeywords(params: { limit?: number } = {}): Promise<RealtimeKeywordsResponse> {
     const queryString = buildQueryString(params)
     return apiFetch<RealtimeKeywordsResponse>(`/v1/keywords/realtime${queryString}`)
+  },
+
+  // 자동완성 시뮬레이션
+  async getAutocompleteSimulation(keyword: string, environmentType?: string): Promise<AutocompleteResponse> {
+    const queryString = buildQueryString({ keyword, environmentType })
+    return apiFetch<AutocompleteResponse>(`/v1/search/autocomplete/simulation${queryString}`)
   }
 }

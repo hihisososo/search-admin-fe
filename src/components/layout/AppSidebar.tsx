@@ -15,16 +15,76 @@ import { ScanSearch, ChevronRight } from "lucide-react"
 import { MENU_ITEMS } from "@/constants/menu"
 import { useState } from "react"
 import { useLocation, Link } from "react-router-dom"
+import type { MenuItem as MenuItemType, SubMenuItem } from "@/constants/menu"
+
+interface MenuItemProps {
+  item: MenuItemType
+  isExpanded: boolean
+  onToggle: () => void
+  currentPath: string
+}
+
+function MenuItem({ item, isExpanded, onToggle, currentPath }: MenuItemProps) {
+  if (!item.subItems) {
+    return (
+      <SidebarMenuButton asChild isActive={currentPath === item.path}>
+        <Link to={item.path}>
+          <item.icon />
+          <span>{item.title}</span>
+        </Link>
+      </SidebarMenuButton>
+    )
+  }
+
+  return (
+    <>
+      <SidebarMenuButton onClick={onToggle}>
+        <item.icon />
+        <span>{item.title}</span>
+        <ChevronRight
+          className={`ml-auto transition-transform duration-200 ${
+            isExpanded ? 'rotate-90' : ''
+          }`}
+        />
+      </SidebarMenuButton>
+      {isExpanded && (
+        <SubMenuItems subItems={item.subItems} currentPath={currentPath} />
+      )}
+    </>
+  )
+}
+
+interface SubMenuItemsProps {
+  subItems: SubMenuItem[]
+  currentPath: string
+}
+
+function SubMenuItems({ subItems, currentPath }: SubMenuItemsProps) {
+  return (
+    <SidebarMenuSub>
+      {subItems.map((subItem) => (
+        <SidebarMenuSubItem key={subItem.id}>
+          <SidebarMenuSubButton
+            asChild
+            isActive={currentPath === subItem.path}
+          >
+            <Link to={subItem.path}>
+              <span>{subItem.title}</span>
+            </Link>
+          </SidebarMenuSubButton>
+        </SidebarMenuSubItem>
+      ))}
+    </SidebarMenuSub>
+  )
+}
 
 export function AppSidebar() {
   const location = useLocation()
-  
-  // 사전관리는 항상 펼쳐둔 상태로 유지
-  const [expandedItems, setExpandedItems] = useState<string[]>(['dictionary'])
+  const [expandedItems, setExpandedItems] = useState<string[]>([])
 
   const toggleExpanded = (itemId: string) => {
-    setExpandedItems(prev => 
-      prev.includes(itemId) 
+    setExpandedItems(prev =>
+      prev.includes(itemId)
         ? prev.filter(id => id !== itemId)
         : [...prev, itemId]
     )
@@ -46,39 +106,12 @@ export function AppSidebar() {
             <SidebarMenu>
               {MENU_ITEMS.map((item) => (
                 <SidebarMenuItem key={item.id}>
-                  {item.subItems ? (
-                    <>
-                      <SidebarMenuButton onClick={() => toggleExpanded(item.id)} className="hover:cursor-pointer">
-                        <item.icon />
-                        <span>{item.title}</span>
-                        <ChevronRight className={`ml-auto transition-transform duration-200 ${isExpanded(item.id) ? 'rotate-90' : ''}`} />
-                      </SidebarMenuButton>
-                      {isExpanded(item.id) && (
-                        <SidebarMenuSub>
-                          {item.subItems.map((subItem) => (
-                            <SidebarMenuSubItem key={subItem.id}>
-                              <SidebarMenuSubButton 
-                                asChild
-                                isActive={location.pathname === subItem.path}
-                                className="hover:cursor-pointer"
-                              >
-                                <Link to={subItem.path} className="hover:cursor-pointer">
-                                  <span>{subItem.title}</span>
-                                </Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
-                      )}
-                    </>
-                  ) : (
-                    <SidebarMenuButton asChild isActive={location.pathname === item.path} className="hover:cursor-pointer">
-                      <Link to={item.path} className="hover:cursor-pointer">
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  )}
+                  <MenuItem
+                    item={item}
+                    isExpanded={isExpanded(item.id)}
+                    onToggle={() => toggleExpanded(item.id)}
+                    currentPath={location.pathname}
+                  />
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
