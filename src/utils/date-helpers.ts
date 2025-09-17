@@ -19,7 +19,7 @@ const DATE_FORMAT_OPTIONS = {
 } as const
 
 const formatDateWithOptions = (
-  dateStr: string | Date, 
+  dateStr: string | Date,
   options: Intl.DateTimeFormatOptions
 ) => {
   const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr
@@ -62,4 +62,12 @@ export const formatTimestamp = (timestamp: string) => {
 export const formatTime = (dateStr: string | Date) => {
   const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr
   return date.toLocaleTimeString(DEFAULT_LOCALE, DATE_FORMAT_OPTIONS.time)
+}
+
+export const formatDateToISO = (date: Date, isEndOfDay = false) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const time = isEndOfDay ? '23:59:59' : '00:00:00'
+  return `${year}-${month}-${day}T${time}`
 }

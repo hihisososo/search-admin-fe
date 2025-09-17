@@ -11,52 +11,68 @@ interface KeywordsTableProps {
   type?: 'popular' | 'trending'
 }
 
-const TrendIcon = memo(({ trend }: { trend: TopKeyword['trend'] }) => {
-  switch (trend) {
-    case 'up':
-      return (
-        <div className="flex items-center justify-center">
-          <TrendingUp className="h-3.5 w-3.5 text-green-600" />
-        </div>
-      )
-    case 'down':
-      return (
-        <div className="flex items-center justify-center">
-          <TrendingDown className="h-3.5 w-3.5 text-red-600" />
-        </div>
-      )
-    case 'new':
-      return (
-        <div className="flex items-center justify-center">
-          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-            NEW
-          </span>
-        </div>
-      )
-    case 'stable':
-      return (
-        <div className="flex items-center justify-center">
-          <Minus className="h-3.5 w-3.5 text-gray-400" />
-        </div>
-      )
-    default:
-      return (
-        <div className="flex items-center justify-center">
-          <span className="text-gray-400">-</span>
-        </div>
-      )
-  }
-})
+const CTR_THRESHOLDS = {
+  HIGH: 5,
+  MEDIUM: 2
+} as const
+
+const RANK_STYLES = {
+  popular: [
+    'bg-yellow-100 text-yellow-800',
+    'bg-gray-100 text-gray-800',
+    'bg-orange-100 text-orange-800'
+  ],
+  trending: 'bg-orange-100 text-orange-700 font-semibold',
+  default: 'bg-gray-50 text-gray-600'
+} as const
+
+const LEGEND_ITEMS = {
+  popular: [
+    { color: 'bg-green-500', label: '상승' },
+    { color: 'bg-red-500', label: '하락' },
+    { color: 'bg-blue-500', label: '신규' }
+  ],
+  trending: [
+    { color: 'bg-orange-500', label: '급상승' }
+  ]
+} as const
+
+const TREND_ICONS = {
+  up: <TrendingUp className="h-3.5 w-3.5 text-green-600" />,
+  down: <TrendingDown className="h-3.5 w-3.5 text-red-600" />,
+  new: <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">NEW</span>,
+  stable: <Minus className="h-3.5 w-3.5 text-gray-400" />
+} as const
+
+const TrendIcon = memo(({ trend }: { trend: TopKeyword['trend'] }) => (
+  <div className="flex items-center justify-center">
+    {TREND_ICONS[trend] || <span className="text-gray-400">-</span>}
+  </div>
+))
 
 TrendIcon.displayName = 'TrendIcon'
 
-export default memo(function KeywordsTableRefactored({ 
-  keywords, 
+export default memo(function KeywordsTableRefactored({
+  keywords,
   loading,
   title = '인기 검색 키워드 TOP 10',
   type = 'popular'
 }: KeywordsTableProps) {
-  
+
+  const getRankStyle = (index: number): string => {
+    if (type === 'popular') {
+      return index < 3 ? RANK_STYLES.popular[index] : RANK_STYLES.default
+    }
+    return index < 3 ? RANK_STYLES.trending : RANK_STYLES.default
+  }
+
+  const getCTRColor = (ctr: string): string => {
+    const value = parseFloat(ctr)
+    if (value > CTR_THRESHOLDS.HIGH) return 'text-green-600'
+    if (value > CTR_THRESHOLDS.MEDIUM) return 'text-yellow-600'
+    return 'text-gray-500'
+  }
+
   const columns: Column<TopKeyword>[] = [
     {
       key: 'rank',
@@ -66,17 +82,7 @@ export default memo(function KeywordsTableRefactored({
       render: (item) => {
         const index = keywords.indexOf(item)
         return (
-          <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs ${
-            type === 'popular' ? (
-              index === 0 ? 'bg-yellow-100 text-yellow-800' :
-              index === 1 ? 'bg-gray-100 text-gray-800' :
-              index === 2 ? 'bg-orange-100 text-orange-800' :
-              'bg-gray-50 text-gray-600'
-            ) : (
-              index < 3 ? 'bg-orange-100 text-orange-700 font-semibold' :
-              'bg-gray-50 text-gray-600'
-            )
-          }`}>
+          <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs ${getRankStyle(index)}`}>
             {index + 1}
           </span>
         )
@@ -87,11 +93,9 @@ export default memo(function KeywordsTableRefactored({
       label: '키워드',
       align: 'left',
       render: (item) => (
-        <div className="flex items-center gap-2">
-          <span className="truncate max-w-[200px] font-medium" title={item.keyword}>
-            {item.keyword}
-          </span>
-        </div>
+        <span className="truncate max-w-[200px] font-medium" title={item.keyword}>
+          {item.keyword}
+        </span>
       )
     },
     {
@@ -117,11 +121,7 @@ export default memo(function KeywordsTableRefactored({
       label: 'CTR',
       align: 'center',
       render: (item) => (
-        <span className={`font-medium ${
-          parseFloat(item.ctr) > 5 ? 'text-green-600' : 
-          parseFloat(item.ctr) > 2 ? 'text-yellow-600' : 
-          'text-gray-500'
-        }`}>
+        <span className={`font-medium ${getCTRColor(item.ctr)}`}>
           {item.ctr}
         </span>
       )
@@ -141,29 +141,12 @@ export default memo(function KeywordsTableRefactored({
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold">{title}</CardTitle>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            {type === 'popular' ? (
-              <>
-                <div className="flex items-center gap-1">
-                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  <span>상승</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-                  <span>하락</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                  <span>신규</span>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex items-center gap-1">
-                  <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
-                  <span>급상승</span>
-                </div>
-              </>
-            )}
+            {LEGEND_ITEMS[type].map(({ color, label }) => (
+              <div key={label} className="flex items-center gap-1">
+                <span className={`w-2 h-2 ${color} rounded-full`} />
+                <span>{label}</span>
+              </div>
+            ))}
           </div>
         </div>
       </CardHeader>
