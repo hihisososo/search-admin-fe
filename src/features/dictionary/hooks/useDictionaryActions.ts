@@ -84,11 +84,11 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         type === 'unit' ? unitDictionaryService :
         typoCorrectionDictionaryService
 
-      // 오타교정은 분리된 필드로 전송(typoWord/correctWord)
+      // 오타교정은 분리된 필드로 전송(keyword/correctedWord)
       const payload = type === 'typo'
         ? {
-            typoWord: String((editingState.newItem as T).keyword || '').trim(),
-            correctWord: String((editingState.newItem as T & {correctedWord?: string}).correctedWord || '').trim(),
+            keyword: String((editingState.newItem as T).keyword || '').trim(),
+            correctedWord: String((editingState.newItem as T & {correctedWord?: string}).correctedWord || '').trim(),
             description: (editingState.newItem as T & {description?: string}).description,
           }
         : editingState.newItem
@@ -154,14 +154,17 @@ export function useDictionaryActions<T extends BaseDictionaryItem>({
         type === 'unit' ? unitDictionaryService :
         typoCorrectionDictionaryService
 
-      // 오타교정은 분리된 필드로 전송(typoWord/correctWord)
+      // 오타교정은 분리된 필드로 전송(keyword/correctedWord)
       const payload = type === 'typo'
         ? {
-            typoWord: String((editingState.editingItem as T).keyword || (item as T).keyword || '').trim(),
-            correctWord: String((editingState.editingItem as T & {correctedWord?: string}).correctedWord || (item as T & {correctedWord?: string}).correctedWord || '').trim(),
+            keyword: String((editingState.editingItem as T).keyword || (item as T).keyword || '').trim(),
+            correctedWord: String((editingState.editingItem as T & {correctedWord?: string}).correctedWord || (item as T & {correctedWord?: string}).correctedWord || '').trim(),
             description: (editingState.editingItem as T & {description?: string}).description,
           }
-        : editingState.editingItem
+        : {
+            keyword: (editingState.editingItem as T).keyword,
+            description: (editingState.editingItem as T & {description?: string}).description
+          }
 
       await (service.update as (id: number, payload: any, env: any) => Promise<any>)(item.id, payload, environment)
       
