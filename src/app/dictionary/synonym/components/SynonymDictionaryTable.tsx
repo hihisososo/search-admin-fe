@@ -101,8 +101,8 @@ export function SynonymDictionaryTable({
         if (isNew || isEditing) return undefined
         return formatKeywordDisplay(item.keyword)
       }}
-      emptyMessage="?�의???�전???�록??규칙???�습?�다."
-      keywordPlaceholder="?�의??규칙???�력?�세??(?? ?��???=> ?�드??모바???�마?�폰)"
+      emptyMessage="동의어 사전에 등록된 규칙이 없습니다."
+      keywordPlaceholder="동의어 규칙을 입력하세요 (예: 스마트폰 => 핸드폰,모바일,스마트폰)"
     />
   )
 }

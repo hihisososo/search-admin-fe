@@ -22,13 +22,13 @@ export function CategoryRankingDictionaryPage() {
   const [editingItem, setEditingItem] = useState<CategoryRankingDictionaryListItem | null>(null)
   const [isMappingDialogOpen, setIsMappingDialogOpen] = useState(false)
   const { toast } = useToast()
-  
-  // 카테고리??��?� ?�시�?반영???�으므�?모든 ?�경?�서 ?�집 가??
+
+  // 카테고리 랭킹은 실시간 반영이 있으므로 모든 환경에서 편집 가능
   const canEdit = true
-  
+
   // Config for DictionaryHeader
   const config = {
-    name: '카테고리??��',
+    name: '카테고리 랭킹',
     apiPath: '/category-rankings',
     theme: {
       color: 'indigo',
@@ -39,7 +39,7 @@ export function CategoryRankingDictionaryPage() {
     }
   }
 
-  // ?�이??조회
+  // 데이터 조회
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['category-ranking', page, pageSize, search, environment],
     queryFn: () => categoryRankingService.getList({
@@ -49,34 +49,34 @@ export function CategoryRankingDictionaryPage() {
       environment
     })
   })
-  
+
   const totalPages = useMemo(() => {
     if (!data || data.totalElements <= 0) return 0
     return Math.ceil(data.totalElements / pageSize)
   }, [data, pageSize])
 
-  // ??�� mutation
+  // 삭제 mutation
   const deleteMutation = useMutation({
     mutationFn: (id: number) => categoryRankingService.delete(id, environment),
     onSuccess: () => {
-      toast({ title: '??�� ?�료', description: '??��????��?�었?�니??' })
+      toast({ title: '삭제 완료', description: '삭제가 완료되었습니다.' })
       refetch()
       setSelectedItems([])
     },
     onError: (error: any) => {
-      toast({ 
-        title: '??�� ?�패', 
-        description: error.message || '??�� �??�류가 발생?�습?�다.',
+      toast({
+        title: '삭제 실패',
+        description: error.message || '삭제 중 오류가 발생했습니다.',
         variant: 'destructive'
       })
     }
   })
 
-  // ?�괄 ??��
+  // 일괄 삭제
   const handleDeleteSelected = async () => {
     if (selectedItems.length === 0) return
-    
-    if (!confirm(`?�택??${selectedItems.length}�???��????��?�시겠습?�까?`)) {
+
+    if (!confirm(`선택한 ${selectedItems.length}개 항목을 삭제하시겠습니까?`)) {
       return
     }
 
@@ -85,60 +85,60 @@ export function CategoryRankingDictionaryPage() {
         await deleteMutation.mutateAsync(id)
       }
     } catch (_error) {
-      // 개별 ?�러??mutation?�서 처리
+      // 개별 에러는 mutation에서 처리
     }
   }
 
-  // ?�시�??�기??
+  // 실시간 동기화
   const syncMutation = useMutation({
     mutationFn: () => categoryRankingService.realtimeSync(environment),
     onSuccess: () => {
-      toast({ 
-        title: '?�기???�료', 
-        description: '변경사??�� ?�시간으�?반영?�었?�니??' 
+      toast({
+        title: '동기화 완료',
+        description: '변경사항이 실시간으로 반영되었습니다.'
       })
     },
     onError: (error: any) => {
-      toast({ 
-        title: '?�기???�패', 
-        description: error.message || '?�기??�??�류가 발생?�습?�다.',
+      toast({
+        title: '동기화 실패',
+        description: error.message || '동기화 중 오류가 발생했습니다.',
         variant: 'destructive'
       })
     }
   })
 
-  // 카테고리 매핑 ?�집
+  // 카테고리 매핑 편집
   const handleEditMapping = (item: CategoryRankingDictionaryListItem) => {
     setEditingItem(item)
     setIsMappingDialogOpen(true)
   }
 
-  // ???�워??추�?
+  // 새 키워드 추가
   const handleAddNew = () => {
     setEditingItem(null)
     setIsMappingDialogOpen(true)
   }
 
-  // 매핑 ?�????처리
+  // 매핑 저장 처리
   const handleMappingSaved = () => {
     refetch()
     setIsMappingDialogOpen(false)
     setEditingItem(null)
   }
 
-  // ?�시�?반영
+  // 실시간 반영
   const handleApplyChanges = () => {
-    // ?�재 ?�경?�서???�시�?반영 불�?
+    // 현재 환경에서는 실시간 반영 불가
     if (environment === 'CURRENT') {
       toast({
-        title: '?�시�?반영 불�?',
-        description: '?�재 ?�경?�서???�시�?반영???????�습?�다. 개발 ?�는 ?�영 ?�경???�택?�주?�요.',
+        title: '실시간 반영 불가',
+        description: '현재 환경에서는 실시간 반영할 수 없습니다. 개발 또는 운영 환경을 선택해주세요.',
         variant: 'destructive'
       })
       return
     }
 
-    if (!confirm('변경사??�� ?�시간으�?반영?�시겠습?�까?')) {
+    if (!confirm('변경사항을 실시간으로 반영하시겠습니까?')) {
       return
     }
 
@@ -147,7 +147,7 @@ export function CategoryRankingDictionaryPage() {
 
   return (
     <div className="p-6 space-y-4">
-      {/* ?�더 - 기존 ?�전�??�일??DictionaryHeader ?�용 */}
+      {/* 헤더 - 기존 사전과 동일한 DictionaryHeader 사용 */}
       <DictionaryHeader
         config={config as any}
         canEdit={canEdit}
@@ -159,14 +159,14 @@ export function CategoryRankingDictionaryPage() {
         onApplyChanges={handleApplyChanges}
       />
 
-      {/* 검???�바 - 기존 ?�전�??�일??DataTableToolbar ?�용 */}
+      {/* 검색 툴바 - 기존 사전과 동일한 DataTableToolbar 사용 */}
       <DataTableToolbar
         showSearch
         searchValue={searchInput}
         onSearchChange={setSearchInput}
         onSearch={() => {
           setSearch(searchInput)
-          setPage(0)  // 검????�??�이지�??�동
+          setPage(0)  // 검색 시 첫 페이지로 이동
         }}
         totalCount={data?.totalElements || 0}
         currentPage={page}
@@ -175,7 +175,7 @@ export function CategoryRankingDictionaryPage() {
         onPageSizeChange={(ps) => { setPageSize(ps); setPage(0) }}
       />
 
-      {/* ?�이�?*/}
+      {/* 테이블 */}
       <CategoryRankingTable
         items={data?.content || []}
         loading={isLoading}
@@ -186,7 +186,7 @@ export function CategoryRankingDictionaryPage() {
         environment={environment}
       />
 
-      {/* ?�이지?�이??- 기존 ?�전�??�일??PaginationControls ?�용 */}
+      {/* 페이지네이션 - 기존 사전과 동일한 PaginationControls 사용 */}
       {totalPages > 1 && (
         <div className="mt-2">
           <PaginationControls
@@ -212,7 +212,7 @@ export function CategoryRankingDictionaryPage() {
         </div>
       )}
 
-      {/* 카테고리 매핑 ?�이?�로�?*/}
+      {/* 카테고리 매핑 다이얼로그 */}
       <CategoryMappingDialog
         open={isMappingDialogOpen}
         onOpenChange={setIsMappingDialogOpen}

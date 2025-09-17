@@ -118,7 +118,7 @@ export function TypoCorrectionDictionaryTable({
                   onEditingKeywordChange(e.target.value)
                 }
               }}
-              placeholder="?��? ?�어�??�력?�세??(?? ?�송)"
+              placeholder="오타 단어를 입력하세요 (예: 삼송)"
               className={`h-8 ${!isValid && currentValue ? 'border-red-500' : ''}`}
               autoFocus
             />
@@ -149,7 +149,7 @@ export function TypoCorrectionDictionaryTable({
                   onEditingCorrectedWordChange(e.target.value)
                 }
               }}
-              placeholder="교정?��? ?�력?�세??(?? ?�성)"
+              placeholder="교정 단어를 입력하세요 (예: 삼성)"
               className={`h-8 ${!isValid && currentValue ? 'border-red-500' : ''}`}
             />
           )
