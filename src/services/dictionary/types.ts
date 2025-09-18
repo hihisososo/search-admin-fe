@@ -65,8 +65,6 @@ export type DictionaryPageResponse<T> = PageResponse<T>
 // 사전 검색 파라미터
 export interface DictionarySearchParams extends SearchParams {
   environment?: Environment
-  sortBy?: 'keyword' | 'createdAt' | 'updatedAt'
-  sortDir?: 'asc' | 'desc'
   [key: string]: string | number | boolean | undefined
 }
 

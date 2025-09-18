@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api'
-import type { DictionaryEnvironmentType } from '@/types/dashboard'
+import { Environment as DictionaryEnvironmentType } from '@/services/common/types'
 
 // 타입 정의
 export interface CategoryMapping {
@@ -41,8 +41,7 @@ export interface PageRequest {
   page?: number
   size?: number
   search?: string
-  sortBy?: 'keyword' | 'createdAt' | 'updatedAt'
-  sortDir?: 'asc' | 'desc'
+  sort?: string  // Spring Data format: "field,direction"
   environment: DictionaryEnvironmentType
 }
 
@@ -73,14 +72,13 @@ class CategoryRankingService {
 
   // 목록 조회
   async getList(params: PageRequest): Promise<PageResponse<CategoryRankingDictionaryListItem>> {
-    const { page = 0, size = 20, search, sortBy = 'updatedAt', sortDir = 'desc', environment } = params
-    
+    const { page = 0, size = 20, search, sort = 'updatedAt,desc', environment } = params
+
     return apiClient.get(this.baseUrl, {
       page,
       size,
       search,
-      sortBy,
-      sortDir,
+      sort,
       environment
     })
   }

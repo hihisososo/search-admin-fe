@@ -45,8 +45,7 @@ export interface SearchLogParams extends SearchParams, DateRangeParams {
   maxResponseTime?: number
   minResultCount?: number
   maxResultCount?: number
-  sort?: SearchLogSortField
-  order?: SearchLogSortDirection
+  // sort 필드는 SearchParams에서 상속받음 (string 타입)
   searchSessionId?: string
 }
 

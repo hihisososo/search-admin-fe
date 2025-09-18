@@ -21,8 +21,7 @@ export interface PageResponse<T> {
 export interface PageParams {
   page?: number
   size?: number
-  sort?: string
-  order?: 'asc' | 'desc'
+  sort?: string  // Spring Data format: "field,direction" (e.g., "updatedAt,desc")
   [key: string]: string | number | boolean | undefined
 }
 

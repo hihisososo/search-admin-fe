@@ -27,12 +27,11 @@ class EvaluationService {
   
   // 쿼리 리스트 조회 (왼쪽 패널)
   async getQueries(params: PageParams = {}): Promise<EvaluationQueryListResponse> {
-    // 백엔드 API 파라미터 매핑
+    // 백엔드 API 파라미터 매핑 (Spring Data Pageable 형식)
     const apiParams: Record<string, any> = {
       page: params.page,
       size: params.size,
-      sortBy: params.sort, // sort -> sortBy
-      sortDirection: params.order?.toUpperCase() || 'DESC', // order -> sortDirection (대문자로)
+      sort: params.sort, // Spring Data format: "field,direction"
       query: params.query // 검색어 추가
     }
     
@@ -71,8 +70,7 @@ class EvaluationService {
     const apiParams: Record<string, any> = {
       page: params.page,
       size: params.size,
-      sortBy: params.sort, // sort -> sortBy
-      sortDirection: params.order?.toUpperCase() || 'DESC' // order -> sortDirection (대문자로)
+      sort: params.sort || 'relevanceScore,desc' // Spring Data format with default
     }
     
     const cleanedParams = Object.entries(apiParams).reduce((acc, [key, value]) => {
