@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useTaskStatus, useRunningTasks } from './use-evaluation'
+import { useTask as useTaskStatus, useRunningTasks } from './use-task'
 
 interface AsyncTaskHookOptions {
   onComplete?: (result?: string) => void
