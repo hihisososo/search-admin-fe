@@ -6,7 +6,7 @@ export const EVALUATION_CONFIG = {
 
 export const TASK_TYPE_LABELS = {
   QUERY_GENERATION: '쿼리 생성',
-  CANDIDATE_GENERATION: '후보군 생성', 
+  CANDIDATE_GENERATION: '후보군 생성',
   LLM_EVALUATION: 'LLM 평가',
   EVALUATION_EXECUTION: '평가 실행'
 } as const
@@ -16,4 +16,4 @@ export const TASK_STATUS_LABELS = {
   IN_PROGRESS: '진행중',
   COMPLETED: '완료',
   FAILED: '실패'
-} as const 
+} as const

@@ -1,5 +1,5 @@
 import type { TooltipProps } from 'recharts'
-import { formatDate } from './chart-utils'
+import { formatChartDate } from '@/utils/chart-helpers'
 
 interface CustomTooltipProps extends TooltipProps<number, string> {
   active?: boolean
@@ -16,7 +16,7 @@ export const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) =>
 
   return (
     <div className="bg-white p-2 border border-gray-200 rounded shadow-sm text-xs">
-      <p className="font-medium text-gray-700 mb-1">{label && formatDate(label)}</p>
+      <p className="font-medium text-gray-700 mb-1">{label && formatChartDate(label)}</p>
       {payload.map((entry, index) => (
         <p key={index} className="text-gray-600" style={{ color: entry.color }}>
           {entry.name}: {

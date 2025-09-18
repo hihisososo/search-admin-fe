@@ -4,16 +4,22 @@ import { useDashboardData } from '@/hooks/use-dashboard'
 import { formatDateToISO } from '@/utils/date-helpers'
 import type { DashboardApiParams } from '@/services'
 import { useDashboardTransformers } from './hooks/use-dashboard-transformers'
-import { DASHBOARD_CONSTANTS } from './constants'
 import DashboardHeader from './components/DashboardHeader'
 import StatsCards from './components/StatsCards'
 import ResponseTimeChart from './components/ResponseTimeChart'
 import SearchVolumeChart from './components/SearchVolumeChart'
 import KeywordsTable from './components/KeywordsTable'
 
+const getDefaultDateRange = () => {
+  const today = new Date()
+  const start = new Date(today)
+  start.setDate(today.getDate() - 6)
+  return { from: start, to: today }
+}
+
 export default function DashboardPage() {
   const [dateRange, setDateRange] = useState<DateRange>(
-    DASHBOARD_CONSTANTS.getDefaultDateRange()
+    getDefaultDateRange()
   )
 
   const apiParams = useMemo((): DashboardApiParams => {

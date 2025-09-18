@@ -1,4 +1,4 @@
-import { useDictionaryData } from '@/features/dictionary/hooks/useDictionaryData'
+import { useDictionaryData } from '@/app/dictionary/common/hooks/useDictionaryData'
 import type { 
   DictionaryItem, 
   DictionarySortField, 
@@ -7,7 +7,7 @@ import type {
   DictionaryPageResponse 
 } from '@/types/dashboard'
 import type { TypoCorrectionDictionaryItem } from '@/services/dictionary/types'
-import type { DictionaryType } from '@/features/dictionary/types/dictionary.types'
+import type { DictionaryType } from '@/app/dictionary/common/types/dictionary.types'
 
 interface UseDictionaryParams {
   type: DictionaryType

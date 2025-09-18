@@ -11,7 +11,7 @@ import {
   Line,
 } from 'recharts'
 import type { SearchVolumeChartData } from '@/services/dashboard/types'
-import { formatDate } from './chart-utils'
+import { formatChartDate } from '@/utils/chart-helpers'
 import { CustomTooltip } from './ChartTooltip'
 
 interface SearchVolumeChartProps {
@@ -58,7 +58,7 @@ export default function SearchVolumeChart({ data, loading }: SearchVolumeChartPr
                     tickLine={false}
                     axisLine={false}
                     fontSize={11}
-                    tickFormatter={formatDate}
+                    tickFormatter={formatChartDate}
                   />
                   <YAxis
                     tickLine={false}

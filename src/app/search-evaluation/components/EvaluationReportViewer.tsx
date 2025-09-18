@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { ChevronDown, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
-import { EVALUATION_CONFIG } from "@/constants/evaluation"
+import { EVALUATION_CONFIG } from "../constants"
 import { PaginationControls } from "./PaginationControls"
 import type { EvaluationReport } from "@/services/evaluation/types"
 

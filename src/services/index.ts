@@ -16,7 +16,9 @@ export {
   type TrendingKeywordsResponse,
   type KeywordItem,
   type StatItem,
-  type DashboardApiParams
+  type DashboardApiParams,
+  type ResponseTimeChartData,
+  type SearchVolumeChartData
 } from './dashboard/types'
 export { dashboardService } from './dashboard/api'
 

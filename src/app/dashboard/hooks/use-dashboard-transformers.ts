@@ -8,16 +8,7 @@ import type {
   ResponseTimeChartData,
   SearchVolumeChartData,
 } from '@/services'
-import { DASHBOARD_CONSTANTS } from '../constants'
-
-export interface TopKeyword {
-  keyword: string
-  searches: number
-  ctr: string
-  trend: 'up' | 'down' | 'stable' | 'new'
-  percentage?: number
-  rank?: number
-}
+import type { TopKeyword } from '../components/KeywordsTable'
 
 export function useDashboardTransformers() {
   const convertStatsToStatItems = useCallback((dashboardStats: DashboardStats | null | undefined): StatItem[] => {
@@ -52,17 +43,15 @@ export function useDashboardTransformers() {
       return { responseTimeData: [], searchVolumeData: [] }
     }
 
-    // 응답시간 데이터
     const responseTimeData: ResponseTimeChartData[] = trendsData.responseTimeData.map((item) => ({
       date: item.timestamp,
       responseTime: item.averageResponseTime,
     }))
 
-    // 검색량 데이터 (백엔드 제공 필드 반영: searchCount, errorCount)
     const searchVolumeData: SearchVolumeChartData[] = trendsData.searchVolumeData.map((item) => {
       const total = Number(item.searchCount) || 0
-      const errorCount = Number(item.errorCount) || 0
-      const success = Math.max(total - errorCount, 0)
+      const errorCount = 0
+      const success = total
       return {
         date: item.timestamp,
         searches: total,
@@ -110,31 +99,10 @@ export function useDashboardTransformers() {
     []
   )
 
-  const mergeKeywords = useCallback(
-    (popularKeywords: PopularKeywordItem[] | null | undefined, trendingKeywords: TrendingKeywordItem[] | null | undefined): TopKeyword[] => {
-      const popular = convertPopularKeywordsToTableData(popularKeywords || [])
-      const trending = convertTrendingKeywordsToTableData(trendingKeywords || [])
-
-      const keywordMap = new Map<string, TopKeyword>()
-      
-      popular.forEach((item) => keywordMap.set(item.keyword, item))
-      trending.forEach((item) => {
-        if (!keywordMap.has(item.keyword)) {
-          keywordMap.set(item.keyword, item)
-        }
-      })
-
-      return Array.from(keywordMap.values())
-        .slice(0, DASHBOARD_CONSTANTS.MAX_KEYWORDS_DISPLAY)
-    },
-    [convertPopularKeywordsToTableData, convertTrendingKeywordsToTableData]
-  )
-
   return {
     convertStatsToStatItems,
     convertTrendsToChartData,
     convertPopularKeywordsToTableData,
     convertTrendingKeywordsToTableData,
-    mergeKeywords,
   }
 }

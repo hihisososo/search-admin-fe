@@ -1,5 +1,5 @@
 import { useRunningTasks } from "@/hooks/use-evaluation"
-import { TASK_STATUS_LABELS, TASK_TYPE_LABELS } from "@/constants/evaluation"
+import { TASK_STATUS_LABELS, TASK_TYPE_LABELS } from "../constants"
 
 interface RunningTasksIndicatorProps {
   className?: string

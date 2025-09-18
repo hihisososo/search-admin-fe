@@ -1,8 +1,23 @@
 import { memo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { BaseTable, type Column } from '@/components/common/tables'
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
-import type { TopKeyword } from '../hooks/use-dashboard-transformers'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+
+export interface TopKeyword {
+  keyword: string
+  searches: number
+  ctr: string
+  trend: 'up' | 'down' | 'stable' | 'new'
+  percentage?: number
+  rank?: number
+}
 
 interface KeywordsTableProps {
   keywords: TopKeyword[]
@@ -73,67 +88,7 @@ export default memo(function KeywordsTableRefactored({
     return 'text-gray-500'
   }
 
-  const columns: Column<TopKeyword>[] = [
-    {
-      key: 'rank',
-      label: '순위',
-      width: 'w-12',
-      align: 'center',
-      render: (item) => {
-        const index = keywords.indexOf(item)
-        return (
-          <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs ${getRankStyle(index)}`}>
-            {index + 1}
-          </span>
-        )
-      }
-    },
-    {
-      key: 'keyword',
-      label: '키워드',
-      align: 'left',
-      render: (item) => (
-        <span className="truncate max-w-[200px] font-medium" title={item.keyword}>
-          {item.keyword}
-        </span>
-      )
-    },
-    {
-      key: 'searches',
-      label: '검색량',
-      align: 'center',
-      render: (item) => (
-        <span className="font-medium">{item.searches.toLocaleString()}</span>
-      )
-    },
-    {
-      key: 'percentage',
-      label: '비율',
-      align: 'center',
-      render: (item) => (
-        <span className="text-muted-foreground">
-          {item.percentage ? `${item.percentage.toFixed(1)}%` : '-'}
-        </span>
-      )
-    },
-    {
-      key: 'ctr',
-      label: 'CTR',
-      align: 'center',
-      render: (item) => (
-        <span className={`font-medium ${getCTRColor(item.ctr)}`}>
-          {item.ctr}
-        </span>
-      )
-    },
-    {
-      key: 'trend',
-      label: '추세',
-      width: 'w-16',
-      align: 'center',
-      render: (item) => <TrendIcon trend={item.trend} />
-    }
-  ]
+  const displayKeywords = keywords.slice(0, 10)
 
   return (
     <Card>
@@ -151,13 +106,74 @@ export default memo(function KeywordsTableRefactored({
         </div>
       </CardHeader>
       <CardContent>
-        <BaseTable
-          columns={columns}
-          data={keywords.slice(0, 10)}
-          loading={loading}
-          emptyMessage="데이터 없음"
-          keyExtractor={(item) => item.keyword}
-        />
+        {loading ? (
+          <div className="flex items-center justify-center p-8">
+            <div className="text-gray-500">로딩 중...</div>
+          </div>
+        ) : displayKeywords.length === 0 ? (
+          <div className="flex items-center justify-center p-8">
+            <div className="text-gray-500">데이터 없음</div>
+          </div>
+        ) : (
+          <div className="border rounded-lg overflow-x-auto">
+            <Table className="min-w-full">
+              <TableHeader>
+                <TableRow className="bg-gray-50 hover:bg-gray-50">
+                  <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-12">
+                    순위
+                  </TableHead>
+                  <TableHead className="py-2 text-xs font-semibold text-gray-700 text-left">
+                    키워드
+                  </TableHead>
+                  <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center">
+                    검색량
+                  </TableHead>
+                  <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center">
+                    비율
+                  </TableHead>
+                  <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center">
+                    CTR
+                  </TableHead>
+                  <TableHead className="py-2 text-xs font-semibold text-gray-700 text-center w-16">
+                    추세
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {displayKeywords.map((item, index) => (
+                  <TableRow key={item.keyword} className="hover:bg-gray-50 transition-colors">
+                    <TableCell className="py-2 px-3 text-xs text-center">
+                      <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs ${getRankStyle(index)}`}>
+                        {index + 1}
+                      </span>
+                    </TableCell>
+                    <TableCell className="py-2 px-3 text-xs text-left">
+                      <span className="truncate max-w-[200px] font-medium" title={item.keyword}>
+                        {item.keyword}
+                      </span>
+                    </TableCell>
+                    <TableCell className="py-2 px-3 text-xs text-center">
+                      <span className="font-medium">{item.searches.toLocaleString()}</span>
+                    </TableCell>
+                    <TableCell className="py-2 px-3 text-xs text-center">
+                      <span className="text-muted-foreground">
+                        {item.percentage ? `${item.percentage.toFixed(1)}%` : '-'}
+                      </span>
+                    </TableCell>
+                    <TableCell className="py-2 px-3 text-xs text-center">
+                      <span className={`font-medium ${getCTRColor(item.ctr)}`}>
+                        {item.ctr}
+                      </span>
+                    </TableCell>
+                    <TableCell className="py-2 px-3 text-xs text-center">
+                      <TrendIcon trend={item.trend} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </CardContent>
     </Card>
   )

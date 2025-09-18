@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { evaluationService, taskService } from '@/services'
-import { EVALUATION_CONFIG } from '@/constants/evaluation'
+import { EVALUATION_CONFIG } from '@/app/search-evaluation/constants'
 import type { PageParams } from '@/services'
 import type {
   CreateQueryRequest,

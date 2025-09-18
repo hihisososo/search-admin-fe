@@ -11,7 +11,7 @@ import {
   Line,
 } from 'recharts'
 import type { ResponseTimeChartData } from '@/services/dashboard/types'
-import { formatDate } from './chart-utils'
+import { formatChartDate } from '@/utils/chart-helpers'
 import { CustomTooltip } from './ChartTooltip'
 
 interface ResponseTimeChartProps {
@@ -57,7 +57,7 @@ export default function ResponseTimeChart({ data, loading }: ResponseTimeChartPr
                     tickLine={false}
                     axisLine={false}
                     fontSize={11}
-                    tickFormatter={formatDate}
+                    tickFormatter={formatChartDate}
                   />
                   <YAxis
                     tickLine={false}

@@ -5,6 +5,8 @@ export type {
   StatItem,
   DashboardStats,
   KeywordItem,
+  PopularKeywordItem,
+  TrendingKeywordItem,
   PopularKeywordsResponse,
   TrendingKeywordsResponse,
   TrendDataPoint,
@@ -40,7 +42,7 @@ export const ENVIRONMENT_LABELS = {
     label: '운영',
     color: 'bg-gray-800'
   }
-} as const 
+} as const
 
 // 🔄 DEPRECATED: 검색 로그 타입들도 @/services로 이전되었습니다.
 export type {
@@ -49,4 +51,4 @@ export type {
   SearchLogParams,
   SearchLogSortField,
   SearchLogSortDirection
-} from '@/services/search-logs/types' 
+} from '@/services/search-logs/types'
