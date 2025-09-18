@@ -131,6 +131,19 @@ export interface StatItem {
   value: number | string
 }
 
+// 차트 데이터 타입 정의
+export interface ResponseTimeChartData {
+  date: string
+  responseTime: number
+}
+
+export interface SearchVolumeChartData {
+  date: string
+  searches: number
+  successfulSearches: number
+  failedSearches: number
+}
+
 // 이전 버전과의 호환성을 위한 타입 (deprecated)
 export interface KeywordItem {
   keyword: string

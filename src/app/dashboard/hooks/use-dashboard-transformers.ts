@@ -5,6 +5,8 @@ import type {
   PopularKeywordItem,
   TrendingKeywordItem,
   StatItem,
+  ResponseTimeChartData,
+  SearchVolumeChartData,
 } from '@/services'
 import { DASHBOARD_CONSTANTS } from '../constants'
 
@@ -45,19 +47,19 @@ export function useDashboardTransformers() {
     ]
   }, [])
 
-  const convertTrendsToChartData = useCallback((trendsData: TrendsResponse | null | undefined) => {
+  const convertTrendsToChartData = useCallback((trendsData: TrendsResponse | null | undefined): { responseTimeData: ResponseTimeChartData[]; searchVolumeData: SearchVolumeChartData[] } => {
     if (!trendsData || !trendsData.searchVolumeData || !trendsData.responseTimeData) {
       return { responseTimeData: [], searchVolumeData: [] }
     }
 
     // 응답시간 데이터
-    const responseTimeData = trendsData.responseTimeData.map((item: any) => ({
+    const responseTimeData: ResponseTimeChartData[] = trendsData.responseTimeData.map((item) => ({
       date: item.timestamp,
       responseTime: item.averageResponseTime,
     }))
 
     // 검색량 데이터 (백엔드 제공 필드 반영: searchCount, errorCount)
-    const searchVolumeData = trendsData.searchVolumeData.map((item: any) => {
+    const searchVolumeData: SearchVolumeChartData[] = trendsData.searchVolumeData.map((item) => {
       const total = Number(item.searchCount) || 0
       const errorCount = Number(item.errorCount) || 0
       const success = Math.max(total - errorCount, 0)

@@ -7,7 +7,8 @@ import { useDashboardTransformers } from './hooks/use-dashboard-transformers'
 import { DASHBOARD_CONSTANTS } from './constants'
 import DashboardHeader from './components/DashboardHeader'
 import StatsCards from './components/StatsCards'
-import AnalyticsCharts from './components/AnalyticsCharts'
+import ResponseTimeChart from './components/ResponseTimeChart'
+import SearchVolumeChart from './components/SearchVolumeChart'
 import KeywordsTable from './components/KeywordsTable'
 
 export default function DashboardPage() {
@@ -56,11 +57,16 @@ export default function DashboardPage() {
         <StatsCards stats={stats} loading={dashboardData.isLoading} />
 
         <div className="space-y-3">
-          <AnalyticsCharts
-            responseTimeData={responseTimeData}
-            searchVolumeData={searchVolumeData}
-            loading={dashboardData.isLoading}
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <SearchVolumeChart
+              data={searchVolumeData}
+              loading={dashboardData.isLoading}
+            />
+            <ResponseTimeChart
+              data={responseTimeData}
+              loading={dashboardData.isLoading}
+            />
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <KeywordsTable
