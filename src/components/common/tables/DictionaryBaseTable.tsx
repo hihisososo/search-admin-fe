@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Edit, Trash2, Check, X } from "lucide-react"
 import { formatDate } from "@/utils/date-helpers"
-import type { DictionaryItem, DictionarySortField, DictionarySortDirection } from "@/types/dashboard"
+import type { DictionaryItem, DictionarySortField, DictionarySortDirection } from '@/services/dictionary/types'
 
 interface DictionaryBaseTableProps<T extends DictionaryItem> {
   items: T[]

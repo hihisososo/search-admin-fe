@@ -1,2 +1,2 @@
-export { PaginationControls } from '@/app/search-evaluation/components/PaginationControls'
+export { PaginationControls } from '@/pages/search-evaluation/components/PaginationControls'
 
