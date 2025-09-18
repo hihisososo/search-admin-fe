@@ -3,21 +3,21 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from "@/components/layout/Layout"
 import { LoadingSpinner } from "@/components/common"
 
-const Dashboard = lazy(() => import("@/app/dashboard/page"))
-const UserDictionary = lazy(() => import("@/app/dictionary/user/page"))
-const SynonymDictionary = lazy(() => import("@/app/dictionary/synonym/page"))
-const StopwordDictionary = lazy(() => import("@/app/dictionary/stopword/page"))
-const UnitDictionary = lazy(() => import("@/app/dictionary/unit/page"))
-const TypoCorrectionDictionary = lazy(() => import("@/app/dictionary/typo/page"))
-const CategoryRankingDictionary = lazy(() => import("@/app/dictionary/category-ranking/page"))
-const MorphemeAnalysis = lazy(() => import("@/app/dictionary/morpheme-analysis/page"))
-const SearchLogs = lazy(() => import("@/app/search-logs/page"))
-const SearchSimulator = lazy(() => import("@/app/search-simulator/page"))
-const SearchSimulatorAutocomplete = lazy(() => import("@/app/search-simulator/autocomplete/page"))
-const SearchDemo = lazy(() => import("@/app/search-demo/page"))
-const DeployManagement = lazy(() => import("@/app/deploy/page"))
-const AnswerSetManagement = lazy(() => import("@/app/search-evaluation/answer-set/page"))
-const EvaluationExecution = lazy(() => import("@/app/search-evaluation/execution/page"))
+const Dashboard = lazy(() => import("@/pages/dashboard"))
+const UserDictionary = lazy(() => import("@/pages/dictionary/user"))
+const SynonymDictionary = lazy(() => import("@/pages/dictionary/synonym"))
+const StopwordDictionary = lazy(() => import("@/pages/dictionary/stopword"))
+const UnitDictionary = lazy(() => import("@/pages/dictionary/unit"))
+const TypoCorrectionDictionary = lazy(() => import("@/pages/dictionary/typo"))
+const CategoryRankingDictionary = lazy(() => import("@/pages/dictionary/category-ranking"))
+const MorphemeAnalysis = lazy(() => import("@/pages/dictionary/morpheme-analysis"))
+const SearchLogs = lazy(() => import("@/pages/search-logs"))
+const SearchSimulator = lazy(() => import("@/pages/search-simulator"))
+const SearchSimulatorAutocomplete = lazy(() => import("@/pages/search-simulator/autocomplete"))
+const SearchDemo = lazy(() => import("@/pages/search-demo"))
+const DeployManagement = lazy(() => import("@/pages/deploy"))
+const AnswerSetManagement = lazy(() => import("@/pages/search-evaluation/answer-set"))
+const EvaluationExecution = lazy(() => import("@/pages/search-evaluation/execution"))
 
 function PageLoader() {
   return (
